@@ -1,0 +1,131 @@
+---
+import Icon from './Icon.astro';
+import LucideIcon from './LucideIcon.astro';
+
+// The WAREXX operations flow, end to end. A truck travels the line and lights each stage it reaches.
+const stages = [
+  { title: 'Supplier documents', icon: 'FileText' },
+  { title: 'Procurement', icon: 'ShoppingCart' },
+  { title: 'Receiving', icon: 'PackageCheck' },
+  { title: 'Inventory', icon: 'Boxes' },
+  { title: 'Stock movement', icon: 'ArrowLeftRight' },
+  { title: 'Warehouse & stores', icon: 'Store' },
+];
+---
+
+<section class="wx section theme-dark section--alt flip" id="warexx" data-theme="dark" aria-labelledby="wx-title">
+  <div class="wx__bg" aria-hidden="true"></div>
+  <div class="container">
+    <header class="wx__head">
+      <p class="eyebrow" data-reveal>Built by AAVORAA</p>
+      <img class="wx__logo only-dark" src="/brand/warexx-logo-light.png" alt="WAREXX by AAVORAA" width="900" height="267" loading="lazy" decoding="async" data-reveal style="--d:1" />
+      <img class="wx__logo only-light" src="/brand/warexx-logo-dark.png" alt="WAREXX by AAVORAA" width="900" height="329" loading="lazy" decoding="async" data-reveal style="--d:1" />
+      <h2 id="wx-title" data-reveal style="--d:2">From Connected Thinking to <span class="accent">Connected Operations.</span></h2>
+      <p class="lead" data-reveal style="--d:3">One platform from the supplier's document to the store shelf.</p>
+    </header>
+
+    <div class="flowline" data-reveal style="--d:2">
+      <div class="flowline__track" aria-hidden="true">
+        <span class="flowline__road"></span>
+        <span class="flowline__truck"><LucideIcon name="Truck" size={22} stroke={1.75} /></span>
+      </div>
+      <ol class="flowline__stages">
+        {
+          stages.map((s, i) => (
+            <li class="stage" style={`--i:${i}`}>
+              <span class="stage__node"><LucideIcon name={s.icon} size={22} /></span>
+              <span class="stage__n">0{i + 1}</span>
+              <span class="stage__title">{s.title}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="flowline__out" aria-hidden="true"><LucideIcon name="ChartLine" size={16} /> Operational visibility across every step</p>
+    </div>
+
+    <div class="wx__ctas" data-reveal>
+      <a class="btn" href="/warexx/" data-track="warexx" data-track-location="home_section">
+        Explore WAREXX <Icon name="arrow" class="arrow" />
+      </a>
+      <a class="btn btn--outline" href="#contact" data-entry="Software / Website / App" data-track="cta_secondary" data-track-location="warexx">
+        Discuss a Custom Software Solution
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wx { overflow: hidden; isolation: isolate; --T: 9s; /* one truck journey */ }
+  .wx__bg {
+    position: absolute; inset: 0; z-index: -1;
+    background:
+      radial-gradient(ellipse 50% 45% at 50% 20%, rgba(201, 149, 74, 0.14), transparent 70%),
+      radial-gradient(ellipse 60% 30% at 50% 100%, rgba(201, 149, 74, 0.06), transparent 70%);
+  }
+
+  /* logo leads the section — larger than the headline */
+  .wx__head { display: grid; justify-items: center; text-align: center; gap: 1.1rem; max-width: 48rem; margin: 0 auto; }
+  .wx__logo { width: clamp(260px, 32vw, 440px); height: auto; margin: 0.5rem 0 0.25rem; }
+  .wx__head h2 { font-size: clamp(1.4rem, 1.05rem + 1.2vw, 2rem); letter-spacing: -0.02em; }
+  .wx__head .lead { font-size: 0.95rem; }
+
+  /* ---------- the flow line ---------- */
+  .flowline { position: relative; margin-top: clamp(3rem, 6vw, 4.5rem); --node: 64px; }
+  .flowline__track { position: absolute; left: calc(100% / 12); right: calc(100% / 12); top: calc(var(--node) / 2); height: 0; }
+  .flowline__road {
+    position: absolute; left: 0; right: 0; top: -1px; height: 2px;
+    background: repeating-linear-gradient(90deg, rgba(201, 149, 74, 0.55) 0 10px, transparent 10px 18px);
+  }
+  .flowline__truck {
+    /* wheels sit on the road (Lucide truck wheels end ~23px down this 32px box); it passes behind each stage block */
+    position: absolute; top: -23px; left: 0; translate: -50% 0;
+    display: grid; place-items: center; width: 40px; height: 32px; color: var(--gold);
+    filter: drop-shadow(0 4px 10px rgba(201, 149, 74, 0.45));
+    animation: truck-x var(--T) linear infinite; /* linear so it stays in sync with the stages */
+  }
+  .flowline__truck::after { /* little dust trail */
+    content: ''; position: absolute; right: 78%; bottom: 8px; width: 22px; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, transparent, rgba(201, 149, 74, 0.6));
+  }
+  @keyframes truck-x {
+    0% { left: 0; opacity: 0; } 4% { opacity: 1; } 92% { opacity: 1; } 100% { left: 100%; opacity: 0; }
+  }
+
+  .flowline__stages { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.75rem; }
+  .stage { display: grid; justify-items: center; text-align: center; gap: 0.45rem; }
+  .stage__node {
+    position: relative; display: grid; place-items: center; width: var(--node); height: var(--node); border-radius: 18px;
+    color: var(--gold-ink); background: var(--node-bg); border: 1px solid rgba(201, 149, 74, 0.35);
+    box-shadow: 0 14px 30px -20px var(--shadow);
+    /* lights up as the truck arrives (truck reaches stage i at i/5 of the journey) */
+    animation: stage-lit var(--T) linear infinite; animation-delay: calc(var(--i) * var(--T) / 5.6);
+  }
+  @keyframes stage-lit {
+    0%, 12% { background: var(--gold); color: var(--black); border-color: var(--gold); box-shadow: 0 0 0 6px rgba(201, 149, 74, 0.18), 0 14px 30px -18px rgba(201, 149, 74, 0.8); }
+    22%, 100% { background: var(--node-bg); color: var(--gold-ink); border-color: rgba(201, 149, 74, 0.35); box-shadow: 0 14px 30px -20px var(--shadow); }
+  }
+  .stage__n { margin-top: 0.4rem; font-family: var(--font-head); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--gold-ink); }
+  .stage__title { font-family: var(--font-head); font-weight: 600; font-size: 0.98rem; letter-spacing: -0.01em; line-height: 1.25; }
+  .flowline__out { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 2rem; font-size: 0.85rem; color: var(--text-light-muted); }
+  .flowline__out :global(svg) { color: var(--gold-ink); }
+
+  .wx__ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+
+  /* ---------- mobile: the line runs downward ---------- */
+  @media (max-width: 760px) {
+    .flowline { --node: 54px; max-width: 360px; margin-inline: auto; }
+    .flowline__track { left: calc(var(--node) / 2); right: auto; top: calc(var(--node) / 2); bottom: calc(var(--node) / 2 + 3.5rem); height: auto; width: 0; }
+    .flowline__road { left: -1px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; background: repeating-linear-gradient(180deg, rgba(201, 149, 74, 0.55) 0 10px, transparent 10px 18px); }
+    .flowline__truck { left: 0; top: 0; translate: -50% -50%; rotate: 90deg; animation-name: truck-y; }
+    .flowline__truck::after { display: none; }
+    @keyframes truck-y { 0% { top: 0; opacity: 0; } 4% { opacity: 1; } 92% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+    .flowline__stages { grid-template-columns: 1fr; gap: 1.1rem; }
+    .stage { grid-template-columns: var(--node) auto 1fr; justify-items: start; align-items: center; text-align: left; column-gap: 1rem; }
+    .stage__n { margin: 0; }
+    .flowline__out { justify-content: flex-start; }
+    .wx__ctas .btn { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flowline__truck { display: none; }
+  }
+</style>

@@ -1,0 +1,270 @@
+---
+import Icon from './Icon.astro';
+import LucideIcon from './LucideIcon.astro';
+import { pillars } from '../data/site';
+
+/* Ribbon of fine gold lines that connects the four cards (same visual language as the hero).
+   Generated at build time; it stretches to the stage width with non-scaling strokes. */
+const RW = 1200;
+const RH = 260;
+const ribbon = Array.from({ length: 18 }, (_, i) => {
+  const off = (i / 17 - 0.5) * 70;
+  const pts: string[] = [];
+  for (let x = -20; x <= RW + 20; x += 15) {
+    const u = x / RW;
+    const twist = Math.cos(u * 7.5 + 0.6);
+    const y = RH / 2 + 34 * Math.sin(u * 6.2 + 0.4) + 12 * Math.sin(u * 13 + 1.3) + off * twist;
+    pts.push(`${x.toFixed(0)},${y.toFixed(1)}`);
+  }
+  return `M${pts.join(' L')}`;
+});
+
+/* Small wave motif per card — each pillar gets its own rhythm */
+const motifParams: Record<string, [number, number, number]> = {
+  build: [2.2, 14, 0.0],
+  brand: [3.4, 10, 1.1],
+  grow: [1.6, 18, 2.2],
+  transform: [4.6, 8, 0.6],
+};
+const motif = (key: string) => {
+  const [f, a, ph] = motifParams[key];
+  return Array.from({ length: 9 }, (_, i) => {
+    const off = (i - 4) * 4;
+    const pts: string[] = [];
+    for (let x = 0; x <= 240; x += 6) {
+      const u = x / 240;
+      const y = 50 + a * Math.sin(u * f * Math.PI + ph) + off * Math.cos(u * 4 + ph);
+      pts.push(`${x},${y.toFixed(1)}`);
+    }
+    return `M${pts.join(' L')}`;
+  });
+};
+---
+
+<section class="caps theme-dark flip" id="services" data-theme="dark" data-caps aria-labelledby="caps-title">
+  <div class="caps__light" aria-hidden="true"><span class="caps__floor"></span></div>
+
+  <div class="container">
+    <header class="caps__head">
+      <p class="eyebrow" data-reveal>Build. Transform. Grow.</p>
+      <h2 id="caps-title" data-reveal style="--d:1">What We <span class="accent">Do</span></h2>
+      <p class="lead" data-reveal style="--d:2">Four capabilities, connected by one business strategy.</p>
+    </header>
+
+    <div class="caps__stage">
+      <svg class="caps__ribbon" viewBox={`0 0 ${RW} ${RH}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="caps-rib" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stop-color="#7A4F1D" />
+            <stop offset="45%" stop-color="#C9954A" />
+            <stop offset="70%" stop-color="#E2BD84" />
+            <stop offset="100%" stop-color="#C9954A" />
+          </linearGradient>
+        </defs>
+        <g class="caps__ribbon-lines">
+          {ribbon.map((d, i) => <path d={d} pathLength="1" style={`--l:${i}`} />)}
+        </g>
+        <g class="caps__ribbon-pulses">
+          {ribbon.filter((_, i) => i % 3 === 1).map((d, i) => <path d={d} pathLength="1" style={`--l:${i}`} />)}
+        </g>
+      </svg>
+
+      <ul class="caps__grid" data-caps-grid>
+        {
+          pillars.map((p, i) => (
+            <li style={`--i:${i}`} data-caps-card>
+              <a class="cap" href={`#pillar-${p.key}`} data-track="service_card" data-track-label={p.key}>
+                <span class="cap__top">
+                  <span class="cap__tag" aria-hidden="true"><Icon name={p.key} size={18} /></span>
+                  <span class="cap__n">0{i + 1}</span>
+                </span>
+
+                <svg class="cap__motif" viewBox="0 0 240 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                  {motif(p.key).map((d, j) => <path d={d} style={`--j:${j}`} />)}
+                </svg>
+
+                <span class="cap__title">{p.label}</span>
+                <span class="cap__desc">{p.short}</span>
+                <span class="cap__list">
+                  {p.capabilities.slice(0, 3).map((c) => (
+                    <span><LucideIcon name={c.icon} size={15} />{c.name}</span>
+                  ))}
+                </span>
+                <span class="cap__more">
+                  Explore <Icon name="arrow" size={16} />
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .caps {
+    position: relative; isolation: isolate; overflow: hidden; margin-top: -1px;
+    padding-top: clamp(4rem, 8vw, 7rem); padding-bottom: clamp(7rem, 12vw, 11rem);
+    --cq: var(--cards-q, 1); /* 0..1, set by main.ts as the cards scroll in; 1 without JS */
+  }
+
+  /* glowing floor that hands over to the ivory section below */
+  .caps__light { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+  .caps__floor {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 50%;
+    background: radial-gradient(ellipse 60% 70% at 50% 100%, rgba(226, 189, 132, 0.28) 0%, rgba(201, 149, 74, 0.14) 35%, transparent 70%);
+    opacity: calc(0.2 + var(--cq) * 0.8);
+  }
+  .caps__light::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 50%;
+    background: linear-gradient(to bottom, transparent 60%, var(--black) 100%);
+  }
+
+  /* ---------- heading ---------- */
+  .caps__head { display: grid; justify-items: center; text-align: center; gap: 1.1rem; margin-bottom: clamp(3rem, 6vw, 5rem); }
+  .caps__head h2 { font-size: clamp(2.2rem, 1.4rem + 3.2vw, 4rem); }
+  .caps__head h2 .accent { display: inline; }
+  .caps__head .lead { max-width: 40rem; }
+  .caps__sub { display: block; margin-top: 0.35rem; color: var(--text-dark-faint); font-weight: 300; }
+
+  /* ---------- connecting ribbon ---------- */
+  .caps__stage { position: relative; }
+  .caps__ribbon {
+    position: absolute; left: calc(-1 * var(--gutter)); right: calc(-1 * var(--gutter)); top: 6%; height: 44%;
+    width: calc(100% + 2 * var(--gutter)); z-index: 0; overflow: visible; pointer-events: none;
+  }
+  .caps__ribbon path { fill: none; vector-effect: non-scaling-stroke; }
+  .caps__ribbon-lines path {
+    stroke: url(#caps-rib); stroke-width: 1; stroke-opacity: 0.55;
+    stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--cq));
+  }
+  .caps__ribbon-lines { filter: drop-shadow(0 0 6px rgba(201, 149, 74, 0.45)); }
+  .caps__ribbon-pulses path {
+    stroke: #fff1d6; stroke-width: 1.6; stroke-linecap: round;
+    stroke-dasharray: 0.05 0.95;
+    opacity: clamp(0, calc((var(--cq) - 0.9) * 10), 1);
+    animation: rib-pulse 6s linear infinite; animation-delay: calc(var(--l) * -1.1s);
+    filter: drop-shadow(0 0 4px rgba(255, 220, 160, 0.9));
+  }
+  @keyframes rib-pulse { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+  /* ---------- cards ---------- */
+  .caps__grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(0.75rem, 1.4vw, 1.25rem); }
+  .caps__grid li { display: flex; }
+
+  .cap {
+    position: relative; isolation: isolate; overflow: hidden;
+    display: flex; flex-direction: column; gap: 0.85rem; width: 100%;
+    min-height: 420px; padding: 1.25rem 1.35rem 1.4rem; border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(24, 20, 18, 0.62), rgba(12, 10, 10, 0.86));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px) saturate(120%); -webkit-backdrop-filter: blur(10px) saturate(120%);
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    color: var(--white);
+    transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), border-color 0.6s, box-shadow 0.8s var(--ease);
+  }
+  .cap::after { /* hairline gold edge on top, switches on with the card */
+    content: ''; position: absolute; left: 12%; right: 12%; top: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent); opacity: 0; transition: opacity 0.8s;
+  }
+
+  /* not yet reached by the ribbon (only when JS drives the sequence) */
+  :global(.js) .caps__grid li:not(.is-lit) .cap { opacity: 0.5; transform: translateY(14px); }
+
+  /* lit = the ribbon has reached this card */
+  li.is-lit .cap {
+    opacity: 1; transform: none; border-color: rgba(201, 149, 74, 0.3);
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.85), 0 0 50px -24px rgba(201, 149, 74, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  li.is-lit .cap::after { opacity: 0.7; }
+
+  .cap:hover, .cap:focus-visible {
+    transform: translateY(-14px) !important;
+    border-color: rgba(201, 149, 74, 0.6) !important;
+    box-shadow: 0 40px 70px -30px rgba(0, 0, 0, 0.9), 0 -10px 70px -20px rgba(201, 149, 74, 0.5) !important;
+  }
+  .cap:hover::after, .cap:focus-visible::after { opacity: 1; }
+
+  .cap__top { display: flex; align-items: center; justify-content: space-between; }
+  .cap__tag {
+    display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold);
+  }
+  .cap__n { font-family: var(--font-head); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.08em; color: var(--text-dark-faint); transition: color 0.6s; }
+  li.is-lit .cap__n { color: var(--gold); }
+
+  /* wave motif: dim until lit, flows on hover */
+  .cap__motif { width: 100%; height: 96px; margin: 0.6rem 0 0.4rem; overflow: visible; }
+  .cap__motif path {
+    fill: none; stroke: var(--gold); stroke-width: 1; vector-effect: non-scaling-stroke;
+    stroke-opacity: calc(0.12 + var(--j) * 0.012);
+    stroke-dasharray: 6 4; stroke-dashoffset: 0;
+    transition: stroke-opacity 0.8s var(--ease);
+  }
+  li.is-lit .cap__motif path { stroke-opacity: calc(0.32 + var(--j) * 0.03); stroke-dasharray: none; }
+  .cap:hover .cap__motif path, .cap:focus-visible .cap__motif path {
+    stroke: var(--gold-light); stroke-opacity: 0.75; stroke-dasharray: 18 6;
+    animation: motif-flow 1.6s linear infinite; animation-delay: calc(var(--j) * -0.12s);
+  }
+  @keyframes motif-flow { to { stroke-dashoffset: -48; } }
+
+  .cap__title { font-family: var(--font-head); font-weight: 600; font-size: 1.3rem; line-height: 1.2; letter-spacing: -0.015em; }
+  .cap__desc { font-size: 0.875rem; color: var(--text-dark-muted); line-height: 1.5; }
+  .cap__list { display: grid; gap: 0.35rem; font-size: 0.8125rem; color: rgba(255, 255, 255, 0.78); margin-top: auto; padding-top: 0.85rem; border-top: 1px solid var(--line-dark-soft); }
+  .cap__list span { display: flex; align-items: center; gap: 0.5rem; }
+  .cap__list :global(svg) { flex: none; color: var(--gold); }
+
+  .cap__more {
+    display: inline-flex; align-items: center; gap: 0.5rem; align-self: flex-start;
+    font-size: 0.875rem; font-weight: 500; color: var(--gold);
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; padding-bottom: 2px;
+    transition: background-size 0.5s var(--ease), color 0.3s;
+  }
+  .cap__more :global(svg) { transition: transform 0.4s var(--ease); }
+  .cap:hover .cap__more, .cap:focus-visible .cap__more { background-size: 100% 1px; color: var(--gold-light); }
+  .cap:hover .cap__more :global(svg), .cap:focus-visible .cap__more :global(svg) { transform: translateX(4px); }
+
+  @media (max-width: 1000px) {
+    .caps__grid { grid-template-columns: repeat(2, 1fr); }
+    .cap { min-height: 380px; }
+    .caps__ribbon { top: 18%; height: 30%; }
+  }
+  @media (max-width: 560px) {
+    .caps__grid { grid-template-columns: 1fr; }
+    .caps__ribbon { display: none; }
+    .cap { min-height: 0; }
+    .cap__motif { height: 70px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .caps__grid li .cap { opacity: 1; transform: none; }
+    .caps__ribbon-pulses { display: none; }
+  }
+
+  /* ---------- Light theme ---------- */
+  :global(:root[data-theme='light']) .caps__light::after { background: linear-gradient(to bottom, transparent 60%, var(--white) 100%); }
+  :global(:root[data-theme='light']) .caps__floor { background: radial-gradient(ellipse 60% 70% at 50% 100%, rgba(201, 149, 74, 0.16) 0%, rgba(201, 149, 74, 0.06) 40%, transparent 70%); }
+  :global(:root[data-theme='light']) .caps__ribbon-lines path { stroke-opacity: 0.75; }
+  :global(:root[data-theme='light']) .caps__ribbon-lines { filter: none; }
+  :global(:root[data-theme='light']) .caps__ribbon-pulses path { stroke: var(--gold-deep); filter: drop-shadow(0 0 3px rgba(201, 149, 74, 0.6)); }
+  :global(:root[data-theme='light']) .cap {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.94));
+    border-color: rgba(10, 9, 9, 0.08);
+    box-shadow: 0 30px 60px -36px rgba(10, 9, 9, 0.25), inset 0 1px 0 #fff;
+    color: var(--black);
+  }
+  :global(:root[data-theme='light']) li.is-lit .cap {
+    border-color: rgba(201, 149, 74, 0.4);
+    box-shadow: 0 30px 60px -36px rgba(10, 9, 9, 0.28), 0 0 50px -26px rgba(201, 149, 74, 0.6), inset 0 1px 0 #fff;
+  }
+  :global(:root[data-theme='light']) .cap:hover, :global(:root[data-theme='light']) .cap:focus-visible {
+    box-shadow: 0 40px 70px -34px rgba(10, 9, 9, 0.3), 0 -10px 60px -24px rgba(201, 149, 74, 0.55) !important;
+  }
+  :global(:root[data-theme='light']) .cap__tag { background: rgba(201, 149, 74, 0.08); border-color: rgba(201, 149, 74, 0.25); color: var(--gold-ink); }
+  :global(:root[data-theme='light']) li.is-lit .cap__n { color: var(--gold-ink); }
+  :global(:root[data-theme='light']) .cap:hover .cap__motif path, :global(:root[data-theme='light']) .cap:focus-visible .cap__motif path { stroke: var(--gold-deep); }
+  :global(:root[data-theme='light']) .cap__list { color: rgba(10, 9, 9, 0.78); }
+  :global(:root[data-theme='light']) .cap__more { color: var(--gold-ink); }
+  :global(:root[data-theme='light']) .cap:hover .cap__more, :global(:root[data-theme='light']) .cap:focus-visible .cap__more { color: var(--gold-deep); }
+</style>

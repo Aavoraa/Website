@@ -1,0 +1,158 @@
+---
+import Page from '../layouts/Page.astro';
+import LucideIcon from '../components/LucideIcon.astro';
+import Clients from '../components/Clients.astro';
+import PageCTA from '../components/PageCTA.astro';
+import { industries, cases } from '../data/site';
+import { industryDetail, industryKeywords } from '../data/pages';
+const caseBySlug = Object.fromEntries(cases.map((c) => [c.slug, c]));
+const withProof = industries.filter((i) => industryDetail[i.name]?.cases?.length).length;
+---
+
+<Page
+  title="Industries | AAVORAA"
+  description="AAVORAA works across retail, textile and apparel, real estate, education, healthcare, SaaS, finance, manufacturing, logistics, hospitality and more — with plans tuned to how each market buys."
+  path="/industries/"
+  eyebrow="Industries & Fields"
+  heading="Built Around the Way"
+  accent="Your Business Works."
+  intro="Smart growth plans tuned to how each market actually buys — from textile retail floors to US mortgage networks."
+  crumbs={[{ label: 'Industries' }]}
+>
+  <ul slot="head" class="head-stats">
+    <li><strong>{industries.length}</strong> industries and fields</li>
+    <li><strong>{withProof}</strong> with published case studies</li>
+  </ul>
+
+  <section class="section theme-dark flip" data-theme="dark" aria-label="Industries">
+    <div class="container">
+      <div class="finder" data-reveal>
+        <label class="finder__search">
+          <LucideIcon name="Search" size={18} />
+          <span class="sr-only">Search industries</span>
+          <input type="search" placeholder="Search your industry — e.g. retail, schools, property" autocomplete="off" data-ind-search />
+        </label>
+        <button class="finder__toggle" type="button" aria-pressed="false" data-ind-proof>
+          <LucideIcon name="BadgeCheck" size={16} /> With case studies
+        </button>
+        <p class="finder__count" aria-live="polite" data-ind-count>{industries.length} industries</p>
+      </div>
+      <ul class="inds">
+        {
+          industries.map((ind, i) => {
+            const d = industryDetail[ind.name];
+            return (
+              <li class="ind pcard" id={ind.name.toLowerCase().replace(/[^a-z]+/g, '-')} data-reveal style={`--d:${i % 3}`} data-proof={d?.cases?.length ? '1' : '0'} data-text={`${ind.name} ${industryKeywords[ind.name] ?? ''} ${d?.text ?? ''} ${d?.needs.join(' ') ?? ''}`.toLowerCase()}>
+                <div class="ind__top">
+                  <span class="ico-tile"><LucideIcon name={ind.icon} size={22} /></span>
+                  <h2>{ind.name}</h2>
+                </div>
+                {d && <p class="ind__text">{d.text}</p>}
+                {d && <ul class="ticks ind__needs">{d.needs.map((n) => <li>{n}</li>)}</ul>}
+                {d?.cases?.length ? (
+                  <div class="ind__cases">
+                    <span class="ind__k">Related work</span>
+                    <span class="ind__links">
+                      {d.cases.map((slug) => caseBySlug[slug] && (
+                        <a class="chip" href={`/work/${slug}/`}>{caseBySlug[slug].client.split(' — ')[0]} <LucideIcon name="ArrowUpRight" size={12} /></a>
+                      ))}
+                    </span>
+                  </div>
+                ) : (
+                  <a class="ind__ask" href={`/contact/?interest=${encodeURIComponent('Not Sure Yet')}`}>Talk to us about {ind.name.toLowerCase()} <LucideIcon name="ArrowRight" size={14} /></a>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+      <p class="inds__empty" hidden data-ind-empty><LucideIcon name="Info" size={16} /> No exact match — but the method travels well. <a href="/contact/">Tell us about your industry</a>.</p>
+      <p class="inds__note" data-reveal>
+        <LucideIcon name="Info" size={16} /> Don’t see your industry? The method travels well — we start by learning how your customers buy and how your operations run.
+      </p>
+    </div>
+  </section>
+
+  <Clients />
+
+  <PageCTA
+    title="Every Market Buys Differently."
+    accent="Let’s Plan for Yours."
+    text="Tell us about your industry, your customers and where growth is stuck. We’ll bring the playbooks that fit."
+    location="industries_page"
+  />
+</Page>
+
+<script>
+  // live industry search + "with case studies" filter
+  const input = document.querySelector<HTMLInputElement>('[data-ind-search]');
+  const proofBtn = document.querySelector<HTMLButtonElement>('[data-ind-proof]');
+  const count = document.querySelector<HTMLElement>('[data-ind-count]');
+  const empty = document.querySelector<HTMLElement>('[data-ind-empty]');
+  const cards = [...document.querySelectorAll<HTMLElement>('.ind[data-text]')];
+  const words = new Map(cards.map((c) => [c, c.dataset.text!.split(/[^a-z0-9]+/)]));
+  // every search term must match a word: exactly ("car") when some card has that exact word, otherwise as a word start ("hos" → hospital)
+  const matches = (c: HTMLElement, terms: string[], exact: boolean) =>
+    terms.every((t) => words.get(c)!.some((w) => (exact ? w === t : w.startsWith(t))));
+  const apply = () => {
+    const q = (input?.value || '').trim().toLowerCase();
+    const terms = q ? q.split(/\s+/) : [];
+    const exact = terms.length > 0 && cards.some((c) => matches(c, terms, true));
+    const proofOnly = proofBtn?.getAttribute('aria-pressed') === 'true';
+    let n = 0;
+    cards.forEach((c) => {
+      const show = (!terms.length || matches(c, terms, exact)) && (!proofOnly || c.dataset.proof === '1');
+      c.hidden = !show;
+      if (show) { n++; c.classList.add('is-in'); }
+    });
+    if (count) count.textContent = `${n} ${n === 1 ? 'industry' : 'industries'}`;
+    if (empty) empty.hidden = n > 0;
+  };
+  input?.addEventListener('input', apply);
+  proofBtn?.addEventListener('click', () => {
+    proofBtn.setAttribute('aria-pressed', String(proofBtn.getAttribute('aria-pressed') !== 'true'));
+    apply();
+  });
+</script>
+
+<style>
+  .head-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem 2rem; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-light-muted); }
+  .head-stats strong { font-family: var(--font-head); font-size: 1.4rem; color: var(--gold-ink); margin-right: 0.35rem; }
+
+  .finder { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin-bottom: 1.75rem; }
+  .finder__search {
+    flex: 1 1 340px; display: flex; align-items: center; gap: 0.7rem; padding: 0 1.1rem; height: 52px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--surface-line); color: var(--gold-ink); transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .finder__search:focus-within { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201, 149, 74, 0.15); }
+  .finder__search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; color: var(--ink); font-size: 0.95rem; }
+  .finder__search input::placeholder { color: var(--text-light-faint); }
+  .finder__toggle {
+    display: inline-flex; align-items: center; gap: 0.45rem; height: 52px; padding: 0 1.2rem; border-radius: 999px;
+    font-size: 0.88rem; font-weight: 500; color: var(--text-light-muted); background: var(--surface); border: 1px solid var(--surface-line);
+    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+  }
+  .finder__toggle:hover { border-color: rgba(201, 149, 74, 0.5); color: var(--ink); }
+  .finder__toggle[aria-pressed='true'] { color: var(--black); background: var(--gold); border-color: var(--gold); }
+  .finder__count { margin-left: auto; font-size: 0.85rem; color: var(--text-light-faint); }
+  .ind[hidden] { display: none; }
+  .inds__empty { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 2rem 0; color: var(--text-light-muted); }
+  .inds__empty[hidden] { display: none; }
+  .inds__empty a { color: var(--gold-ink); text-decoration: underline; text-underline-offset: 3px; }
+  .inds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .ind { display: grid; align-content: start; gap: 0.9rem; padding: 1.5rem; scroll-margin-top: 110px; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .ind:hover { transform: translateY(-4px); border-color: rgba(201, 149, 74, 0.4); }
+  .ind__top { display: flex; align-items: center; gap: 0.9rem; }
+  .ind h2 { font-size: 1.2rem; letter-spacing: -0.015em; }
+  .ind__text { font-size: 0.92rem; line-height: 1.6; color: var(--text-light-muted); }
+  .ind__needs li { font-size: 0.88rem; }
+  .ind__cases { display: grid; gap: 0.5rem; margin-top: auto; padding-top: 0.9rem; border-top: 1px solid var(--line-light); }
+  .ind__k { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .ind__links { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .ind__links .chip:hover { border-color: var(--gold); color: var(--ink); }
+  .ind__ask { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; padding-top: 0.9rem; border-top: 1px solid var(--line-light); font-size: 0.85rem; font-weight: 500; color: var(--gold-ink); }
+  .inds__note { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 2.5rem; text-align: center; font-size: 0.92rem; color: var(--text-light-muted); }
+  .inds__note :global(svg) { flex: none; color: var(--gold-ink); }
+  @media (max-width: 1000px) { .inds { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .inds { grid-template-columns: 1fr; } }
+</style>

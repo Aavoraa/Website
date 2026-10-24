@@ -1,0 +1,69 @@
+---
+import Icon from './Icon.astro';
+import { faqs, site } from '../data/site';
+---
+
+<section class="faq section theme-dark section--alt flip" id="faq" data-theme="dark" aria-labelledby="faq-title">
+  <div class="container faq__grid">
+    <header class="faq__head">
+      <p class="eyebrow" data-reveal>FAQ</p>
+      <h2 id="faq-title" data-reveal style="--d:1">Questions Before We <span class="accent">Get Started?</span></h2>
+      <p class="lead" data-reveal style="--d:2">
+        Scope, pricing and timelines depend on what your business needs. If your question isn’t here,
+        <a href={`mailto:${site.contact.email}`}>write to us</a>.
+      </p>
+    </header>
+
+    <div class="faq__list">
+      {
+        faqs.map((f, i) => (
+          <div class="faq__item" data-reveal style={`--d:${Math.min(i, 4)}`}>
+            <h3>
+              <button type="button" id={`faq-q-${i}`} aria-expanded="false" aria-controls={`faq-a-${i}`} data-accordion-trigger>
+                <span>{f.q}</span>
+                <span class="faq__icon" aria-hidden="true"><Icon name="plus" size={18} /></span>
+              </button>
+            </h3>
+            <div class="faq__panel" id={`faq-a-${i}`} role="region" aria-labelledby={`faq-q-${i}`}>
+              <div><p>{f.a}</p></div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(2.5rem, 6vw, 7rem); align-items: start; }
+  .faq__head { display: grid; gap: 1.4rem; position: sticky; top: 120px; }
+  .faq__head h2 { font-size: clamp(2rem, 1.3rem + 2.4vw, 3.3rem); }
+  .faq__head a { color: var(--gold-ink); text-decoration: underline; text-underline-offset: 3px; }
+  .faq__list { border-top: 1px solid var(--line-light); }
+  .faq__item { border-bottom: 1px solid var(--line-light); }
+  .faq__item h3 { font-size: inherit; letter-spacing: 0; line-height: inherit; }
+  .faq__item button {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; text-align: left;
+    padding: 1.4rem 0; font-family: var(--font-head); font-weight: 600; font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem);
+    letter-spacing: -0.01em; transition: color 0.3s;
+  }
+  .faq__item button:hover { color: var(--gold-ink); }
+  .faq__icon {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+    border: 1px solid var(--line-light); transition: transform 0.5s var(--ease), background-color 0.4s, border-color 0.4s, color 0.4s;
+  }
+  button[aria-expanded='true'] .faq__icon { transform: rotate(45deg); background: var(--gold); border-color: var(--gold); color: var(--black); }
+  /* smooth height animation via grid rows (collapsed only when JS is available) */
+  .faq__panel { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.55s var(--ease), visibility 0s; }
+  .faq__panel > div { overflow: hidden; }
+  .faq__panel p { padding: 0 3.5rem 1.5rem 0; color: var(--text-light-muted); transition: opacity 0.4s, transform 0.5s var(--ease); }
+  :global(.js) .faq__panel:not(.is-open) { grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 0.55s var(--ease), visibility 0s 0.55s; }
+  :global(.js) .faq__panel:not(.is-open) p { opacity: 0; transform: translateY(-6px); }
+  .faq__panel.is-open p { transition-delay: 0.1s; }
+
+  @media (max-width: 860px) {
+    .faq__grid { grid-template-columns: 1fr; }
+    .faq__head { position: static; }
+    .faq__panel p { padding-right: 0; }
+  }
+</style>

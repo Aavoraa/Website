@@ -1,0 +1,34 @@
+---
+/* INTERIM PAGE — replace with the legally reviewed Privacy Policy before launch. */
+import Page from '../layouts/Page.astro';
+import { site } from '../data/site';
+---
+
+<Page
+  title="Privacy Policy | AAVORAA"
+  description="How AAVORAA handles information shared through this website."
+  path="/privacy/"
+  eyebrow="Legal"
+  heading="Privacy Policy"
+  intro="Our full Privacy Policy is being finalised. In the meantime, this summary explains how this website handles your information."
+>
+  <section class="section theme-dark flip" data-theme="dark">
+    <div class="container legal">
+      <h2>Information you share with us</h2>
+      <p>When you submit the enquiry form or email us, we receive the details you provide — such as your name, work email, company name and a description of your requirements. We use this information only to respond to your enquiry and to discuss whether AAVORAA can help.</p>
+      <h2>Analytics</h2>
+      <p>This website may use analytics tools, such as Google Analytics, to understand how visitors use the site and to improve it. Where analytics is active, it collects usage information such as pages visited and the source of your visit.</p>
+      <h2>Your choices</h2>
+      <p>You can ask us what information we hold about you, or ask us to correct or delete it, by writing to <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>
+      <h2>Contact</h2>
+      <p>AAVORAA, {site.contact.location}. Email: <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .legal { max-width: 46rem; display: grid; gap: 1rem; }
+  .legal h2 { font-size: 1.4rem; margin-top: 1.25rem; }
+  .legal p { color: var(--text-light-muted); }
+  .legal a { color: var(--gold-ink); text-decoration: underline; text-underline-offset: 3px; }
+</style>

@@ -1,0 +1,205 @@
+---
+import Icon from './Icon.astro';
+import LucideIcon from './LucideIcon.astro';
+import { cases } from '../data/site';
+const featured = cases.filter((c) => c.featured);
+
+// Licence-free Unsplash photos (unsplash.com/license), toned to the palette in CSS
+const PHOTOS: Record<string, { src: string; alt: string }> = {
+  warehouse: { src: '/img/work/software.jpg', alt: 'Laptop showing application code on a developer desk' },
+  automation: { src: '/img/work/data.jpg', alt: 'Analytics dashboard on a laptop screen' },
+  realestate: { src: '/img/work/marketing.jpg', alt: 'Marketing performance dashboard on a laptop' },
+  search: { src: '/img/work/search.jpg', alt: 'Search results on a smartphone screen' },
+};
+
+const TABS = [
+  { key: 'challenge', label: 'Challenge', icon: 'CircleAlert' },
+  { key: 'solution', label: 'Solution', icon: 'Wrench' },
+  { key: 'outcome', label: 'Outcome', icon: 'TrendingUp' },
+] as const;
+---
+
+<section class="work section theme-dark section--alt flip" id="work" data-theme="dark" aria-labelledby="work-title">
+  <div class="container">
+    <div class="work__head">
+      <header class="section-head">
+        <p class="eyebrow" data-reveal>Our Work</p>
+        <h2 id="work-title" data-reveal style="--d:1">Business Challenges. Thoughtful Solutions. <span class="accent">Measurable Progress.</span></h2>
+      </header>
+      <a class="btn btn--outline" href="/work/" data-track="case_study" data-track-label="explore_all" data-reveal style="--d:2">
+        Explore Our Work <Icon name="arrow" class="arrow" />
+      </a>
+    </div>
+
+    <ul class="projects">
+      {
+        featured.map((c, i) => (
+          <li data-reveal style={`--d:${i}`}>
+            <article class="proj" aria-labelledby={`proj-${i}`} data-proj>
+              <div class="proj__art">
+                {c.art && PHOTOS[c.art] && (
+                  <img src={PHOTOS[c.art].src} alt={PHOTOS[c.art].alt} width="900" height="600" loading="lazy" decoding="async" />
+                )}
+              </div>
+              <div class="proj__meta">
+                <p class="proj__sector">{c.sector}</p>
+                <h3 id={`proj-${i}`} class="proj__client">{c.client}</h3>
+                <ul class="proj__tags">{c.services.map((s) => <li>{s}</li>)}</ul>
+              </div>
+
+              <!-- the story: three buttons stay put at the bottom; hovering one raises its panel above them -->
+              <div class="proj__more" data-proj-more>
+                <div class="proj__pop" aria-live="polite">
+                  {TABS.map((t, k) => (
+                    <div
+                      class="proj__pane"
+                      role="tabpanel"
+                      id={`proj-${i}-pane-${t.key}`}
+                      aria-labelledby={`proj-${i}-tab-${t.key}`}
+                      hidden={k !== 0}
+                    >
+                      <span class="proj__pane-k"><LucideIcon name={t.icon} size={14} /> {t.label}</span>
+                      <p>{c[t.key]}</p>
+                    </div>
+                  ))}
+                </div>
+                <div class="proj__tabs" role="tablist" aria-label={`${c.client}: project story`} style="--sel:0">
+                  {TABS.map((t, k) => (
+                    <button
+                      class="proj__tab"
+                      type="button"
+                      role="tab"
+                      id={`proj-${i}-tab-${t.key}`}
+                      aria-controls={`proj-${i}-pane-${t.key}`}
+                      aria-selected={k === 0 ? 'true' : 'false'}
+                      tabindex={k === 0 ? 0 : -1}
+                      data-proj-tab
+                      data-track="case_study"
+                      data-track-label={`${c.client} ${t.label}`}
+                    >
+                      <LucideIcon name={t.icon} size={13} /> {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .work__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.5rem 2rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .work__head h2 { font-size: clamp(1.8rem, 1.2rem + 2vw, 2.8rem); max-width: 18em; }
+
+  /* all four projects in one view */
+  .projects { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(0.75rem, 1.4vw, 1.25rem); }
+  .proj {
+    position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column;
+    container-type: inline-size;
+    border-radius: var(--radius-lg); background: var(--card-bg); border: 1px solid var(--surface-line);
+    box-shadow: 0 30px 60px -45px var(--shadow);
+    transition: transform 0.6s var(--ease), border-color 0.4s, box-shadow 0.6s var(--ease);
+  }
+  .proj:hover, .proj:focus-within { transform: translateY(-6px); border-color: rgba(201, 149, 74, 0.45); box-shadow: 0 40px 70px -40px var(--shadow), 0 0 50px -26px rgba(201, 149, 74, 0.5); }
+
+  /* real photos, toned warm-monochrome so they sit in the black & gold palette */
+  .proj__art {
+    /* 16:10 at rest; while the story is open it shrinks into a banner (by --shrink, set in main.ts) so the panel never covers the title */
+    position: relative; flex: none; height: calc(100cqi * 0.625); transition: height 0.45s var(--ease); overflow: hidden; border-bottom: 1px solid var(--surface-line); background: #0d0b0b; isolation: isolate; }
+  .proj__art img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: grayscale(1) sepia(0.45) saturate(1.15) brightness(0.62) contrast(1.08);
+    transform: scale(1.02);
+    transition: filter 0.7s var(--ease), transform 1.1s var(--ease);
+  }
+  .proj__art::before { /* gold wash */
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(135deg, rgba(201, 149, 74, 0.28), rgba(201, 149, 74, 0.04) 60%);
+    mix-blend-mode: soft-light;
+  }
+  .proj__art::after { /* melt into the card below */
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, rgba(10, 9, 9, 0.05) 30%, rgba(13, 11, 11, 0.85)), radial-gradient(120% 90% at 50% 0%, transparent 55%, rgba(10, 9, 9, 0.5));
+  }
+  .proj.is-open .proj__art, .proj:has(.proj__more:hover) .proj__art, .proj:has(.proj__more:focus-within) .proj__art { height: calc(100cqi * 0.625 - var(--shrink, 0px)); }
+  .proj:hover .proj__art img, .proj:focus-within .proj__art img { filter: grayscale(0.55) sepia(0.3) saturate(1.1) brightness(0.78) contrast(1.05); transform: scale(1.07); }
+
+  :global(:root[data-theme='light']) .proj__art { background: #efe9df; }
+  :global(:root[data-theme='light']) .proj__art img { filter: grayscale(1) sepia(0.35) saturate(1.1) brightness(1.02) contrast(0.92); }
+  :global(:root[data-theme='light']) .proj__art::after { background: linear-gradient(180deg, transparent 45%, rgba(255, 255, 255, 0.55)); }
+  :global(:root[data-theme='light']) .proj:hover .proj__art img { filter: grayscale(0.5) sepia(0.25) saturate(1.05) brightness(1) contrast(0.98); }
+
+  .proj__meta { display: grid; gap: 0.45rem; padding: 1.2rem 1.25rem 0.5rem; align-content: start; }
+  .proj__sector { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .proj__client { font-size: 1.2rem; letter-spacing: -0.015em; line-height: 1.2; }
+  .proj__tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.3rem; }
+  .proj__tags li { padding: 0.22rem 0.6rem; border-radius: 999px; font-size: 0.7rem; color: var(--text-light-muted); border: 1px solid var(--surface-line); }
+
+  /* ---------- story: a segmented switch, and a panel that rises above it ---------- */
+  .proj__more { margin-top: auto; padding: 0.9rem 1rem 1.1rem; }
+  .proj__tabs {
+    position: relative; z-index: 4; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 3px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(201, 149, 74, 0.3);
+  }
+  .proj__tabs::before { /* sliding gold indicator, shown while the panel is open */
+    content: ''; position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3);
+    border-radius: 999px; background: linear-gradient(180deg, var(--gold-light), var(--gold));
+    box-shadow: 0 6px 16px -8px rgba(201, 149, 74, 0.8);
+    transform: translateX(calc(var(--sel, 0) * 100%)); opacity: 0;
+    transition: transform 0.45s var(--ease), opacity 0.3s var(--ease);
+  }
+  .proj__more:hover .proj__tabs::before, .proj__more:focus-within .proj__tabs::before, .proj.is-open .proj__tabs::before { opacity: 1; }
+  .proj__tab {
+    position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; min-width: 0;
+    height: 30px; padding: 0 0.35rem; border: 0; border-radius: 999px; background: none; cursor: pointer;
+    font: inherit; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+    color: var(--gold-ink); transition: color 0.3s;
+  }
+  .proj__tab :global(svg) { flex: none; }
+  .proj__more:hover .proj__tab[aria-selected='true'],
+  .proj__more:focus-within .proj__tab[aria-selected='true'],
+  .proj.is-open .proj__tab[aria-selected='true'] { color: var(--black); }
+  .proj__tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .proj__pop {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; height: var(--pop-h, 168px);
+    padding: 1.1rem 1.15rem calc(1.1rem + 38px + 0.8rem); /* room for the switch, which never moves */
+    background:
+      radial-gradient(120% 70% at 50% 0%, rgba(201, 149, 74, 0.12), transparent 70%),
+      var(--node-bg);
+    border-top: 1px solid rgba(201, 149, 74, 0.4);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -24px 40px -24px rgba(0, 0, 0, 0.75);
+    opacity: 0; transform: translateY(24px); visibility: hidden;
+    transition: transform 0.45s var(--ease), opacity 0.3s var(--ease), visibility 0s linear 0.45s;
+  }
+  .proj__pop::before { /* small handle */
+    content: ''; position: absolute; top: 7px; left: 50%; width: 34px; height: 3px; margin-left: -17px;
+    border-radius: 3px; background: rgba(201, 149, 74, 0.35);
+  }
+  .proj__more:hover .proj__pop, .proj__more:focus-within .proj__pop, .proj.is-open .proj__pop {
+    opacity: 1; transform: none; visibility: visible;
+    transition: transform 0.45s var(--ease), opacity 0.3s var(--ease), visibility 0s;
+  }
+  :global(:root[data-theme='light']) .proj__pop { box-shadow: 0 -20px 36px -24px rgba(10, 9, 9, 0.3); }
+  :global(:root[data-theme='light']) .proj__tabs { background: rgba(10, 9, 9, 0.02); }
+
+  /* narrow cards: drop the icons, then tighten the labels, so the switch never clips */
+  @container (max-width: 330px) { .proj__tab :global(svg) { display: none; } }
+  @container (max-width: 285px) { .proj__tab { font-size: 0.6rem; letter-spacing: 0.03em; } }
+
+  .proj__pane { display: grid; gap: 0.4rem; }
+  .proj__pane[hidden] { display: none; }
+  .proj__pane:not([hidden]) { animation: pane-in 0.4s var(--ease) both; }
+  @keyframes pane-in { from { opacity: 0; transform: translateY(6px); } }
+  .proj__pane-k { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-ink); }
+  .proj__pane p { font-size: 0.8rem; font-weight: 400; line-height: 1.5; color: var(--text-light-muted); }
+
+  @media (max-width: 1240px) { .projects { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .projects { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .proj__pop, .proj__tabs::before, .proj__art { transition: none; } .proj__pane:not([hidden]) { animation: none; } }
+</style>

@@ -1,0 +1,200 @@
+---
+import Page from '../layouts/Page.astro';
+import WarexxMap from '../components/WarexxMap.astro';
+import LucideIcon from '../components/LucideIcon.astro';
+import Icon from '../components/Icon.astro';
+import StepGrid from '../components/StepGrid.astro';
+import PageCTA from '../components/PageCTA.astro';
+import { warexxCapabilities, cases, site } from '../data/site';
+
+const proof = cases.find((c) => c.slug === 'essa-warehouse-pos')!;
+const demoHref = `/contact/?interest=${encodeURIComponent('Software / Website / App')}`;
+
+// Modules as built and running for a ~100-staff textile retailer (portfolio deck, slides 6 & 14).
+const modules = [
+  { icon: 'ScanLine', title: 'Supplier Document Intake', text: 'Photograph or scan supplier invoices and turn them into structured data. Intake learns each supplier’s format.' },
+  { icon: 'ClipboardCheck', title: 'Purchases & GRN', text: 'LR and invoice entry, with mandatory attributes checked before a GRN can be saved and MRP reverse-calculation pricing.' },
+  { icon: 'QrCode', title: 'Inventory & QR Traceability', text: 'Piece-level QR codes and carton labels, so every item can be traced from receipt to sale.' },
+  { icon: 'ArrowLeftRight', title: 'Stock Movement', text: 'Outward and inward movement between warehouse and stores, with live visibility of where stock sits.' },
+  { icon: 'Undo2', title: 'Returns & Payments', text: 'Supplier returns and payments recorded in the same flow, not in a separate spreadsheet.' },
+  { icon: 'Store', title: 'Store POS', text: 'A point of sale connected to the same inventory, so the shop and the warehouse see the same numbers.' },
+  { icon: 'Smartphone', title: 'Warehouse Floor App', text: 'A phone app for the people doing the work — receiving, labelling and moving stock on the floor.' },
+  { icon: 'ChartColumnBig', title: 'Reports & Intelligence', text: '33 operational reports, with natural-language questions and voice in English and Tamil.' },
+  { icon: 'ShieldCheck', title: 'Cloud & Access Control', text: 'Deployed on AWS with role-based access, so each team sees what it needs.' },
+];
+
+const fits = [
+  { icon: 'Shirt', title: 'Textile & apparel retail', text: 'Many suppliers, piece-level stock and fast-moving collections.' },
+  { icon: 'Store', title: 'Multi-store retailers', text: 'A warehouse feeding several shops that need one version of stock.' },
+  { icon: 'Truck', title: 'Distributors & wholesalers', text: 'High volumes of inward documents and outward dispatches.' },
+  { icon: 'Warehouse', title: 'Growing warehouses', text: 'Teams outgrowing spreadsheets, paper GRNs and manual Tally entry.' },
+];
+
+const rollout = [
+  { n: '01', title: 'Module Review', text: 'We review your current process with the people who run it.', icon: 'Search' },
+  { n: '02', title: 'Priority Modules', text: 'The modules that remove the most manual work go live first.', icon: 'ListChecks' },
+  { n: '03', title: 'Phased Rollout', text: 'Module-wise approvals across warehouse and stores.', icon: 'Layers' },
+  { n: '04', title: 'Support & Growth', text: 'Training, support and new modules as operations grow.', icon: 'LifeBuoy' },
+];
+---
+
+<Page
+  title="WAREXX by AAVORAA | Warehouse & Operations Platform"
+  description="WAREXX connects supplier documents, procurement, GRN, inventory with QR traceability, stock movement, POS and reporting in one platform. Built by AAVORAA."
+  path="/warexx/"
+  eyebrow="Built by AAVORAA"
+  heading="From Connected Thinking to"
+  accent="Connected Operations."
+  intro="WAREXX brings procurement, supplier documents, warehouse operations, inventory, stock movement, stores and operational intelligence together in one connected platform."
+  crumbs={[{ label: 'WAREXX' }]}
+>
+  <div slot="head" class="hero-btns">
+    <a class="btn" href={demoHref} data-track="warexx" data-track-location="warexx_hero">Request a WAREXX Walkthrough <Icon name="arrow" class="arrow" /></a>
+    <a class="btn btn--ghost" href="#modules">Explore the Modules</a>
+  </div>
+
+  <section class="section theme-dark flip" data-theme="dark" data-inview aria-labelledby="wx-p-title">
+    <div class="container wxp">
+      <div class="wxp__text">
+        <img src="/brand/warexx-logo-light.png" alt="WAREXX by AAVORAA" width="900" height="267" class="wxp__logo only-dark" />
+        <img src="/brand/warexx-logo-dark.png" alt="WAREXX by AAVORAA" width="900" height="329" class="wxp__logo only-light" />
+        <h2 id="wx-p-title">One platform for the work between the supplier and the shelf.</h2>
+        <p class="lead">
+          WAREXX was built by AAVORAA to solve real operational problems: supplier documents arriving in different
+          formats, manual receiving, and limited visibility of stock between warehouse and store.
+        </p>
+        <ul class="wxp__list">
+          {warexxCapabilities.map((c) => (
+            <li><Icon name="check" size={16} /><span><strong>{c.title}</strong> — {c.text}</span></li>
+          ))}
+        </ul>
+      </div>
+      <div class="wxp__visual"><WarexxMap /></div>
+    </div>
+  </section>
+
+  <section class="section theme-dark section--alt flip" id="modules" data-theme="dark" aria-labelledby="mod-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>Platform Modules</p>
+        <h2 id="mod-title" class="ph2" data-reveal style="--d:1">Everything From Invoice <span class="accent">to Point of Sale.</span></h2>
+        <p class="lead" data-reveal style="--d:2">Modules that work on their own and work better together — rolled out in the order that saves your team the most time.</p>
+      </header>
+      <ul class="mods">
+        {
+          modules.map((m, i) => (
+            <li class="mod pcard" data-reveal style={`--d:${i % 3}`}>
+              <div class="mod__top">
+                <span class="ico-tile"><LucideIcon name={m.icon} size={22} /></span>
+                <span class="mod__n">{String(i + 1).padStart(2, '0')}</span>
+              </div>
+              <h3>{m.title}</h3>
+              <p>{m.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="fit-title">
+    <div class="container fit">
+      <div class="fit__text">
+        <p class="eyebrow" data-reveal>Who It’s For</p>
+        <h2 id="fit-title" class="ph2" data-reveal style="--d:1">Built for Businesses <span class="accent">That Move Stock.</span></h2>
+        <p class="lead" data-reveal style="--d:2">If stock moves between suppliers, a warehouse and stores — and the paperwork can’t keep up — WAREXX was made for you.</p>
+      </div>
+      <ul class="fits">
+        {
+          fits.map((f, i) => (
+            <li class="fitc pcard" data-reveal style={`--d:${i}`}>
+              <span class="ico-tile"><LucideIcon name={f.icon} size={20} /></span>
+              <span><strong>{f.title}</strong><small>{f.text}</small></span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="proof-title">
+    <div class="container">
+      <a class="proof pcard" href={`/work/${proof.slug}/`} data-reveal>
+        <div class="proof__media tone"><img src="/img/work/software.jpg" alt="" width="900" height="600" loading="lazy" decoding="async" /></div>
+        <div class="proof__body">
+          <p class="eyebrow">In Production</p>
+          <h2 id="proof-title">{proof.client}</h2>
+          <p class="proof__sector">{proof.sector}</p>
+          <p>{proof.challenge}</p>
+          <p class="proof__out"><strong>{proof.metric?.value}</strong> {proof.outcome}</p>
+          <span class="proof__more">Read the case study <LucideIcon name="ArrowRight" size={15} /></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="roll-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>How Rollout Works</p>
+        <h2 id="roll-title" class="ph2" data-reveal style="--d:1">Live in Phases, <span class="accent">Not All at Once.</span></h2>
+      </header>
+      <StepGrid items={rollout} />
+    </div>
+  </section>
+
+  <PageCTA
+    eyebrow="See How It Works"
+    title="Interested in WAREXX"
+    accent="for Your Operations?"
+    text="Tell us how your warehouse, stores and suppliers work today. We’ll walk you through WAREXX and whether it fits — or discuss a custom solution."
+    primary={{ label: 'Request a WAREXX Walkthrough', href: demoHref }}
+    secondary={{ label: `Email ${site.contact.email}`, href: `mailto:${site.contact.email}?subject=${encodeURIComponent('WAREXX enquiry')}` }}
+    location="warexx_page_cta"
+  />
+</Page>
+
+<style>
+  .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
+  .hero-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 0.75rem; }
+
+  .wxp { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
+  .wxp__text { display: grid; gap: 1.5rem; }
+  .wxp__logo { width: 200px; height: auto; }
+  .wxp h2 { font-size: clamp(1.8rem, 1.2rem + 2vw, 2.8rem); }
+  .wxp__list { display: grid; gap: 0.9rem; }
+  .wxp__list li { display: flex; gap: 0.75rem; color: var(--text-dark-muted); }
+  .wxp__list :global(svg) { flex: none; margin-top: 0.3rem; color: var(--gold); }
+  .wxp__list strong { color: var(--ink); font-weight: 500; }
+
+  .mods { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .mod { display: grid; align-content: start; gap: 0.75rem; padding: 1.6rem; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .mod:hover { transform: translateY(-4px); border-color: rgba(201, 149, 74, 0.45); }
+  .mod__top { display: flex; align-items: center; justify-content: space-between; }
+  .mod__n { font-family: var(--font-head); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.12em; color: var(--gold-ink); }
+  .mod h3 { font-size: 1.2rem; }
+  .mod p { font-size: 0.92rem; line-height: 1.6; color: var(--text-light-muted); }
+
+  .fit { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+  .fit__text { display: grid; gap: 1.2rem; }
+  .fits { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+  .fitc { display: flex; gap: 0.9rem; align-items: flex-start; padding: 1.25rem; }
+  .fitc span:last-child { display: grid; gap: 0.25rem; }
+  .fitc strong { font-family: var(--font-head); font-weight: 600; font-size: 1.05rem; }
+  .fitc small { font-size: 0.86rem; line-height: 1.5; color: var(--text-light-muted); }
+
+  .proof { display: grid; grid-template-columns: 1fr 1.1fr; overflow: hidden; transition: border-color 0.4s, transform 0.5s var(--ease); }
+  .proof:hover { border-color: rgba(201, 149, 74, 0.45); transform: translateY(-4px); }
+  .proof__media { min-height: 320px; }
+  .proof__body { display: grid; align-content: center; gap: 0.9rem; padding: clamp(1.75rem, 4vw, 3rem); }
+  .proof h2 { font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.3rem); }
+  .proof__sector { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .proof__body > p:not(.eyebrow):not(.proof__sector) { color: var(--text-light-muted); line-height: 1.65; }
+  .proof__out { padding-top: 1rem; border-top: 1px solid var(--line-light); color: var(--ink) !important; font-weight: 500; }
+  .proof__out strong { display: block; font-family: var(--font-head); font-size: 2.4rem; letter-spacing: -0.03em; line-height: 1; color: var(--gold-ink); margin-bottom: 0.35rem; }
+  .proof__more { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 500; color: var(--gold-ink); }
+
+  @media (max-width: 1000px) { .mods { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 900px) { .wxp, .fit, .proof { grid-template-columns: 1fr; } .proof__media { min-height: 0; aspect-ratio: 16 / 9; } }
+  @media (max-width: 560px) { .mods, .fits { grid-template-columns: 1fr; } }
+</style>

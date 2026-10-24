@@ -1,0 +1,75 @@
+---
+/** Layout for secondary pages: shared nav/footer and a compact cinematic header. */
+import Base from './Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  eyebrow: string;
+  heading: string;
+  accent?: string;
+  intro?: string;
+  noindex?: boolean;
+  crumbs?: { label: string; href?: string }[]; // breadcrumb trail after Home
+}
+const { title, description, path, eyebrow, heading, accent, intro, noindex, crumbs = [] } = Astro.props;
+---
+
+<Base title={title} description={description} path={path} noindex={noindex}>
+  <Nav />
+  <main id="main">
+    <header class="phead theme-dark flip" data-theme="dark">
+      <div class="phead__bg" aria-hidden="true">
+        <img class="only-dark" src="/images/hero-ribbon.webp" alt="" width="2400" height="1400" decoding="async" />
+        <img class="only-light" src="/images/hero-ribbon-light.webp" alt="" width="2400" height="1400" decoding="async" />
+      </div>
+      <div class="depth" aria-hidden="true">
+        <i class="d-orb" data-parallax="0.35" style="--k:0; width:420px; height:420px; left:-6%; top:12%"></i>
+        <i class="d-orb" data-parallax="0.22" style="--k:2; width:300px; height:300px; right:-4%; top:-10%"></i>
+        <i class="d-ring" data-parallax="0.5" style="--k:1; width:180px; height:180px; right:12%; top:58%"></i>
+        <i class="d-ring" data-parallax="0.28" style="--k:3; width:90px; height:90px; left:14%; top:18%"></i>
+        <i class="d-dot" data-parallax="0.6" style="--k:4; left:22%; top:70%"></i>
+        <i class="d-dot" data-parallax="0.42" style="--k:2; right:24%; top:24%"></i>
+        <i class="d-dot" data-parallax="0.75" style="--k:5; left:68%; top:80%"></i>
+        <i class="d-line" data-parallax="0.3" style="--k:1; height:160px; left:8%; top:48%"></i>
+        <i class="d-line" data-parallax="0.55" style="--k:3; height:120px; right:7%; top:30%"></i>
+      </div>
+      <div class="container phead__content">
+        <nav aria-label="Breadcrumb">
+          <ol class="crumbs">
+            <li><a href="/">Home</a></li>
+            {crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}
+          </ol>
+        </nav>
+        <p class="eyebrow">{eyebrow}</p>
+        <h1>{heading} {accent && <span class="accent">{accent}</span>}</h1>
+        {intro && <p class="lead">{intro}</p>}
+        <slot name="head" />
+      </div>
+    </header>
+    <slot />
+  </main>
+  <Footer />
+</Base>
+
+<script>
+  import '../scripts/main.ts';
+</script>
+
+<style>
+  .phead { position: relative; isolation: isolate; overflow: hidden; padding: clamp(9rem, 18vw, 12rem) 0 clamp(5rem, 10vw, 8rem); }
+  .phead__bg { position: absolute; inset: 0; z-index: -1; }
+  .phead__bg img { position: absolute; inset: auto 0 0; width: 100%; height: 150%; object-fit: cover; object-position: 50% 100%; opacity: 0.55;
+    translate: 0 calc(var(--hp, 0) * 45%); scale: calc(1 + var(--hp, 0) * 0.08); } /* background lags behind the page */
+  .phead__bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10, 9, 9, 0.85), rgba(10, 9, 9, 0.55) 60%, var(--black)); }
+  .phead__content { display: grid; gap: 1.25rem; justify-items: center; text-align: center; }
+  .phead h1 { font-size: clamp(2.4rem, 1.4rem + 4vw, 4.6rem); letter-spacing: -0.035em; max-width: 15em; }
+  .phead h1 .accent { display: block; }
+  .phead .lead { max-width: 42rem; }
+
+  :global(:root[data-theme='light']) .phead { background: var(--ivory); }
+  :global(:root[data-theme='light']) .phead__bg::after { background: linear-gradient(to bottom, rgba(244, 240, 232, 0.85), rgba(244, 240, 232, 0.5) 60%, var(--ivory)); }
+</style>

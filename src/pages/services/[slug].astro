@@ -1,0 +1,227 @@
+---
+import Page from '../../layouts/Page.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import Icon from '../../components/Icon.astro';
+import StepGrid from '../../components/StepGrid.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import { pillars, cases, type PillarKey } from '../../data/site';
+import { pillarSlug, pillarPage, serviceDetails, servicePath, growthMethod } from '../../data/pages';
+
+export function getStaticPaths() {
+  return (Object.keys(pillarSlug) as PillarKey[]).map((key) => ({ params: { slug: pillarSlug[key] }, props: { key } }));
+}
+
+const { key } = Astro.props as { key: PillarKey };
+const p = pillars.find((x) => x.key === key)!;
+const page = pillarPage[key];
+const details = serviceDetails[key];
+const related = cases.filter((c) => c.pillars.includes(key)).slice(0, 3);
+const others = pillars.filter((x) => x.key !== key);
+const words = p.headline.split(' ');
+const contactHref = `/contact/?interest=${encodeURIComponent(page.interest)}`;
+---
+
+<Page
+  title={`${p.label} | AAVORAA`}
+  description={`${p.description} ${page.intro}`.slice(0, 158)}
+  path={servicePath(key)}
+  eyebrow={page.eyebrow}
+  heading={words.slice(0, -2).join(' ')}
+  accent={words.slice(-2).join(' ')}
+  intro={page.intro}
+  crumbs={[{ label: 'Services', href: '/services/' }, { label: p.label }]}
+>
+  <div slot="head" class="hero-btns">
+    <a class="btn" href={contactHref} data-track="cta_primary" data-track-location={`service_${key}_hero`}>Book Free Strategic Consultation <Icon name="arrow" class="arrow" /></a>
+    <a class="btn btn--ghost" href="#services-detail">See What’s Included</a>
+  </div>
+
+  <!-- Capabilities + outcomes -->
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="caps-title">
+    <div class="container caps">
+      <div class="caps__intro">
+        <p class="eyebrow" data-reveal>What We Do</p>
+        <h2 id="caps-title" class="ph2" data-reveal style="--d:1">{p.label}, <span class="accent">End to End.</span></h2>
+        <p class="lead" data-reveal style="--d:2">{p.description}</p>
+        <ul class="caps__out" data-reveal style="--d:3">
+          {page.outcomes.map((o) => <li><LucideIcon name="CircleCheck" size={18} /> {o}</li>)}
+        </ul>
+      </div>
+      <ul class="caps__grid">
+        {
+          p.capabilities.map((c, i) => (
+            <li class="cap pcard" data-reveal style={`--d:${i % 3}`}>
+              <span class="ico-tile"><LucideIcon name={c.icon} size={22} /></span>
+              <span>{c.name}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Service deep dives -->
+  <section class="section theme-dark section--alt flip" id="services-detail" data-theme="dark" aria-labelledby="detail-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>What’s Included</p>
+        <h2 id="detail-title" class="ph2" data-reveal style="--d:1">Deliverables, Stack <span class="accent">and Proof.</span></h2>
+      </header>
+      <div class="dives">
+        {
+          details.map((d, i) => (
+            <article class="dive pcard" id={`svc-${i + 1}`} data-reveal>
+              <div class="dive__main">
+                <div class="dive__top">
+                  <span class="ico-tile"><LucideIcon name={d.icon} size={22} /></span>
+                  <span class="dive__n">0{i + 1}</span>
+                </div>
+                <h3>{d.name}</h3>
+                <p class="dive__sum">{d.summary}</p>
+                <dl class="dive__meta">
+                  <div><dt><LucideIcon name="Layers" size={15} /> Tools &amp; stack</dt><dd>{d.stack}</dd></div>
+                  <div><dt><LucideIcon name="Clock" size={15} /> Timeline &amp; model</dt><dd>{d.model}</dd></div>
+                </dl>
+              </div>
+              <div class="dive__list">
+                <p class="dive__k">Deliverables</p>
+                <ul class="ticks">{d.deliverables.map((x) => <li>{x}</li>)}</ul>
+              </div>
+              {d.proof && (
+                <a class="dive__proof" href={d.proof.slug ? `/work/${d.proof.slug}/` : undefined}>
+                  <span class="dive__proof-k"><LucideIcon name="BadgeCheck" size={16} /> Proof</span>
+                  <span class="dive__proof-t">{d.proof.text} <strong>— {d.proof.client}</strong></span>
+                  {d.proof.slug && <LucideIcon name="ArrowRight" size={16} class="dive__proof-a" />}
+                </a>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Method -->
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="method-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>How We Deliver</p>
+        <h2 id="method-title" class="ph2" data-reveal style="--d:1">A Repeatable <span class="accent">Growth Method.</span></h2>
+        <p class="lead" data-reveal style="--d:2">{page.startsWith}</p>
+      </header>
+      <StepGrid items={growthMethod} />
+    </div>
+  </section>
+
+  <!-- Related work -->
+  {
+    related.length > 0 && (
+      <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="rel-title">
+        <div class="container">
+          <div class="rel__head">
+            <header class="section-head">
+              <p class="eyebrow" data-reveal>Selected Work</p>
+              <h2 id="rel-title" class="ph2" data-reveal style="--d:1">{p.label} <span class="accent">in Practice.</span></h2>
+            </header>
+            <a class="btn btn--outline" href="/work/" data-reveal style="--d:2">All Case Studies <Icon name="arrow" class="arrow" /></a>
+          </div>
+          <ul class="rel">
+            {related.map((c, i) => (
+              <li data-reveal style={`--d:${i}`}><CaseCard item={c} /></li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Other services -->
+  <section class="section theme-dark flip others-sec" data-theme="dark" aria-labelledby="others-title">
+    <div class="container">
+      <h2 id="others-title" class="others__h" data-reveal>Explore Other Services</h2>
+      <ul class="others">
+        {
+          others.map((o, i) => (
+            <li data-reveal style={`--d:${i}`}>
+              <a class="other pcard" href={servicePath(o.key)}>
+                <span>
+                  <strong>{o.label}</strong>
+                  <small>{o.short}</small>
+                </span>
+                <LucideIcon name="ArrowUpRight" size={20} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <PageCTA
+    title={`Ready to Talk ${p.label}?`}
+    accent="Let’s Scope It Together."
+    text={page.startsWith}
+    primary={{ label: 'Book Free Strategic Consultation', href: contactHref }}
+    location={`service_${key}`}
+  />
+</Page>
+
+<style>
+  .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
+  .hero-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 0.75rem; }
+
+  .caps { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(2.5rem, 6vw, 5rem); align-items: center; }
+  .caps__intro { display: grid; gap: 1.2rem; }
+  .caps__out { display: grid; gap: 0.7rem; margin-top: 0.4rem; }
+  .caps__out li { display: flex; gap: 0.6rem; align-items: flex-start; font-weight: 500; color: var(--ink); }
+  .caps__out :global(svg) { flex: none; margin-top: 0.15rem; color: var(--gold-ink); }
+  .caps__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+  .cap { display: flex; align-items: center; gap: 0.9rem; padding: 1.1rem 1.2rem; font-family: var(--font-head); font-weight: 600; font-size: 1rem; line-height: 1.3; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .cap:hover { transform: translateY(-3px); border-color: rgba(201, 149, 74, 0.4); }
+
+  .dives { display: grid; gap: 1.25rem; }
+  .dive {
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.5rem clamp(2rem, 5vw, 4rem);
+    padding: clamp(1.5rem, 3.5vw, 2.5rem); scroll-margin-top: 110px;
+  }
+  .dive__main { display: grid; gap: 0.9rem; align-content: start; }
+  .dive__top { display: flex; align-items: center; justify-content: space-between; }
+  .dive__n { font-family: var(--font-head); font-weight: 700; font-size: 2.2rem; letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 1px var(--frame-label); }
+  :global(:root:not([data-theme='light'])) .dive__n { -webkit-text-stroke-color: rgba(201, 149, 74, 0.45); }
+  .dive h3 { font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); }
+  .dive__sum { color: var(--text-light-muted); line-height: 1.7; }
+  .dive__meta { display: grid; gap: 0.75rem; margin-top: 0.3rem; }
+  .dive__meta div { display: grid; gap: 0.2rem; padding-top: 0.75rem; border-top: 1px solid var(--line-light); }
+  .dive__meta dt { display: flex; align-items: center; gap: 0.45rem; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .dive__meta dd { font-size: 0.92rem; color: var(--ink); }
+  .dive__list { display: grid; gap: 0.9rem; align-content: start; padding: 1.4rem; border-radius: var(--radius-sm); background: rgba(201, 149, 74, 0.05); border: 1px solid rgba(201, 149, 74, 0.15); }
+  .dive__k { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .dive__proof {
+    grid-column: 1 / -1; display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; border-radius: var(--radius-sm);
+    border: 1px dashed rgba(201, 149, 74, 0.35); font-size: 0.9rem; color: var(--text-light-muted); transition: border-color 0.3s, background-color 0.3s;
+  }
+  a.dive__proof[href]:hover { border-style: solid; background: rgba(201, 149, 74, 0.06); }
+  .dive__proof-k { flex: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .dive__proof-t { flex: 1; }
+  .dive__proof strong { color: var(--ink); font-weight: 500; }
+  .dive__proof :global(.dive__proof-a) { flex: none; color: var(--gold-ink); }
+
+  .rel__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.5rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .rel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(0.75rem, 1.5vw, 1.25rem); }
+
+  .others-sec { padding-block: clamp(3.5rem, 7vw, 5.5rem) 0; }
+  .others__h { font-size: var(--fs-h3); margin-bottom: 1.5rem; }
+  .others { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem; }
+  .other { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.3rem 1.4rem; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .other:hover { transform: translateY(-4px); border-color: rgba(201, 149, 74, 0.45); }
+  .other span { display: grid; gap: 0.2rem; }
+  .other strong { font-family: var(--font-head); font-weight: 600; font-size: 1.1rem; }
+  .other small { font-size: 0.85rem; color: var(--text-light-muted); }
+  .other :global(svg) { flex: none; color: var(--gold-ink); }
+
+  @media (max-width: 1000px) { .rel { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 900px) { .caps, .dive { grid-template-columns: 1fr; } .others { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .rel { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .caps__grid { grid-template-columns: 1fr; } .dive__proof { flex-wrap: wrap; } }
+</style>

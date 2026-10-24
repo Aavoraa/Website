@@ -1,0 +1,90 @@
+---
+import { approach } from '../data/site';
+---
+
+<section class="approach section theme-dark section--alt flip" id="approach" data-theme="dark" aria-labelledby="approach-title">
+  <div class="container">
+    <header class="section-head section-head--center">
+      <p class="eyebrow" data-reveal>The AAVORAA Approach</p>
+      <h2 id="approach-title" data-reveal style="--d:1">One Business Vision. <span class="accent">Connected Solutions.</span></h2>
+      <p class="lead" data-reveal style="--d:2">
+        Strategy and execution connected in one continuous system — not five disconnected service boxes.
+      </p>
+    </header>
+
+    <div class="flow" data-progress>
+      <div class="flow__phases" aria-hidden="true">
+        <span class="flow__phase flow__phase--strategy">Strategy</span>
+        <span class="flow__phase flow__phase--execution">Execution</span>
+      </div>
+
+      <div class="flow__body">
+      <div class="flow__track" aria-hidden="true"><span class="flow__fill"></span></div>
+
+      <ol class="flow__steps">
+        {
+          approach.map((s, i) => (
+            <li class="flow__step" data-step data-reveal style={`--d:${i}`}>
+              <span class="flow__node" aria-hidden="true"><span /></span>
+              <span class="flow__n">0{i + 1}</span>
+              <h3>{s.step}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .flow { position: relative; margin-top: clamp(3.5rem, 7vw, 6rem); --progress: 0; --cols: 5; }
+
+  .flow__phases { display: grid; grid-template-columns: repeat(var(--cols), 1fr); margin-bottom: 1.75rem; }
+  .flow__phase {
+    position: relative; padding-bottom: 0.9rem; text-align: center;
+    font-size: var(--fs-cap); font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-light-faint);
+  }
+  .flow__phase::after { /* thin bracket */
+    content: ''; position: absolute; left: 10%; right: 10%; bottom: 0; height: 8px;
+    border: 1px solid rgba(138, 92, 36, 0.4); border-bottom: 0; border-radius: 6px 6px 0 0;
+  }
+  .flow__phase--strategy { grid-column: 1 / span 2; }
+  .flow__phase--execution { grid-column: 3 / span 3; }
+
+  .flow__body { position: relative; }
+  .flow__track {
+    position: absolute; left: 10%; right: 10%; top: 9px; height: 1px; background: var(--line-light);
+  }
+  .flow__fill {
+    position: absolute; inset: 0; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light));
+    transform-origin: left; transform: scaleX(var(--progress)); box-shadow: 0 0 12px rgba(201, 149, 74, 0.6);
+  }
+
+  .flow__steps { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 1.25rem; }
+  .flow__step { display: grid; align-content: start; justify-items: center; text-align: center; gap: 0.55rem; padding-inline: 0.25rem; }
+  .flow__node {
+    position: relative; width: 19px; height: 19px; border-radius: 50%; margin-bottom: 1rem;
+    background: var(--node-bg); border: 1px solid var(--hair);
+    display: grid; place-items: center; transition: border-color 0.6s var(--ease), box-shadow 0.6s var(--ease);
+  }
+  .flow__node span { width: 7px; height: 7px; border-radius: 50%; background: var(--hair); transition: background-color 0.6s, transform 0.6s var(--ease); }
+  .flow__step.is-lit .flow__node { border-color: var(--gold); box-shadow: 0 0 0 6px rgba(201, 149, 74, 0.14); }
+  .flow__step.is-lit .flow__node span { background: var(--gold); transform: scale(1.15); }
+  .flow__n { font-family: var(--font-head); font-weight: 600; font-size: 0.8rem; color: var(--gold-ink); letter-spacing: 0.08em; }
+  .flow__step h3 { font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem); letter-spacing: -0.01em; text-transform: uppercase; }
+  .flow__step p { font-size: 0.9rem; color: var(--text-light-muted); max-width: 13rem; }
+
+  @media (max-width: 860px) {
+    .flow__phases { display: none; }
+    .flow__track { left: 9px; right: auto; top: 0; bottom: 0; width: 1px; height: auto; }
+    .flow__fill { transform-origin: top; transform: scaleY(var(--progress)); }
+    .flow__steps { grid-template-columns: 1fr; gap: 2.25rem; }
+    .flow__step {
+      grid-template-columns: 19px 1fr; justify-items: start; text-align: left; column-gap: 1.5rem; row-gap: 0.3rem;
+    }
+    .flow__node { grid-row: 1 / span 3; margin: 0; }
+    .flow__step p { max-width: none; }
+  }
+</style>

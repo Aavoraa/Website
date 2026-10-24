@@ -1,0 +1,109 @@
+---
+import Page from '../../layouts/Page.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import Icon from '../../components/Icon.astro';
+import StepGrid from '../../components/StepGrid.astro';
+import Tools from '../../components/Tools.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import { pillars } from '../../data/site';
+import { serviceDetails, servicePath, pillarPhoto, startSteps } from '../../data/pages';
+---
+
+<Page
+  title="Services | Software, Branding, Marketing & AI Automation | AAVORAA"
+  description="Explore AAVORAA's services: software and app development, branding and creative, marketing and lead generation, and AI and business automation — delivered by one accountable team."
+  path="/services/"
+  eyebrow="Our Services"
+  heading="Every Capability Your Growth Needs."
+  accent="One Accountable Team."
+  intro="Strategy, creative, code, campaigns and automation — delivered end to end by one team, so nothing gets lost between vendors."
+  crumbs={[{ label: 'Services' }]}
+>
+  <section class="section theme-dark flip" data-theme="dark" aria-label="Service lines">
+    <div class="container svc-list">
+      {
+        pillars.map((p, i) => (
+          <article class:list={['svc', { 'svc--rev': i % 2 === 1 }]} id={p.key}>
+            <a class="svc__media tone" href={servicePath(p.key)} tabindex="-1" aria-hidden="true" data-reveal="scale">
+              <img src={pillarPhoto[p.key]} alt="" width="900" height="600" loading="lazy" decoding="async" />
+              <span class="svc__word">{p.visual}</span>
+            </a>
+            <div class="svc__text">
+              <p class="svc__label" data-reveal>
+                <span>0{i + 1}</span> {p.label}
+              </p>
+              <h2 data-reveal style="--d:1">{p.headline}</h2>
+              <p class="svc__desc" data-reveal style="--d:2">{p.description}</p>
+              <ul class="svc__caps" data-reveal style="--d:3">
+                {p.capabilities.map((c) => (
+                  <li>
+                    <LucideIcon name={c.icon} size={16} /> {c.name}
+                  </li>
+                ))}
+              </ul>
+              <p class="svc__inc" data-reveal style="--d:4">
+                <strong>Includes:</strong> {serviceDetails[p.key].map((d) => d.name).join(' · ')}
+              </p>
+              <a class="btn btn--outline" href={servicePath(p.key)} data-reveal style="--d:5" data-track="service_card" data-track-label={p.key}>
+                {p.cta} <Icon name="arrow" class="arrow" />
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="start-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>How We Start</p>
+        <h2 id="start-title" class="ph2" data-reveal style="--d:1">From Hello to Growth <span class="accent">in Five Moves.</span></h2>
+        <p class="lead" data-reveal style="--d:2">A clear, action-driven path — you’ll always know exactly what happens next.</p>
+      </header>
+      <StepGrid items={startSteps} />
+    </div>
+  </section>
+
+  <Tools />
+
+  <PageCTA
+    title="Not Sure Where to Start?"
+    accent="Start With a Conversation."
+    text="Many engagements begin with a single need — a website, a brand or one automation. We’ll help you decide what will move the business first."
+    location="services_page"
+  />
+</Page>
+
+<style>
+  .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
+  .svc-list { display: grid; gap: clamp(4rem, 9vw, 7rem); }
+  .svc { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; scroll-margin-top: 110px; }
+  .svc--rev .svc__media { order: 2; }
+  .svc__media { display: block; aspect-ratio: 5 / 4; border-radius: var(--radius-lg); border: 1px solid var(--frame-line); box-shadow: 0 50px 90px -50px var(--shadow); }
+  .svc__media:hover :global(img) { transform: scale(1.05); filter: grayscale(0.5) sepia(0.3) saturate(1.1) brightness(0.75) contrast(1.05); }
+  .svc__word {
+    position: absolute; z-index: 2; left: 1.5rem; bottom: 1.1rem;
+    font-family: var(--font-head); font-weight: 700; font-size: clamp(2.6rem, 1.6rem + 4vw, 5rem); letter-spacing: -0.05em; line-height: 0.8;
+    text-transform: uppercase; color: transparent; -webkit-text-stroke: 1px rgba(226, 189, 132, 0.75);
+    background: linear-gradient(90deg, var(--gold-light), var(--gold)) no-repeat 0 0 / 0% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    transition: background-size 1.6s var(--ease) 0.7s;
+  }
+  .svc__media:global(.wipe-in) .svc__word, .svc__media:hover .svc__word { background-size: 100% 100%; }
+  .svc__text { display: grid; gap: 1.1rem; justify-items: start; }
+  .svc__label { display: inline-flex; align-items: center; gap: 0.75rem; font-size: var(--fs-cap); font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-ink); }
+  .svc__label span { font-family: var(--font-head); font-weight: 600; letter-spacing: 0.08em; padding-right: 0.75rem; border-right: 1px solid var(--line-light); }
+  .svc h2 { font-size: clamp(1.8rem, 1.2rem + 2.2vw, 2.9rem); }
+  .svc__desc { color: var(--text-light-muted); font-size: var(--fs-lead); line-height: 1.7; }
+  .svc__caps { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem 1.25rem; width: 100%; }
+  .svc__caps li { display: flex; align-items: center; gap: 0.6rem; font-size: 0.92rem; font-weight: 500; color: var(--ink); }
+  .svc__caps :global(svg) { flex: none; color: var(--gold-ink); }
+  .svc__inc { font-size: 0.85rem; color: var(--text-light-muted); padding-top: 0.9rem; border-top: 1px solid var(--line-light); width: 100%; }
+  .svc__inc strong { color: var(--gold-ink); font-weight: 500; }
+  @media (max-width: 900px) {
+    .svc { grid-template-columns: 1fr; }
+    .svc--rev .svc__media { order: 0; }
+  }
+  @media (max-width: 480px) { .svc__caps { grid-template-columns: 1fr; } }
+</style>

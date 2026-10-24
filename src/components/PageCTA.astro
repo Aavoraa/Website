@@ -1,0 +1,62 @@
+---
+/** Closing call-to-action band for inner pages. */
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+interface Props {
+  eyebrow?: string;
+  title: string;
+  accent?: string;
+  text?: string;
+  primary?: { label: string; href: string };
+  secondary?: { label: string; href: string };
+  location: string; // analytics label
+}
+const {
+  eyebrow = 'Let’s Grow Together',
+  title,
+  accent,
+  text,
+  primary = { label: 'Book Free Strategic Consultation', href: '/contact/' },
+  secondary = { label: `Call ${site.contact.phoneDisplay}`, href: site.contact.phoneHref },
+  location,
+} = Astro.props;
+---
+
+<section class="pcta section theme-dark flip" data-theme="dark" aria-label="Get in touch">
+  <div class="container">
+    <div class="pcta__panel" data-reveal="scale">
+      <div class="pcta__glow" aria-hidden="true"></div>
+      <div class="depth" aria-hidden="true">
+        <i class="d-ring" data-parallax="0.25" style="--k:0; width:260px; height:260px; left:-70px; top:-90px"></i>
+        <i class="d-ring" data-parallax="-0.15" style="--k:2; width:160px; height:160px; right:-40px; bottom:-50px"></i>
+        <i class="d-dot" data-parallax="0.35" style="--k:1; left:12%; bottom:22%"></i>
+        <i class="d-dot" data-parallax="-0.2" style="--k:3; right:14%; top:20%"></i>
+        <i class="d-orb" data-parallax="0.18" style="--k:4; width:240px; height:240px; right:18%; top:-120px"></i>
+      </div>
+      <p class="eyebrow">{eyebrow}</p>
+      <h2>{title} {accent && <span class="accent">{accent}</span>}</h2>
+      {text && <p class="lead">{text}</p>}
+      <div class="pcta__btns">
+        <a class="btn" href={primary.href} data-track="cta_primary" data-track-location={location}>{primary.label} <Icon name="arrow" class="arrow" /></a>
+        <a class="btn btn--ghost" href={secondary.href} data-track="cta_secondary" data-track-location={location}>{secondary.label}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pcta { padding-block: clamp(4rem, 8vw, 7rem); }
+  .pcta__panel {
+    position: relative; overflow: hidden; isolation: isolate; display: grid; justify-items: center; gap: 1.1rem; text-align: center;
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 4rem); border-radius: var(--radius-lg);
+    background: radial-gradient(90% 120% at 50% 0%, rgba(201, 149, 74, 0.16), transparent 60%), linear-gradient(180deg, #151211, #0b0a09);
+    border: 1px solid rgba(201, 149, 74, 0.28);
+  }
+  .pcta__glow { position: absolute; inset: auto -20% -60% -20%; height: 120%; z-index: -1; background: radial-gradient(closest-side, rgba(201, 149, 74, 0.18), transparent); }
+  .pcta h2 { font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3.2rem); max-width: 18em; }
+  .pcta h2 .accent { display: block; }
+  .pcta .lead { max-width: 40rem; }
+  .pcta__btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 0.5rem; }
+  :global(:root[data-theme='light']) .pcta__panel { background: radial-gradient(90% 120% at 50% 0%, rgba(201, 149, 74, 0.14), transparent 60%), linear-gradient(180deg, #ffffff, var(--ivory)); border-color: rgba(201, 149, 74, 0.35); }
+  @media (max-width: 520px) { .pcta__btns .btn { width: 100%; } }
+</style>

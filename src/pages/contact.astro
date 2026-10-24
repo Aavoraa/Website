@@ -1,0 +1,76 @@
+---
+import Page from '../layouts/Page.astro';
+import LucideIcon from '../components/LucideIcon.astro';
+import Enquiry from '../components/Enquiry.astro';
+import StepGrid from '../components/StepGrid.astro';
+import FAQ from '../components/FAQ.astro';
+import { site } from '../data/site';
+import { startSteps, markets } from '../data/pages';
+
+const channels = [
+  { icon: 'Mail', label: 'Email us', value: site.contact.email, href: `mailto:${site.contact.email}`, note: 'Best for detailed requirements and documents.' },
+  { icon: 'Phone', label: 'Call us', value: site.contact.phoneDisplay, href: site.contact.phoneHref, note: 'Speak to the team about your project.' },
+  { icon: 'MapPin', label: 'Visit us', value: site.contact.location, note: 'Working with businesses in India and internationally.' },
+];
+---
+
+<Page
+  title="Contact AAVORAA | Book a Free Strategic Consultation"
+  description="Contact AAVORAA in Coimbatore. Book a free strategic consultation about software, branding, marketing, lead generation or AI automation."
+  path="/contact/"
+  eyebrow="Contact"
+  heading="Let’s Talk About"
+  accent="Where You Want to Grow."
+  intro="Share a few details about your business and what you need. We’ll review them and come back with the right next step."
+  crumbs={[{ label: 'Contact' }]}
+>
+  <section class="section theme-dark flip ch-sec" data-theme="dark" aria-label="Contact details">
+    <div class="container">
+      <ul class="ch">
+        {
+          channels.map((c, i) => (
+            <li class="ch__card pcard" data-reveal style={`--d:${i}`}>
+              <span class="ico-tile"><LucideIcon name={c.icon} size={22} /></span>
+              <span class="ch__label">{c.label}</span>
+              {c.href ? <a class="ch__value" href={c.href}>{c.value}</a> : <span class="ch__value">{c.value}</span>}
+              <span class="ch__note">{c.note}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="mk" data-reveal>
+        <li class="mk__k">Serving</li>
+        {markets.map((m) => <li class="chip">{m}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <Enquiry />
+
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="next-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>What Happens Next</p>
+        <h2 id="next-title" class="ph2" data-reveal style="--d:1">From Hello to Growth <span class="accent">in Five Moves.</span></h2>
+      </header>
+      <StepGrid items={startSteps} />
+    </div>
+  </section>
+
+  <FAQ />
+</Page>
+
+<style>
+  .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
+  .ch-sec { padding-block: clamp(3rem, 6vw, 4.5rem) clamp(1rem, 3vw, 2rem); }
+  .ch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .ch__card { display: grid; align-content: start; gap: 0.5rem; padding: 1.6rem; }
+  .ch__card .ico-tile { margin-bottom: 0.4rem; }
+  .ch__label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .ch__value { font-family: var(--font-head); font-weight: 600; font-size: 1.2rem; color: var(--ink); overflow-wrap: anywhere; }
+  a.ch__value:hover { color: var(--gold-ink); }
+  .ch__note { font-size: 0.86rem; color: var(--text-light-muted); }
+  .mk { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.45rem; margin-top: 1.75rem; }
+  .mk__k { margin-right: 0.35rem; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-light-faint); }
+  @media (max-width: 860px) { .ch { grid-template-columns: 1fr; } }
+</style>

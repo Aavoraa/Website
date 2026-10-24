@@ -1,0 +1,38 @@
+---
+/** Client testimonials from the AAVORAA portfolio deck. */
+import LucideIcon from './LucideIcon.astro';
+import { testimonials } from '../data/pages';
+interface Props { alt?: boolean }
+const { alt = false } = Astro.props;
+---
+
+<section class:list={['tst section theme-dark flip', { 'section--alt': alt }]} data-theme="dark" aria-labelledby="tst-title">
+  <div class="container">
+    <header class="section-head section-head--center">
+      <p class="eyebrow" data-reveal>What Clients Say</p>
+      <h2 id="tst-title" class="ph2" data-reveal style="--d:1">In Their <span class="accent">Own Words.</span></h2>
+    </header>
+    <ul class="tst__grid">
+      {
+        testimonials.map((t, i) => (
+          <li class="tst__card pcard" data-reveal style={`--d:${i}`}>
+            <LucideIcon name="Quote" size={28} class="tst__q" />
+            <blockquote>{t.quote}</blockquote>
+            <p class="tst__who"><strong>{t.who}</strong> · {t.org}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .tst .section-head { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+  .tst__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(0.75rem, 1.5vw, 1.25rem); }
+  .tst__card { display: grid; align-content: start; gap: 1rem; padding: 1.75rem; }
+  .tst__card :global(.tst__q) { color: var(--gold-ink); opacity: 0.8; }
+  .tst__card blockquote { margin: 0; font-family: var(--font-head); font-size: 1.12rem; font-weight: 500; line-height: 1.45; letter-spacing: -0.01em; color: var(--ink); }
+  .tst__who { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--line-light); font-size: 0.85rem; color: var(--text-light-muted); }
+  .tst__who strong { color: var(--gold-ink); font-weight: 500; }
+  @media (max-width: 900px) { .tst__grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,92 @@
+# Added by MilesWeb support (2026-10-13) when the site went live: anything that is not a real
+# file or folder is served the homepage. Kept so re-uploads don't undo their server-side fix.
+DirectoryIndex index.html
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+# aavoraa.com/mail -> webmail. Must sit above the homepage catch-all below, or /mail just shows
+# the homepage (a redirect added in the hosting panel is appended after it and never runs).
+RewriteRule ^mail/?$ https://webmail.milesweb.com/ [R=301,L]
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule . /index.html [L]
+</IfModule>
+
+# =============================================================================
+#  AAVORAA website — Apache configuration for GoDaddy (cPanel / Linux hosting)
+#  Upload this file together with the site into public_html/.
+# =============================================================================
+
+Options -Indexes
+DirectoryIndex index.html
+
+# ---------- Custom 404 page ----------
+ErrorDocument 404 /404.html
+
+# ---------- HTTPS + canonical domain ----------
+# The site's canonical address is https://aavoraa.com (no "www").
+# STEP 1: in cPanel make sure SSL is active (cPanel > SSL/TLS Status, or GoDaddy's SSL certificate).
+# STEP 2: remove the "#" at the start of the 5 lines below to force HTTPS and drop "www".
+# (Leaving them commented is safe; enabling them before SSL works would make the site unreachable.)
+#
+# RewriteEngine On
+# RewriteCond %{HTTPS} off [OR]
+# RewriteCond %{HTTP_HOST} ^www\. [NC]
+# RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+# RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+# ---------- Correct file types ----------
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+  AddType image/x-icon .ico
+  AddType application/xml .xml
+  AddCharset utf-8 .html .css .js .xml .txt
+</IfModule>
+
+# ---------- Compression ----------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/xml application/javascript text/javascript application/json image/svg+xml
+</IfModule>
+
+# ---------- Browser caching ----------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 hour"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 month"
+</IfModule>
+<IfModule mod_headers.c>
+  # Build assets have content hashes in their names, so they can be cached "forever"
+  <FilesMatch "\.(css|js|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+
+  # Basic security headers
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# ---------- Protect non-public files ----------
+<FilesMatch "^\.|\.(md|log|ini|sh|bak)$">
+  Require all denied
+</FilesMatch>
+<Files ".htaccess">
+  Require all denied
+</Files>

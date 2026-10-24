@@ -1,0 +1,183 @@
+---
+import Icon from './Icon.astro';
+import { nav, bookingHref, bookingIsExternal, site } from '../data/site';
+const ext = bookingIsExternal ? { target: '_blank', rel: 'noopener' } : {};
+// highlight the section of the site the visitor is in (e.g. /work/kpr-mill/ → Our Work)
+const here = (href: string) => (href === '/' ? Astro.url.pathname === '/' : Astro.url.pathname.startsWith(href));
+---
+
+<header class="nav" data-nav data-nav-theme="dark">
+  <div class="nav__pill">
+    <a class="nav__logo" href="/" aria-label={`AAVORAA — ${site.logoTagline} — home`}>
+      <!-- Full-colour logo on dark surfaces, monochrome black on light (per brand guidelines) -->
+      <img class="logo-on-dark" src="/brand/aavoraa-logo-gold.png" alt="" width="900" height="254" />
+      <img class="logo-on-light" src="/brand/aavoraa-logo-black.png" alt="" aria-hidden="true" width="900" height="254" />
+      <!-- Tagline sits where the lockup places it (under the wordmark); live text so it stays legible -->
+      <span class="nav__tagline" aria-hidden="true">{site.logoTagline}</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <ul>
+        {nav.map((item) => (
+          <li><a href={item.href} data-nav-link class:list={{ 'is-current': here(item.href) }} aria-current={here(item.href) ? 'page' : undefined}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <button class="nav__theme" type="button" data-theme-toggle aria-pressed="false">
+      <span class="sr-only" data-theme-label>Switch to light theme</span>
+      <Icon name="sun" size={18} class="i-sun" />
+      <Icon name="moon" size={18} class="i-moon" />
+    </button>
+
+    <a class="btn btn--sm nav__cta" href={bookingHref} data-track="cta_primary" data-track-location="nav" {...ext}>
+      Book a Discovery Call
+    </a>
+
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only">Open menu</span>
+      <Icon name="menu" class="i-open" />
+      <Icon name="close" class="i-close" />
+    </button>
+  </div>
+
+  <div class="nav__panel" id="mobile-menu" data-menu hidden>
+    <ul>
+      {nav.map((item, i) => (
+        <li style={`--i:${i}`}><a href={item.href} data-menu-link>{item.label}<Icon name="arrow" size={18} /></a></li>
+      ))}
+    </ul>
+    <a class="btn nav__panel-cta" href={bookingHref} data-track="cta_primary" data-track-location="mobile_menu" data-menu-link {...ext}>
+      Book a Discovery Call <Icon name="arrow" class="arrow" />
+    </a>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: fixed; inset: 14px 0 auto; z-index: 100;
+    display: flex; flex-direction: column; align-items: center;
+    padding-inline: clamp(12px, 2vw, 28px); pointer-events: none;
+  }
+  .nav__pill {
+    pointer-events: auto;
+    display: flex; align-items: center; gap: 1.25rem;
+    width: 100%; height: var(--nav-h);
+    padding: 0 10px 0 22px; border-radius: 999px;
+    background: rgba(18, 16, 16, 0.62);
+    border: 1px solid rgba(201, 149, 74, 0.22);
+    box-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    transition: background-color 0.5s var(--ease), border-color 0.5s var(--ease), box-shadow 0.5s var(--ease), width 0.6s var(--ease), height 0.6s var(--ease);
+  }
+  .nav.is-scrolled .nav__pill { height: 58px; }
+  .nav[data-nav-theme='light'] .nav__pill {
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(10, 9, 9, 0.08);
+    box-shadow: 0 10px 34px -14px rgba(10, 9, 9, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .nav__logo { position: relative; display: block; flex: none; width: 172px; --logo-w: 172px; }
+  .nav__logo img { width: 100%; height: auto; transition: opacity 0.4s var(--ease); }
+  .nav__logo .logo-on-light { position: absolute; inset: 0; opacity: 0; }
+  .nav[data-nav-theme='light'] .logo-on-dark { opacity: 0; }
+  .nav[data-nav-theme='light'] .logo-on-light { opacity: 1; }
+  .nav__tagline {
+    position: absolute; left: 41.5%; right: 0; top: 60%;
+    font-family: var(--font-body); font-weight: 500; text-transform: uppercase; white-space: nowrap;
+    font-size: calc(var(--logo-w) * 0.0415); letter-spacing: 0.06em; line-height: 1;
+    background: linear-gradient(90deg, #b0742c, #cc9e5c); -webkit-background-clip: text; background-clip: text; color: transparent;
+    transition: opacity 0.4s var(--ease);
+  }
+  .nav[data-nav-theme='light'] .nav__tagline { background: none; color: rgba(10, 9, 9, 0.8); }
+
+  .nav__links { margin-inline: auto; }
+  .nav__links ul { display: flex; gap: 0.25rem; }
+  .nav__links a {
+    position: relative; display: block; padding: 0.5rem 0.8rem; border-radius: 999px; white-space: nowrap;
+    font-size: 0.875rem; font-weight: 500; color: var(--text-dark-muted);
+    transition: color 0.3s, background-color 0.3s;
+  }
+  .nav__links a:hover { color: var(--white); background: rgba(255, 255, 255, 0.06); }
+  .nav__links a.is-active, .nav__links a.is-current { color: var(--white); }
+  .nav__links a.is-active::after, .nav__links a.is-current::after {
+    content: ''; position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px;
+    border-radius: 50%; background: var(--gold);
+  }
+  .nav[data-nav-theme='light'] .nav__links a { color: rgba(10, 9, 9, 0.66); }
+  .nav[data-nav-theme='light'] .nav__links a:hover,
+  .nav[data-nav-theme='light'] .nav__links a.is-active,
+  .nav[data-nav-theme='light'] .nav__links a.is-current { color: var(--black); background: rgba(10, 9, 9, 0.05); }
+  .nav[data-nav-theme='light'] .nav__links a.is-active::after,
+  .nav[data-nav-theme='light'] .nav__links a.is-current::after { background: var(--gold-ink); }
+
+  .nav__cta { flex: none; }
+
+  /* theme toggle */
+  .nav__theme {
+    flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    color: var(--gold); border: 1px solid rgba(201, 149, 74, 0.3);
+    transition: background-color 0.3s, border-color 0.3s, transform 0.5s var(--ease);
+  }
+  .nav__theme:hover { background: rgba(201, 149, 74, 0.12); border-color: var(--gold); }
+  .nav__theme :global(svg) { grid-area: 1 / 1; transition: transform 0.6s var(--ease), opacity 0.4s; }
+  .nav__theme :global(.i-moon) { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+  :global(:root[data-theme='light']) .nav__theme :global(.i-sun) { opacity: 0; transform: rotate(90deg) scale(0.6); }
+  :global(:root[data-theme='light']) .nav__theme :global(.i-moon) { opacity: 1; transform: none; }
+  .nav[data-nav-theme='light'] .nav__theme { color: var(--gold-deep); border-color: rgba(10, 9, 9, 0.15); }
+  .nav__toggle {
+    display: none; width: 44px; height: 44px; border-radius: 50%; place-items: center; color: var(--white);
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .nav__toggle:hover { background: rgba(255, 255, 255, 0.08); }
+  .nav[data-nav-theme='light'] .nav__toggle { color: var(--black); }
+  .nav__toggle :global(.i-close) { display: none; }
+  .nav__toggle[aria-expanded='true'] :global(.i-open) { display: none; }
+  .nav__toggle[aria-expanded='true'] :global(.i-close) { display: block; }
+
+  .nav__panel {
+    pointer-events: auto;
+    width: 100%; margin-top: 8px; padding: 0.75rem;
+    border-radius: 26px; background: rgba(14, 12, 12, 0.94);
+    border: 1px solid rgba(201, 149, 74, 0.2);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.7);
+    transform-origin: top center;
+    animation: panel-in 0.45s var(--ease);
+  }
+  .nav__panel[hidden] { display: none; }
+  .nav__panel li { animation: item-in 0.5s var(--ease) backwards; animation-delay: calc(var(--i) * 40ms + 60ms); }
+  .nav__panel li a {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.95rem 1rem; color: var(--white); font-family: var(--font-head); font-size: 1.25rem; font-weight: 600;
+    border-bottom: 1px solid var(--line-dark-soft);
+  }
+  .nav__panel li a :global(svg) { color: var(--gold); }
+  .nav__panel-cta { width: 100%; margin-top: 0.85rem; }
+  @keyframes panel-in { from { opacity: 0; transform: translateY(-8px) scale(0.98); } }
+  @keyframes item-in { from { opacity: 0; transform: translateY(6px); } }
+
+  @media (max-width: 1320px) {
+    .nav__links a { padding-inline: 0.6rem; }
+  }
+  /* seven links + CTA need ~1180px; below that use the menu button */
+  @media (max-width: 1180px) {
+    .nav__links { display: none; }
+    .nav__theme { margin-left: auto; }
+    .nav__cta { margin-left: 0; }
+    .nav__toggle { display: grid; }
+  }
+  @media (max-width: 520px) {
+    .nav { inset-block-start: 10px; }
+    .nav__pill { padding-left: 18px; gap: 0.5rem; }
+    .nav__logo { width: 132px; --logo-w: 132px; }
+    .nav__tagline { display: none; } /* too small to read at phone size */
+    .nav__cta { display: none; }
+    .nav__toggle { margin-left: 0; }
+  }
+
+  :global(:root[data-theme='light']) .nav__panel { background: rgba(255, 255, 255, 0.97); border-color: rgba(10, 9, 9, 0.08); box-shadow: 0 30px 60px -24px rgba(10, 9, 9, 0.3); }
+  :global(:root[data-theme='light']) .nav__panel li a { color: var(--black); border-color: rgba(10, 9, 9, 0.08); }
+  :global(:root[data-theme='light']) .nav__panel li a :global(svg) { color: var(--gold-ink); }
+</style>

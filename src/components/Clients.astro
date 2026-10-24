@@ -1,0 +1,77 @@
+---
+import { clients } from '../data/site';
+// two rows scrolling in opposite directions
+const half = Math.ceil(clients.length / 2);
+const rows = [clients.slice(0, half), clients.slice(half)];
+---
+
+<section class="clients section theme-dark flip" id="clients" data-theme="dark" aria-labelledby="clients-title">
+  <div class="container">
+    <header class="section-head section-head--center">
+      <p class="eyebrow" data-reveal>Clients</p>
+      <h2 id="clients-title" data-reveal style="--d:1">Brands That <span class="accent">Grow With Us</span></h2>
+      <p class="lead" data-reveal style="--d:2">Businesses across India, USA, UK, UAE, Australia and Southeast Asia.</p>
+    </header>
+  </div>
+
+  <div class="marquee-wrap" data-reveal style="--d:2">
+    {
+      rows.map((row, r) => (
+        <div class:list={['marquee', { 'marquee--reverse': r === 1 }]}>
+          <ul class="marquee__track">
+            {[...row, ...row].map((c, i) => (
+              <li class="logo" aria-hidden={i >= row.length ? 'true' : undefined}>
+                {c.logo || c.src ? (
+                  <img src={c.src ?? `/clients/${c.logo}.png`} alt={i >= row.length ? '' : c.name} loading="lazy" decoding="async" />
+                ) : (
+                  <span class="logo__word">{c.name}</span>
+                )}
+                <span class="logo__name">{c.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .clients { overflow: hidden; }
+  .clients .section-head { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+
+  .marquee-wrap { display: grid; gap: 1rem; }
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee__track { display: flex; gap: 1rem; width: max-content; animation: marquee 70s linear infinite; }
+  .marquee--reverse .marquee__track { animation-direction: reverse; animation-duration: 80s; }
+  .marquee:hover .marquee__track { animation-play-state: paused; }
+  @keyframes marquee { to { transform: translateX(calc(-50% - 0.5rem)); } }
+
+  .logo {
+    flex: none; display: grid; grid-template-rows: 1fr auto; justify-items: center; align-items: center; gap: 0.5rem;
+    width: 200px; height: 118px; padding: 1rem 1.1rem 0.75rem; border-radius: 16px;
+    background: #ffffff; border: 1px solid rgba(10, 9, 9, 0.06);
+    box-shadow: 0 16px 30px -24px rgba(0, 0, 0, 0.6);
+    transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  }
+  .logo img { max-width: 150px; max-height: 52px; width: auto; height: auto; object-fit: contain; filter: grayscale(1) contrast(1.05); opacity: 0.75; transition: filter 0.4s, opacity 0.4s; }
+  /* clients without a supplied logo: a neutral wordmark */
+  .logo__word { font-family: var(--font-head); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; line-height: 1.15; text-align: center; color: rgba(10, 9, 9, 0.72); transition: color 0.4s; }
+  .logo:hover .logo__word { color: var(--black); }
+  .logo:has(.logo__word) .logo__name { display: none; }
+  .logo__name { font-size: 0.68rem; letter-spacing: 0.04em; color: rgba(10, 9, 9, 0.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .logo:hover { transform: translateY(-4px); box-shadow: 0 22px 36px -22px rgba(201, 149, 74, 0.6); }
+  .logo:hover img { filter: none; opacity: 1; }
+
+  :global(:root[data-theme='light']) .logo { box-shadow: 0 16px 30px -26px rgba(10, 9, 9, 0.35); border-color: rgba(10, 9, 9, 0.08); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { -webkit-mask-image: none; mask-image: none; }
+    .marquee__track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; padding-inline: var(--gutter); }
+    .marquee__track [aria-hidden='true'] { display: none; }
+  }
+</style>

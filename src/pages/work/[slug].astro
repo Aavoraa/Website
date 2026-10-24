@@ -1,0 +1,192 @@
+---
+import Page from '../../layouts/Page.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import Icon from '../../components/Icon.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import { cases, pillars, type Case } from '../../data/site';
+import { caseImage, servicePath, pillarPage } from '../../data/pages';
+
+export function getStaticPaths() {
+  return cases.map((c, i) => ({ params: { slug: c.slug }, props: { c, i } }));
+}
+const { c, i } = Astro.props as { c: Case; i: number };
+const prev = cases[(i - 1 + cases.length) % cases.length];
+const next = cases[(i + 1) % cases.length];
+const related = cases.filter((x) => x.slug !== c.slug && x.pillars.some((k) => c.pillars.includes(k))).slice(0, 3);
+const mainPillar = c.pillars[0];
+const contactHref = `/contact/?interest=${encodeURIComponent(pillarPage[mainPillar].interest)}`;
+
+const story = [
+  { k: 'The Challenge', icon: 'CircleAlert', text: c.challenge },
+  c.research ? { k: 'Research & Strategy', icon: 'Compass', text: c.research } : null,
+  { k: 'What We Did', icon: 'Wrench', text: c.solution, list: c.delivered },
+].filter(Boolean) as { k: string; icon: string; text: string; list?: string[] }[];
+---
+
+<Page
+  title={`${c.client} — Case Study | AAVORAA`}
+  description={`${c.client}: ${c.challenge} ${c.outcome}`.slice(0, 158)}
+  path={`/work/${c.slug}/`}
+  eyebrow={`Case Study · ${c.sector}`}
+  heading={c.client}
+  intro={c.outcome}
+  crumbs={[{ label: 'Our Work', href: '/work/' }, { label: c.client }]}
+>
+  <ul slot="head" class="tags">
+    {c.services.map((s) => <li class="chip">{s}</li>)}
+    {c.location && <li class="chip"><LucideIcon name="MapPin" size={13} /> {c.location}</li>}
+  </ul>
+
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="story-title">
+    <div class="container cs">
+      <aside class="cs__side">
+        <div class="cs__photo tone" data-reveal="scale">
+          <img src={caseImage(c)} alt="" width="900" height="600" decoding="async" />
+        </div>
+        {c.metric && (
+          <div class="cs__metric pcard" data-reveal>
+            <strong>{c.metric.value}</strong>
+            <span>{c.metric.label}</span>
+          </div>
+        )}
+        <dl class="cs__facts pcard" data-reveal>
+          <div><dt>Client</dt><dd>{c.client}</dd></div>
+          <div><dt>Sector</dt><dd>{c.sector}</dd></div>
+          {c.location && <div><dt>Location</dt><dd>{c.location}</dd></div>}
+          <div><dt>Services</dt><dd>{c.services.join(', ')}</dd></div>
+          {c.tools && <div><dt>Tools</dt><dd>{c.tools.join(' · ')}</dd></div>}
+        </dl>
+      </aside>
+
+      <div class="cs__story">
+        <h2 id="story-title" class="sr-only">The story</h2>
+        <ol class="tl" data-fill>
+          {
+            story.map((s, k) => (
+              <li class="tl__item" data-reveal style={`--d:${k}`}>
+                <span class="tl__icon"><LucideIcon name={s.icon} size={18} /></span>
+                <div class="tl__body">
+                  <h3>{s.k}</h3>
+                  <p>{s.text}</p>
+                  {s.list && <ul class="ticks">{s.list.map((x) => <li>{x}</li>)}</ul>}
+                </div>
+              </li>
+            ))
+          }
+          <li class="tl__item tl__item--out" data-reveal>
+            <span class="tl__icon"><LucideIcon name="TrendingUp" size={18} /></span>
+            <div class="tl__body">
+              <h3>Results &amp; Outcome</h3>
+              <p class="tl__outcome">{c.outcome}</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="cs__svc" data-reveal>
+          <span class="cs__k">Services behind this result</span>
+          <div class="cs__links">
+            {c.pillars.map((k) => {
+              const p = pillars.find((x) => x.key === k)!;
+              return <a class="cs__svc-link pcard" href={servicePath(k)}>{p.label} <LucideIcon name="ArrowUpRight" size={16} /></a>;
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="section theme-dark section--alt flip pn-sec" data-theme="dark" aria-label="More case studies">
+    <div class="container">
+      <div class="pn">
+        <a class="pn__link pcard" href={`/work/${prev.slug}/`} rel="prev">
+          <LucideIcon name="ArrowLeft" size={18} />
+          <span><small>Previous</small><strong>{prev.client}</strong></span>
+        </a>
+        <a class="pn__link pn__link--next pcard" href={`/work/${next.slug}/`} rel="next">
+          <span><small>Next</small><strong>{next.client}</strong></span>
+          <LucideIcon name="ArrowRight" size={18} />
+        </a>
+      </div>
+      {
+        related.length > 0 && (
+          <>
+            <div class="rel__head">
+              <h2 class="ph2">Related <span class="accent">Work.</span></h2>
+              <a class="btn btn--outline" href="/work/">All Case Studies <Icon name="arrow" class="arrow" /></a>
+            </div>
+            <ul class="rel">
+              {related.map((r, k) => (
+                <li data-reveal style={`--d:${k}`}><CaseCard item={r} /></li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </div>
+  </nav>
+
+  <PageCTA
+    title="Want Results Like This?"
+    accent="Let’s Start With Your Goals."
+    primary={{ label: 'Book Free Strategic Consultation', href: contactHref }}
+    location={`case_${c.slug}`}
+  />
+</Page>
+
+<style>
+  .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.45rem; margin-top: 0.4rem; }
+  .tags .chip { background: rgba(10, 9, 9, 0.35); }
+  .tags :global(svg) { color: var(--gold-ink); }
+  :global(:root[data-theme='light']) .tags .chip { background: rgba(255, 255, 255, 0.6); }
+
+  .cs { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+  .cs__side { display: grid; gap: 1rem; position: sticky; top: 100px; }
+  .cs__photo { aspect-ratio: 4 / 3; border-radius: var(--radius-lg); border: 1px solid var(--frame-line); }
+  .cs__metric { display: grid; gap: 0.3rem; padding: 1.4rem 1.5rem; background: radial-gradient(120% 120% at 0% 0%, rgba(201, 149, 74, 0.14), transparent 60%), var(--card-bg); border-color: rgba(201, 149, 74, 0.3); }
+  .cs__metric strong { font-family: var(--font-head); font-weight: 700; font-size: clamp(2.2rem, 1.6rem + 2vw, 3.2rem); letter-spacing: -0.04em; line-height: 1; color: var(--gold-ink); }
+  .cs__metric span { font-size: 0.9rem; color: var(--ink); }
+  .cs__facts { display: grid; padding: 0.4rem 1.5rem; }
+  .cs__facts div { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--line-light); }
+  .cs__facts div:last-child { border-bottom: 0; }
+  .cs__facts dt { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); padding-top: 0.15rem; }
+  .cs__facts dd { font-size: 0.9rem; color: var(--ink); }
+
+  .tl { position: relative; display: grid; gap: 2.25rem; }
+  .tl::before { content: ''; position: absolute; left: 21px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(180deg, rgba(201, 149, 74, 0.35), rgba(201, 149, 74, 0.08)); }
+  .tl::after { /* gold fill that follows the reader */
+    content: ''; position: absolute; left: 20.5px; top: 8px; width: 2px; height: calc((100% - 16px) * var(--fill, 1));
+    background: linear-gradient(180deg, var(--gold-light), var(--gold)); box-shadow: 0 0 12px rgba(201, 149, 74, 0.6); border-radius: 2px;
+  }
+  .tl__icon { position: relative; z-index: 1; transition: background-color 0.5s var(--ease), color 0.5s var(--ease), box-shadow 0.5s var(--ease), transform 0.5s var(--ease); }
+  .tl__item:global(.is-lit) .tl__icon { color: var(--black); background: var(--gold); border-color: var(--gold); box-shadow: 0 0 0 6px rgba(201, 149, 74, 0.15); transform: scale(1.05); }
+  .tl__item { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 1.25rem; }
+  .tl__icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: var(--gold-ink); background: var(--node-bg); border: 1px solid rgba(201, 149, 74, 0.45); }
+  .tl__item--out .tl__icon { color: var(--black); background: var(--gold); border-color: var(--gold); }
+  .tl__body { display: grid; gap: 0.75rem; padding-top: 0.45rem; }
+  .tl__body h3 { font-size: 0.78rem; font-family: var(--font-body); font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-ink); }
+  .tl__body p { font-size: 1.05rem; line-height: 1.75; color: var(--text-light-muted); }
+  .tl__outcome { font-family: var(--font-head); font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.7rem) !important; font-weight: 600; line-height: 1.35 !important; color: var(--ink) !important; letter-spacing: -0.015em; }
+  .cs__svc { display: grid; gap: 0.75rem; margin-top: 2.75rem; padding-top: 1.75rem; border-top: 1px solid var(--line-light); }
+  .cs__k { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .cs__links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .cs__svc-link { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1.1rem; font-family: var(--font-head); font-weight: 600; transition: border-color 0.3s, transform 0.4s var(--ease); }
+  .cs__svc-link:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .cs__svc-link :global(svg) { color: var(--gold-ink); }
+
+  .pn-sec { padding-block: clamp(3rem, 6vw, 5rem); }
+  .pn { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+  .pn__link { display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.4rem; transition: border-color 0.3s, transform 0.4s var(--ease); }
+  .pn__link:hover { border-color: rgba(201, 149, 74, 0.5); transform: translateY(-3px); }
+  .pn__link--next { justify-content: flex-end; text-align: right; }
+  .pn__link span { display: grid; gap: 0.15rem; }
+  .pn__link small { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .pn__link strong { font-family: var(--font-head); font-weight: 600; font-size: 1.05rem; }
+  .pn__link :global(svg) { flex: none; color: var(--gold-ink); }
+  .rel__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.25rem; margin: clamp(3rem, 6vw, 4.5rem) 0 clamp(1.5rem, 3vw, 2.25rem); }
+  .rel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(0.85rem, 1.6vw, 1.35rem); }
+
+  @media (max-width: 1000px) { .rel { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 900px) { .cs { grid-template-columns: 1fr; } .cs__side { position: static; } }
+  @media (max-width: 640px) { .rel, .pn { grid-template-columns: 1fr; } }
+</style>

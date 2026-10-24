@@ -1,0 +1,187 @@
+---
+import Icon from './Icon.astro';
+import LucideIcon from './LucideIcon.astro';
+import { realityCheck } from '../data/site';
+
+// Chart bars: flat before, compounding growth after (illustrative, no figures implied)
+const BARS = 14;
+const beforeBars = Array.from({ length: BARS }, (_, i) => 4 + ((i * 7) % 5));
+// On the homepage the enquiry form is on the page; elsewhere it lives at /contact/
+const contactHref = Astro.url.pathname === '/' ? '#contact' : '/contact/';
+const afterBars = Array.from({ length: BARS }, (_, i) => Math.round(12 + Math.pow(i / (BARS - 1), 1.6) * 88));
+---
+
+<!-- Why AAVORAA × the challenges: a before/after "reality check" with a draggable divider -->
+<section class="why section theme-dark flip" id="why" data-theme="dark" aria-labelledby="why-title">
+  <div class="container">
+    <header class="section-head section-head--center why__head">
+      <p class="eyebrow" data-reveal>Why AAVORAA</p>
+      <h2 id="why-title" data-reveal style="--d:1">More Than Services. <span class="accent">A Connected Business Advantage.</span></h2>
+      <p class="lead" data-reveal style="--d:2">Drag the slider to see what changes when every capability is connected.</p>
+    </header>
+
+    <div class="rc" data-compare data-reveal="scale" style="--pos: 50%; --d: 2">
+      <!-- BEFORE (shown left of the divider) -->
+      <div class="rc__layer rc__layer--before">
+        <span class="rc__badge rc__badge--before"><LucideIcon name="CircleX" size={15} /> Disconnected approach</span>
+        <ul class="rc__grid" aria-label="Before: the challenges">
+          {
+            realityCheck.map((r) => (
+              <li class="rc__item">
+                <span class="rc__mark"><LucideIcon name="X" size={14} stroke={2} /></span>
+                <span><strong>{r.before.title}</strong><span>{r.before.text}</span></span>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="rc__chart" aria-hidden="true">
+          {beforeBars.map((h) => <i style={`--h:${h}%`} />)}
+          <span class="rc__chart-label">Flatline</span>
+        </div>
+      </div>
+
+      <!-- AFTER (revealed right of the divider) -->
+      <div class="rc__layer rc__layer--after">
+        <span class="rc__badge rc__badge--after"><LucideIcon name="CircleCheck" size={15} /> Connected with AAVORAA</span>
+        <ul class="rc__grid" aria-label="After: with AAVORAA">
+          {
+            realityCheck.map((r) => (
+              <li class="rc__item">
+                <span class="rc__mark"><LucideIcon name="Check" size={14} stroke={2.2} /></span>
+                <span><strong>{r.after.title}</strong><span>{r.after.text}</span></span>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="rc__chart" aria-hidden="true">
+          {afterBars.map((h, i) => <i style={`--h:${h}%; --i:${i}`} />)}
+          <span class="rc__chart-label">Growth</span>
+        </div>
+      </div>
+
+      <!-- divider handle -->
+      <div
+        class="rc__handle"
+        role="slider"
+        tabindex="0"
+        aria-label="Compare before and after"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="50"
+        aria-valuetext="Half before, half after"
+        data-compare-handle
+      >
+        <span class="rc__knob"><LucideIcon name="ChevronsLeftRight" size={18} stroke={2} /></span>
+      </div>
+    </div>
+    <p class="rc__hint caption"><LucideIcon name="MoveHorizontal" size={15} /> Drag the centre bar to compare</p>
+
+    <div class="why__close" data-reveal>
+      <p>We don’t just deliver individual services. <strong>We help connect the pieces that move your business forward.</strong></p>
+      <a class="btn btn--outline" href={contactHref} data-track="cta_secondary" data-track-location="why">
+        Discuss Your Business Goals <Icon name="arrow" class="arrow" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* headline on exactly two lines */
+  .why__head { max-width: none; }
+  .why__head h2 { font-size: clamp(1.9rem, 1.2rem + 2.3vw, 3.2rem); }
+  .why__head h2 .accent { white-space: nowrap; }
+  @media (max-width: 760px) { .why__head h2 .accent { white-space: normal; } }
+
+  /* ---------- compare panel ---------- */
+  .rc {
+    position: relative; margin-top: clamp(2.5rem, 5vw, 3.5rem); border-radius: var(--radius-lg); overflow: hidden;
+    border: 1px solid var(--surface-line); box-shadow: 0 40px 80px -50px var(--shadow);
+    user-select: none; -webkit-user-select: none; touch-action: pan-y; cursor: ew-resize;
+  }
+  .rc__layer { display: grid; align-content: start; gap: 1.4rem; padding: clamp(1.25rem, 3vw, 2rem); }
+  .rc__layer--before { position: relative; background: linear-gradient(180deg, #121010, #0c0a0a); }
+  .rc__layer--after {
+    position: absolute; inset: 0;
+    background: radial-gradient(120% 90% at 100% 0%, rgba(201, 149, 74, 0.12), transparent 60%), linear-gradient(180deg, #17130f, #0d0b0a);
+    clip-path: inset(0 0 0 var(--pos));
+  }
+
+  .rc__badge {
+    justify-self: start; display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 500;
+  }
+  .rc__badge--before { color: rgba(255, 255, 255, 0.6); background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); }
+  .rc__badge--after { justify-self: end; color: var(--gold); background: rgba(201, 149, 74, 0.1); border: 1px solid rgba(201, 149, 74, 0.35); }
+
+  .rc__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .rc__item { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.9rem 1rem; border-radius: 14px; }
+  .rc__item strong { display: block; font-family: var(--font-head); font-weight: 600; font-size: 0.98rem; letter-spacing: -0.01em; line-height: 1.25; }
+  .rc__item span > span { display: block; margin-top: 0.2rem; font-size: 0.82rem; line-height: 1.45; }
+  .rc__mark { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; margin-top: 0.05rem; }
+
+  .rc__layer--before .rc__item { background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.82); }
+  .rc__layer--before .rc__item span > span { color: rgba(255, 255, 255, 0.5); }
+  .rc__layer--before .rc__mark { color: rgba(255, 255, 255, 0.55); border: 1px solid rgba(255, 255, 255, 0.25); }
+  .rc__layer--after .rc__item { background: rgba(201, 149, 74, 0.06); border: 1px solid rgba(201, 149, 74, 0.22); color: #fff; }
+  .rc__layer--after .rc__item span > span { color: rgba(255, 255, 255, 0.66); }
+  .rc__layer--after .rc__mark { background: var(--gold); color: var(--black); }
+
+  /* chart */
+  .rc__chart { position: relative; display: flex; align-items: flex-end; gap: clamp(4px, 0.8vw, 10px); height: clamp(90px, 14vw, 150px); padding-top: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+  .rc__chart i { flex: 1; height: var(--h); border-radius: 6px 6px 0 0; }
+  .rc__layer--before .rc__chart i { background: rgba(255, 255, 255, 0.1); }
+  .rc__layer--after .rc__chart i {
+    background: linear-gradient(180deg, var(--gold-light), var(--gold) 45%, var(--gold-deep));
+    box-shadow: 0 0 20px -6px rgba(201, 149, 74, 0.6);
+  }
+  .rc__chart-label { position: absolute; top: 0; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+  .rc__layer--before .rc__chart-label { left: 0; color: rgba(255, 255, 255, 0.4); }
+  .rc__layer--after .rc__chart-label { right: 0; color: var(--gold); }
+
+  /* divider */
+  .rc__handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 44px; translate: -50% 0; display: grid; place-items: center; cursor: ew-resize; outline: none; }
+  .rc__handle::before {
+    content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; translate: -50% 0;
+    background: linear-gradient(180deg, transparent, var(--gold-light) 12%, var(--gold-light) 88%, transparent);
+    box-shadow: 0 0 18px rgba(201, 149, 74, 0.7);
+  }
+  .rc__knob {
+    position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+    color: var(--black); background: var(--gold); box-shadow: 0 0 0 6px rgba(201, 149, 74, 0.2), 0 10px 26px -8px rgba(0, 0, 0, 0.7);
+    transition: transform 0.3s var(--ease);
+  }
+  .rc__handle:hover .rc__knob, .rc:global(.is-dragging) .rc__knob { transform: scale(1.1); }
+  .rc__handle:focus-visible .rc__knob { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  .rc__hint { display: flex; align-items: center; justify-content: center; gap: 0.45rem; margin-top: 1rem; color: var(--text-light-faint); }
+  .rc__hint :global(svg) { color: var(--gold-ink); }
+
+  .why__close {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.5rem 2.5rem; text-align: center;
+    margin-top: clamp(2.5rem, 5vw, 3.5rem); padding-top: 2.25rem; border-top: 1px solid var(--line-light);
+  }
+  .why__close p { font-size: var(--fs-lead); color: var(--text-light-muted); max-width: 34rem; }
+  .why__close strong { color: var(--ink); font-weight: 500; }
+
+  /* ---------- light theme ---------- */
+  :global(:root[data-theme='light']) .rc__layer--before { background: linear-gradient(180deg, #ece8e0, #e4dfd5); }
+  :global(:root[data-theme='light']) .rc__layer--after { background: radial-gradient(120% 90% at 100% 0%, rgba(201, 149, 74, 0.16), transparent 60%), linear-gradient(180deg, #ffffff, #fbf8f2); }
+  :global(:root[data-theme='light']) .rc__badge--before { color: rgba(10, 9, 9, 0.6); background: rgba(10, 9, 9, 0.04); border-color: rgba(10, 9, 9, 0.14); }
+  :global(:root[data-theme='light']) .rc__badge--after { color: var(--gold-ink); }
+  :global(:root[data-theme='light']) .rc__layer--before .rc__item { background: rgba(255, 255, 255, 0.5); border-color: rgba(10, 9, 9, 0.08); color: rgba(10, 9, 9, 0.8); }
+  :global(:root[data-theme='light']) .rc__layer--before .rc__item span > span { color: rgba(10, 9, 9, 0.55); }
+  :global(:root[data-theme='light']) .rc__layer--before .rc__mark { color: rgba(10, 9, 9, 0.5); border-color: rgba(10, 9, 9, 0.25); }
+  :global(:root[data-theme='light']) .rc__layer--after .rc__item { background: rgba(201, 149, 74, 0.07); color: var(--black); }
+  :global(:root[data-theme='light']) .rc__layer--after .rc__item span > span { color: rgba(10, 9, 9, 0.66); }
+  :global(:root[data-theme='light']) .rc__layer--before .rc__chart i { background: rgba(10, 9, 9, 0.1); }
+  :global(:root[data-theme='light']) .rc__chart { border-color: rgba(10, 9, 9, 0.12); }
+  :global(:root[data-theme='light']) .rc__layer--before .rc__chart-label { color: rgba(10, 9, 9, 0.45); }
+  :global(:root[data-theme='light']) .rc__layer--after .rc__chart-label { color: var(--gold-ink); }
+
+  @media (max-width: 760px) {
+    .rc__grid { grid-template-columns: 1fr; gap: 0.6rem; }
+    .rc__item { padding: 0.75rem 0.85rem; }
+    .rc__item span > span { font-size: 0.78rem; }
+    .why__close .btn { width: 100%; white-space: normal; }
+  }
+</style>

@@ -1,0 +1,119 @@
+---
+import Page from '../../layouts/Page.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import { pillars } from '../../data/site';
+import { articles } from '../../data/insights';
+import { articleImage } from '../../data/pages';
+const label = Object.fromEntries(pillars.map((p) => [p.key, p.label]));
+const fmt = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+const [lead, ...rest] = articles;
+---
+
+<Page
+  title="Insights | Practical Ideas on Software, Branding, Growth & AI | AAVORAA"
+  description="Practical articles from AAVORAA on websites that generate enquiries, what to automate first, getting found in AI answers and brand positioning."
+  path="/insights/"
+  eyebrow="Insights"
+  heading="Ideas for Building, Transforming"
+  accent="and Growing a Business."
+  intro="Practical thinking from the AAVORAA team — the questions we hear most from business owners, answered plainly."
+  crumbs={[{ label: 'Insights' }]}
+>
+  <section class="section theme-dark flip" data-theme="dark" aria-label="Articles">
+    <div class="container">
+      <div class="topics" role="group" aria-label="Filter articles by topic" data-topics data-reveal>
+        <button class="topic is-on" type="button" aria-pressed="true" data-topic="all">All topics</button>
+        {pillars.filter((p) => articles.some((a) => a.category === p.key)).map((p) => (
+          <button class="topic" type="button" aria-pressed="false" data-topic={p.key}>{p.label}</button>
+        ))}
+      </div>
+      <a class="feat pcard" data-cat={lead.category} href={`/insights/${lead.slug}/`} data-reveal>
+        <div class="feat__media tone"><img src={articleImage(lead)} alt="" width="900" height="600" decoding="async" /></div>
+        <div class="feat__body">
+          <p class="meta"><span class="meta__cat">{label[lead.category]}</span><span>{fmt(lead.date)}</span><span>{lead.readMinutes} min read</span></p>
+          <h2>{lead.title}</h2>
+          <p class="feat__ex">{lead.excerpt}</p>
+          <span class="more">Read the article <LucideIcon name="ArrowRight" size={15} /></span>
+        </div>
+      </a>
+
+      <ul class="posts">
+        {
+          rest.map((a, i) => (
+            <li data-reveal style={`--d:${i}`} data-cat={a.category}>
+              <a class="post pcard" href={`/insights/${a.slug}/`}>
+                <div class="post__media tone"><img src={articleImage(a)} alt="" width="900" height="600" loading="lazy" decoding="async" /></div>
+                <div class="post__body">
+                  <p class="meta"><span class="meta__cat">{label[a.category]}</span><span>{a.readMinutes} min read</span></p>
+                  <h2>{a.title}</h2>
+                  <p class="post__ex">{a.excerpt}</p>
+                  <span class="more">Read the article <LucideIcon name="ArrowRight" size={15} /></span>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <PageCTA
+    title="Have a Question We Haven’t Answered?"
+    accent="Ask Us Directly."
+    text="If something here sounds like your business, we’re happy to talk it through — no obligation."
+    location="insights_page"
+  />
+</Page>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-topics]');
+  bar?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-topic]');
+    if (!btn) return;
+    const key = btn.dataset.topic;
+    bar.querySelectorAll<HTMLButtonElement>('[data-topic]').forEach((b) => {
+      b.classList.toggle('is-on', b === btn);
+      b.setAttribute('aria-pressed', String(b === btn));
+    });
+    document.querySelectorAll<HTMLElement>('[data-cat]').forEach((el) => {
+      el.hidden = key !== 'all' && el.dataset.cat !== key;
+      if (!el.hidden) el.classList.add('is-in');
+    });
+  });
+</script>
+
+<style>
+  .topics { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1.5rem; }
+  .topic {
+    padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 500;
+    color: var(--text-light-muted); background: var(--surface); border: 1px solid var(--surface-line);
+    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+  }
+  .topic:hover { border-color: rgba(201, 149, 74, 0.5); color: var(--ink); }
+  .topic.is-on { color: var(--black); background: var(--gold); border-color: var(--gold); }
+  [data-cat][hidden] { display: none; }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 1rem; font-size: 0.78rem; color: var(--text-light-faint); }
+  .meta__cat { font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .more { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; padding-top: 0.5rem; font-size: 0.85rem; font-weight: 500; color: var(--gold-ink); }
+  .more :global(svg) { transition: transform 0.3s var(--ease); }
+  a:hover .more :global(svg) { transform: translateX(4px); }
+
+  .feat { display: grid; grid-template-columns: 1.1fr 1fr; overflow: hidden; transition: border-color 0.4s, transform 0.5s var(--ease); }
+  .feat:hover { border-color: rgba(201, 149, 74, 0.45); transform: translateY(-4px); }
+  .feat__media { min-height: 320px; }
+  .feat__body { display: grid; align-content: center; gap: 1rem; padding: clamp(1.75rem, 4vw, 3rem); }
+  .feat h2 { font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem); }
+  .feat__ex { color: var(--text-light-muted); line-height: 1.7; }
+
+  .posts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+  .post { display: flex; flex-direction: column; height: 100%; overflow: hidden; transition: border-color 0.4s, transform 0.5s var(--ease); }
+  .post:hover { border-color: rgba(201, 149, 74, 0.45); transform: translateY(-4px); }
+  .post__media { aspect-ratio: 16 / 9; }
+  .feat:hover :global(img), .post:hover :global(img) { transform: scale(1.05); }
+  .post__body { display: flex; flex-direction: column; gap: 0.75rem; flex: 1; padding: 1.4rem 1.5rem 1.5rem; }
+  .post h2 { font-size: 1.2rem; line-height: 1.3; }
+  .post__ex { font-size: 0.9rem; line-height: 1.6; color: var(--text-light-muted); }
+
+  @media (max-width: 900px) { .feat { grid-template-columns: 1fr; } .feat__media { min-height: 0; aspect-ratio: 16 / 9; } .posts { grid-template-columns: 1fr; } }
+</style>

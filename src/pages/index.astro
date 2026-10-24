@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Capabilities from '../components/Capabilities.astro';
+import About from '../components/About.astro';
+import Approach from '../components/Approach.astro';
+import Pillar from '../components/Pillar.astro';
+import Why from '../components/Why.astro';
+import Warexx from '../components/Warexx.astro';
+import Industries from '../components/Industries.astro';
+import Work from '../components/Work.astro';
+import Enquiry from '../components/Enquiry.astro';
+import FAQ from '../components/FAQ.astro';
+import Clients from '../components/Clients.astro';
+import Tools from '../components/Tools.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base structuredData>
+  <Nav />
+  <main id="main">
+    <Hero />
+    <About />
+    <Capabilities />
+    <Clients />
+    <Approach />
+    <div id="solutions">
+      <Pillar kind="build" flip first />
+      <Pillar kind="brand" alt flip reverse />
+      <Pillar kind="grow" flip />
+      <Pillar kind="transform" alt flip reverse />
+    </div>
+    <Tools />
+    <Why />
+    <Industries />
+    <Work />
+    <Warexx />
+    <Enquiry />
+    <FAQ />
+  </main>
+  <Footer />
+</Base>
+
+<script>
+  import '../scripts/main.ts';
+</script>

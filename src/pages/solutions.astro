@@ -1,0 +1,153 @@
+---
+import Page from '../layouts/Page.astro';
+import LucideIcon from '../components/LucideIcon.astro';
+import Icon from '../components/Icon.astro';
+import Why from '../components/Why.astro';
+import PageCTA from '../components/PageCTA.astro';
+import { pillars, cases, entryPoints } from '../data/site';
+import { solutions, servicePath } from '../data/pages';
+const entryIcons = ['Search', 'CodeXml', 'Bot'];
+---
+
+<Page
+  title="Solutions | Solve the Business Problem, Not Just the Task | AAVORAA"
+  description="Business solutions from AAVORAA: more qualified enquiries, visibility on Google and AI answers, connected operations, automation, a brand that stands apart and a clear growth roadmap."
+  path="/solutions/"
+  eyebrow="Solutions"
+  heading="Start With the Problem."
+  accent="We’ll Connect the Solution."
+  intro="Most businesses don’t need more services — they need the right ones, connected. Find the challenge that sounds familiar and see how we solve it."
+  crumbs={[{ label: 'Solutions' }]}
+>
+  <nav slot="head" class="jump" aria-label="Jump to a solution" data-spy>
+    {solutions.map((s) => <a class="chip" href={`#${s.key}`}><LucideIcon name={s.icon} size={14} /> {s.title}</a>)}
+  </nav>
+
+  <section class="section theme-dark flip" data-theme="dark" aria-label="Solutions by business challenge">
+    <div class="container sols">
+      {
+        solutions.map((s, i) => {
+          const proof = cases.find((c) => c.slug === s.caseSlug);
+          return (
+            <article class="sol pcard" id={s.key} data-reveal>
+              <header class="sol__head">
+                <span class="ico-tile"><LucideIcon name={s.icon} size={24} /></span>
+                <span class="sol__n">0{i + 1}</span>
+                <h2>{s.title}</h2>
+                <p class="sol__problem">{s.problem}</p>
+              </header>
+              <div class="sol__cols">
+                <div>
+                  <p class="sol__k"><LucideIcon name="CircleAlert" size={15} /> Signs you need this</p>
+                  <ul class="ticks">{s.signs.map((x) => <li>{x}</li>)}</ul>
+                </div>
+                <div>
+                  <p class="sol__k"><LucideIcon name="Wrench" size={15} /> How we solve it</p>
+                  <ol class="sol__steps">{s.approach.map((x, k) => <li><span>{k + 1}</span>{x}</li>)}</ol>
+                </div>
+              </div>
+              <footer class="sol__foot">
+                <div class="sol__svc">
+                  <span class="sol__k">Services involved</span>
+                  <span class="sol__links">
+                    {s.pillars.map((k) => {
+                      const p = pillars.find((x) => x.key === k)!;
+                      return <a class="chip" href={servicePath(k)}>{p.label}</a>;
+                    })}
+                  </span>
+                </div>
+                {proof && (
+                  <a class="sol__proof" href={`/work/${proof.slug}/`}>
+                    {proof.metric && <strong>{proof.metric.value}</strong>}
+                    <span>{proof.metric ? proof.metric.label : proof.outcome} — {proof.client}</span>
+                    <LucideIcon name="ArrowRight" size={16} />
+                  </a>
+                )}
+                <a class="btn btn--outline btn--sm" href={`/contact/?interest=${encodeURIComponent(s.interest)}`} data-track="cta_secondary" data-track-location={`solution_${s.key}`}>
+                  Discuss This <Icon name="arrow" class="arrow" />
+                </a>
+              </footer>
+            </article>
+          );
+        })
+      }
+    </div>
+  </section>
+
+  <Why />
+
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="entry-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>Easy Ways to Start</p>
+        <h2 id="entry-title" class="ph2" data-reveal style="--d:1">Three Focused <span class="accent">Starting Points.</span></h2>
+        <p class="lead" data-reveal style="--d:2">Not ready for a full project? Start with a focused review and a clear set of recommendations.</p>
+      </header>
+      <ul class="entries">
+        {
+          entryPoints.map((e, i) => (
+            <li data-reveal style={`--d:${i}`}>
+              <a class="entry pcard" href={`/contact/?interest=${encodeURIComponent(e.interest)}`} data-track="cta_secondary" data-track-location="solutions_entry" data-track-label={e.title}>
+                <span class="ico-tile"><LucideIcon name={entryIcons[i]} size={22} /></span>
+                <h3>{e.title}</h3>
+                <p>{e.text}</p>
+                <span class="entry__more">Request this <LucideIcon name="ArrowRight" size={15} /></span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <PageCTA
+    title="Recognise Your Business Here?"
+    accent="Let’s Map the Fix."
+    text="Share the challenge in a few lines. We’ll come back with the questions that matter and a suggested first step."
+    location="solutions_page"
+  />
+</Page>
+
+<style>
+  .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
+  .jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; max-width: 56rem; margin-top: 0.75rem; }
+  .jump .chip { background: rgba(10, 9, 9, 0.35); transition: border-color 0.3s, color 0.3s; }
+  .jump .chip:hover, .jump .chip:global(.is-spy) { border-color: var(--gold); color: var(--ink); }
+  .jump :global(svg) { color: var(--gold-ink); }
+  :global(:root[data-theme='light']) .jump .chip { background: rgba(255, 255, 255, 0.6); }
+
+  .sols { display: grid; gap: 1.5rem; }
+  .sol { display: grid; gap: 1.75rem; padding: clamp(1.5rem, 4vw, 2.75rem); scroll-margin-top: 110px; }
+  .sol__head { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.5rem 1rem; }
+  .sol__n { justify-self: end; font-family: var(--font-head); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; color: var(--gold-ink); }
+  .sol h2 { grid-column: 1 / -1; margin-top: 0.6rem; font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.3rem); }
+  .sol__problem { grid-column: 1 / -1; font-size: var(--fs-lead); color: var(--text-light-muted); max-width: 46rem; }
+  .sol__cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 4vw, 3rem); padding-top: 1.5rem; border-top: 1px solid var(--line-light); }
+  .sol__cols > div { display: grid; gap: 0.9rem; align-content: start; }
+  .sol__k { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .sol__steps { display: grid; gap: 0.7rem; }
+  .sol__steps li { display: flex; gap: 0.75rem; align-items: flex-start; font-size: 0.95rem; line-height: 1.55; color: var(--ink); }
+  .sol__steps span { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-size: 0.75rem; font-weight: 600; color: var(--black); background: var(--gold); }
+  .sol__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line-light); }
+  .sol__svc { display: grid; gap: 0.5rem; }
+  .sol__links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .sol__links .chip:hover { border-color: var(--gold); color: var(--ink); }
+  .sol__proof {
+    flex: 1; min-width: 260px; display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm);
+    background: rgba(201, 149, 74, 0.06); border: 1px solid rgba(201, 149, 74, 0.22); font-size: 0.85rem; color: var(--text-light-muted);
+    transition: border-color 0.3s;
+  }
+  .sol__proof:hover { border-color: var(--gold); }
+  .sol__proof strong { font-family: var(--font-head); font-size: 1.3rem; color: var(--gold-ink); white-space: nowrap; }
+  .sol__proof span { flex: 1; }
+  .sol__proof :global(svg) { flex: none; color: var(--gold-ink); }
+
+  .entries { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .entry { display: grid; align-content: start; gap: 0.75rem; height: 100%; padding: 1.6rem; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .entry:hover { transform: translateY(-5px); border-color: rgba(201, 149, 74, 0.45); }
+  .entry h3 { font-size: 1.2rem; }
+  .entry p { font-size: 0.92rem; line-height: 1.6; color: var(--text-light-muted); }
+  .entry__more { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; padding-top: 0.5rem; font-size: 0.85rem; font-weight: 500; color: var(--gold-ink); }
+
+  @media (max-width: 860px) { .sol__cols, .entries { grid-template-columns: 1fr; } }
+</style>

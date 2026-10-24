@@ -1,0 +1,20 @@
+---
+/** Brand mark from Simple Icons (CC0), rendered at build time. Colour follows `currentColor`. */
+import * as si from 'simple-icons';
+
+interface Props {
+  icon: string; // Simple Icons export name, e.g. "siFigma"
+  size?: number;
+  class?: string;
+}
+const { icon, size = 22, class: cls = '' } = Astro.props;
+const data = (si as Record<string, { path: string; title: string } | undefined>)[icon];
+---
+
+{
+  data ? (
+    <svg class={cls} width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d={data.path} />
+    </svg>
+  ) : null
+}

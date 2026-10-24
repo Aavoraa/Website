@@ -1,0 +1,62 @@
+---
+/** Case-study card used on /work/, service pages and industry pages. The whole card links to /work/<slug>/. */
+import LucideIcon from './LucideIcon.astro';
+import type { Case } from '../data/site';
+import { caseImage } from '../data/pages';
+interface Props { item: Case; headingLevel?: 'h2' | 'h3' }
+const { item, headingLevel: H = 'h3' } = Astro.props;
+const href = `/work/${item.slug}/`;
+---
+
+<article class="case" data-pillars={item.pillars.join(' ')}>
+  <div class="case__media tone">
+    <img src={caseImage(item)} alt="" width="900" height="600" loading="lazy" decoding="async" />
+    {item.metric && (
+      <p class="case__metric"><strong>{item.metric.value}</strong><span>{item.metric.label}</span></p>
+    )}
+  </div>
+  <div class="case__body">
+    <p class="case__sector">{item.sector}</p>
+    <H class="case__client"><a href={href} class="case__link">{item.client}</a></H>
+    <p class="case__challenge">{item.challenge}</p>
+    <ul class="case__tags">{item.services.map((s) => <li class="chip">{s}</li>)}</ul>
+    <p class="case__outcome"><LucideIcon name="TrendingUp" size={15} /> {item.outcome}</p>
+    <span class="case__more" aria-hidden="true">Read the case study <LucideIcon name="ArrowRight" size={15} /></span>
+  </div>
+</article>
+
+<style>
+  .case {
+    position: relative; display: flex; flex-direction: column; height: 100%; overflow: hidden;
+    border-radius: var(--radius-lg); background: var(--card-bg); border: 1px solid var(--surface-line);
+    box-shadow: 0 30px 60px -45px var(--shadow);
+    transition: transform 0.6s var(--ease), border-color 0.4s, box-shadow 0.6s var(--ease);
+  }
+  .case:hover, .case:focus-within { transform: translateY(-6px); border-color: rgba(201, 149, 74, 0.45); box-shadow: 0 40px 70px -40px var(--shadow), 0 0 50px -26px rgba(201, 149, 74, 0.45); }
+  .case__media { aspect-ratio: 16 / 8; }
+  .case:hover .case__media :global(img) { transform: scale(1.06); filter: grayscale(0.55) sepia(0.3) saturate(1.1) brightness(0.78) contrast(1.05); }
+  .case__metric {
+    position: absolute; z-index: 2; left: 1.1rem; bottom: 1rem; display: grid; gap: 0.1rem;
+    padding: 0.55rem 0.85rem; border-radius: 14px; background: rgba(10, 9, 9, 0.62); border: 1px solid rgba(201, 149, 74, 0.35);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .case__metric strong { font-family: var(--font-head); font-size: 1.35rem; line-height: 1; color: var(--gold-light); letter-spacing: -0.02em; }
+  .case__metric span { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.75); }
+
+  .case__body { display: grid; gap: 0.6rem; padding: 1.4rem 1.5rem 1.5rem; flex: 1; align-content: start; }
+  .case__sector { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .case__client { font-size: 1.3rem; letter-spacing: -0.02em; line-height: 1.2; }
+  .case__link::after { content: ''; position: absolute; inset: 0; z-index: 3; border-radius: inherit; } /* whole card is the link */
+  .case__link:focus-visible { outline: none; }
+  .case:has(.case__link:focus-visible) { outline: 2px solid var(--gold); outline-offset: 3px; }
+  .case__challenge { font-size: 0.9rem; line-height: 1.55; color: var(--text-light-muted); }
+  .case__tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .case__outcome {
+    display: flex; gap: 0.5rem; align-items: flex-start; margin-top: 0.35rem; padding-top: 0.85rem; border-top: 1px solid var(--line-light);
+    font-size: 0.88rem; font-weight: 500; line-height: 1.5; color: var(--ink);
+  }
+  .case__outcome :global(svg) { flex: none; margin-top: 0.2rem; color: var(--gold-ink); }
+  .case__more { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; padding-top: 0.5rem; font-size: 0.8rem; font-weight: 500; color: var(--gold-ink); }
+  .case__more :global(svg) { transition: transform 0.3s var(--ease); }
+  .case:hover .case__more :global(svg) { transform: translateX(4px); }
+</style>

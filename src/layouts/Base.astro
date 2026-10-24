@@ -1,0 +1,131 @@
+---
+import '@fontsource/instrument-sans/600.css';
+import '@fontsource/instrument-sans/700.css';
+import '@fontsource/montserrat/300.css';
+import '@fontsource/montserrat/400.css';
+import '@fontsource/montserrat/500.css';
+import '../styles/global.css';
+import { site, integrations } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+  noindex?: boolean;
+  structuredData?: boolean;
+}
+
+const {
+  title = site.title,
+  description = site.description,
+  path = '/',
+  noindex = false,
+  structuredData = false,
+} = Astro.props;
+
+const canonical = new URL(path, site.url).toString();
+const ogImage = new URL('/images/og-aavoraa.jpg', site.url).toString();
+
+// Organization + WebSite structured data (accurate business info only — no ratings/reviews).
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${site.url}/#organization`,
+      name: site.name,
+      url: site.url,
+      logo: `${site.url}/brand/icon-512.png`,
+      description: site.summary,
+      slogan: site.tagline,
+      email: site.contact.email,
+      telephone: site.contact.phoneDisplay.replace(/\s/g, ''),
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Coimbatore',
+        addressRegion: 'Tamil Nadu',
+        addressCountry: 'IN',
+      },
+      makesOffer: {
+        '@type': 'Offer',
+        itemOffered: { '@type': 'SoftwareApplication', name: 'WAREXX', applicationCategory: 'BusinessApplication' },
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${site.url}/#website`,
+      url: site.url,
+      name: site.name,
+      publisher: { '@id': `${site.url}/#organization` },
+      inLanguage: 'en',
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#0A0909" />
+    <meta name="color-scheme" content="dark light" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/brand/icon-32.png" />
+    <link rel="apple-touch-icon" href="/brand/icon-180.png" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <!-- Open Graph / social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AAVORAA" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="AAVORAA — AI-enabled business transformation" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {integrations.gscVerification && <meta name="google-site-verification" content={integrations.gscVerification} />}
+
+    
+    {structuredData && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <!-- Mark JS-capable browsers and apply the saved theme before paint (no flash) -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      try {
+        if (localStorage.getItem('aav-theme') === 'light') document.documentElement.dataset.theme = 'light';
+      } catch (e) {}
+    </script>
+
+    <!-- Analytics: dataLayer is always available for the tracking hooks; GA4 loads only when configured. -->
+    <script is:inline define:vars={{ ga4Id: integrations.ga4Id }}>
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      if (ga4Id) {
+        // Consent defaults: analytics allowed, advertising denied. Adjust to your consent policy.
+        window.gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted' });
+        window.gtag('js', new Date());
+        window.gtag('config', ga4Id);
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(ga4Id);
+        document.head.appendChild(s);
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>

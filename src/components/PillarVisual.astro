@@ -1,0 +1,136 @@
+---
+/**
+ * Abstract line-art for each solution pillar. Strokes draw in when the section enters view.
+ * Purely illustrative (not product screenshots).
+ */
+import type { PillarKey } from '../data/site';
+interface Props { kind: PillarKey }
+const { kind } = Astro.props;
+---
+
+<svg class={`pv pv--${kind}`} viewBox="0 0 480 480" fill="none" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id={`pv-glow-${kind}`} cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#C9954A" stop-opacity="0.32" />
+      <stop offset="100%" stop-color="#C9954A" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id={`pv-line-${kind}`} x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9C6A2C" />
+      <stop offset="50%" stop-color="#E2BD84" />
+      <stop offset="100%" stop-color="#C9954A" />
+    </linearGradient>
+  </defs>
+  <circle cx="240" cy="240" r="220" fill={`url(#pv-glow-${kind})`} class="pv__glow" />
+
+  {
+    kind === 'build' && (
+      <g stroke-width="1.2">
+        {/* three layered surfaces — software, web, product */}
+        <g class="pv__float pv__float--3">
+          <path class="draw" pathLength="1" d="M120 300 L240 360 L360 300 L240 240 Z" stroke="currentColor" opacity="0.35" />
+        </g>
+        <g class="pv__float pv__float--2">
+          <path class="draw" pathLength="1" d="M120 240 L240 300 L360 240 L240 180 Z" stroke="currentColor" opacity="0.55" />
+          <path class="draw" pathLength="1" d="M165 240 L240 277 L315 240" stroke="currentColor" opacity="0.4" />
+        </g>
+        <g class="pv__float pv__float--1">
+          <path class="draw" pathLength="1" d="M120 180 L240 240 L360 180 L240 120 Z" stroke={`url(#pv-line-${kind})`} stroke-width="1.6" />
+          <path class="draw" pathLength="1" d="M150 180 L240 225 M180 165 L270 210 M210 150 L300 195" stroke={`url(#pv-line-${kind})`} />
+          <circle class="pop" cx="240" cy="120" r="4" fill="#C9954A" />
+          <circle class="pop" cx="360" cy="180" r="3" fill="#C9954A" />
+        </g>
+        <path class="fade" d="M240 120 V60 M120 180 V360 M360 180 V360 M240 240 V420" stroke="currentColor" stroke-opacity="0.18" stroke-dasharray="2 6" />
+      </g>
+    )
+  }
+
+  {
+    kind === 'brand' && (
+      <g stroke-width="1.2">
+        {/* construction geometry: proportion circles, a diamond, and guides */}
+        <circle class="draw" pathLength="1" cx="240" cy="240" r="170" stroke="currentColor" opacity="0.18" />
+        <circle class="draw" pathLength="1" cx="240" cy="240" r="105" stroke="currentColor" opacity="0.35" />
+        <circle class="draw" pathLength="1" cx="240" cy="240" r="65" stroke={`url(#pv-line-${kind})`} stroke-width="1.6" />
+        <path class="draw" pathLength="1" d="M240 70 L410 240 L240 410 L70 240 Z" stroke={`url(#pv-line-${kind})`} stroke-width="1.4" />
+        <path class="fade" d="M40 240 H440 M240 40 V440" stroke="currentColor" stroke-opacity="0.18" stroke-dasharray="2 6" />
+        <path class="draw" pathLength="1" d="M120 120 L360 360 M360 120 L120 360" stroke="currentColor" opacity="0.14" />
+        <circle class="draw" pathLength="1" cx="305" cy="240" r="40" stroke="currentColor" opacity="0.3" />
+        <circle class="pop" cx="240" cy="70" r="4" fill="#C9954A" />
+        <circle class="pop" cx="410" cy="240" r="4" fill="#C9954A" />
+        <circle class="pop" cx="240" cy="410" r="4" fill="#C9954A" />
+        <circle class="pop" cx="70" cy="240" r="4" fill="#C9954A" />
+        <circle class="pv__spin" cx="240" cy="240" r="170" stroke="#C9954A" stroke-width="2" stroke-dasharray="40 1028" stroke-linecap="round" />
+      </g>
+    )
+  }
+
+  {
+    kind === 'grow' && (
+      <g stroke-width="1.2">
+        {/* visibility → attention → qualified enquiries */}
+        <path class="draw" pathLength="1" d="M60 400 H430 M60 400 V60" stroke="currentColor" opacity="0.3" />
+        <path class="draw" pathLength="1" d="M60 330 H430 M60 260 H430 M60 190 H430 M60 120 H430" stroke="currentColor" opacity="0.1" />
+        <path class="draw" pathLength="1" d="M60 380 C140 370 170 330 220 300 S300 240 330 180 S390 100 430 80" stroke={`url(#pv-line-${kind})`} stroke-width="2" />
+        <path class="fade" d="M60 392 C150 388 200 360 250 340 S350 300 430 250" stroke="currentColor" stroke-opacity="0.3" stroke-dasharray="3 5" />
+        <circle class="pop" cx="220" cy="300" r="5" fill="#C9954A" />
+        <circle class="pop" cx="330" cy="180" r="5" fill="#C9954A" />
+        <circle class="pop" cx="430" cy="80" r="6" fill="#E2BD84" />
+        <circle class="pv__ping" cx="430" cy="80" r="6" stroke="#C9954A" />
+        <path class="fade" d="M220 300 V400 M330 180 V400 M430 80 V400" stroke="currentColor" stroke-opacity="0.18" stroke-dasharray="2 5" />
+      </g>
+    )
+  }
+
+  {
+    kind === 'transform' && (
+      <g stroke-width="1.2">
+        {/* manual steps rerouted into one automated flow */}
+        <path id="tf-path" class="draw" pathLength="1" d="M70 130 H170 Q200 130 200 160 V220 Q200 250 230 250 H300 Q330 250 330 280 V330 Q330 360 360 360 H420" stroke={`url(#pv-line-${kind})`} stroke-width="1.8" />
+        <path class="draw" pathLength="1" d="M70 250 H140 Q160 250 160 270 V340 Q160 360 180 360 H260" stroke="currentColor" opacity="0.3" />
+        <path class="fade" d="M200 60 V100 M330 140 V220 M420 250 V320" stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="2 5" />
+        <rect class="draw" pathLength="1" x="46" y="106" width="48" height="48" rx="12" stroke="currentColor" opacity="0.6" />
+        <rect class="draw" pathLength="1" x="176" y="196" width="48" height="48" rx="12" stroke="currentColor" opacity="0.6" transform="rotate(45 200 220)" />
+        <rect class="draw" pathLength="1" x="306" y="226" width="48" height="48" rx="12" stroke="currentColor" opacity="0.6" />
+        <circle class="draw" pathLength="1" cx="420" cy="360" r="26" stroke={`url(#pv-line-${kind})`} stroke-width="1.6" />
+        <circle class="pop" cx="420" cy="360" r="6" fill="#C9954A" />
+        <circle class="pv__pulse" r="5" fill="#E2BD84">
+          <animateMotion dur="5s" repeatCount="indefinite" rotate="auto">
+            <mpath href="#tf-path" />
+          </animateMotion>
+        </circle>
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .pv { width: 100%; height: auto; overflow: visible; }
+  .pv .draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2.2s var(--ease); }
+  .pv .fade { opacity: 0; transition: opacity 1.4s var(--ease) 0.6s; }
+  .pv .pop { opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(0); transition: transform 0.8s var(--ease), opacity 0.6s; }
+  .pv__glow { opacity: 0; transition: opacity 2s var(--ease); }
+  .pv__pulse { opacity: 0; transition: opacity 0.6s 2s; }
+
+  :global(.in-view) .pv .draw { stroke-dashoffset: 0; }
+  :global(.in-view) .pv .fade { opacity: 1; }
+  :global(.in-view) .pv .pop { opacity: 1; transform: scale(1); transition-delay: 1.4s; }
+  :global(.in-view) .pv .pv__glow { opacity: 1; }
+  :global(.in-view) .pv .pv__pulse { opacity: 1; }
+
+  .pv__float { animation: pv-float 7s var(--ease-soft) infinite alternate; }
+  .pv__float--2 { animation-delay: -2s; }
+  .pv__float--3 { animation-delay: -4s; }
+  @keyframes pv-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
+
+  .pv__spin { transform-origin: 240px 240px; animation: pv-spin 14s linear infinite; }
+  @keyframes pv-spin { to { transform: rotate(360deg); } }
+
+  .pv__ping { transform-box: fill-box; transform-origin: center; animation: pv-ping 2.6s var(--ease) infinite; }
+  @keyframes pv-ping { from { transform: scale(1); opacity: 0.8; } to { transform: scale(4); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pv .draw { stroke-dashoffset: 0; }
+    .pv .pop, .pv .fade, .pv__glow { opacity: 1; transform: none; }
+    .pv__pulse, .pv__ping, .pv__spin { display: none; }
+  }
+</style>

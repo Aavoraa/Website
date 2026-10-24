@@ -1,0 +1,24 @@
+---
+/**
+ * Lucide line icon by name (https://lucide.dev, ISC licence), rendered at build time — no client JS.
+ * Usage: <LucideIcon name="Truck" size={20} />. Colour follows `currentColor`.
+ */
+import * as icons from 'lucide-static';
+
+interface Props {
+  name: string;
+  size?: number;
+  stroke?: number;
+  class?: string;
+}
+const { name, size = 20, stroke = 1.5, class: cls = '' } = Astro.props;
+const raw = (icons as Record<string, string>)[name];
+if (!raw) throw new Error(`Unknown Lucide icon: ${name}`);
+const svg = raw
+  .replace(/\swidth="[^"]*"/, ` width="${size}"`)
+  .replace(/\sheight="[^"]*"/, ` height="${size}"`)
+  .replace(/stroke-width="[^"]*"/, `stroke-width="${stroke}"`)
+  .replace(/class="[^"]*"/, `class="lucide ${cls}" aria-hidden="true" focusable="false"`);
+---
+
+<Fragment set:html={svg} />

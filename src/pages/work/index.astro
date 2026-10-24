@@ -1,0 +1,129 @@
+---
+import Page from '../../layouts/Page.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import Testimonials from '../../components/Testimonials.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import { cases, pillars } from '../../data/site';
+const highlights = cases.filter((c) => c.metric).slice(0, 6);
+---
+
+<Page
+  title="Our Work | Case Studies | AAVORAA"
+  description="AAVORAA case studies across software, automation, branding, SEO, performance marketing and lead generation — the challenge, the strategy, what we did and the outcome."
+  path="/work/"
+  eyebrow="Our Work"
+  heading="Business Challenges. Thoughtful Solutions."
+  accent="Measurable Progress."
+  intro="Selected projects delivered by the AAVORAA team. Every number below is traceable to a real engagement."
+  crumbs={[{ label: 'Our Work' }]}
+>
+  <section class="section theme-dark flip results-sec" data-theme="dark" aria-labelledby="results-title">
+    <div class="container">
+      <h2 id="results-title" class="sr-only">Highlighted results</h2>
+      <ul class="results">
+        {
+          highlights.map((c, i) => (
+            <li data-reveal style={`--d:${i % 3}`}>
+              <a class="result pcard" href={`/work/${c.slug}/`}>
+                <strong>{c.metric!.value}</strong>
+                <span class="result__l">{c.metric!.label}</span>
+                <span class="result__c">{c.client}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="all-title">
+    <div class="container">
+      <div class="wk__head">
+        <h2 id="all-title" class="ph2" data-reveal>All Case Studies</h2>
+        <div class="filters" role="group" aria-label="Filter case studies by service" data-filters>
+          <button class="filter is-on" type="button" aria-pressed="true" data-filter="all">All <span>{cases.length}</span></button>
+          {
+            pillars.map((p) => (
+              <button class="filter" type="button" aria-pressed="false" data-filter={p.key}>
+                {p.label} <span>{cases.filter((c) => c.pillars.includes(p.key)).length}</span>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+      <ul class="wgrid" data-case-grid>
+        {
+          cases.map((c, i) => (
+            <li data-pillars={c.pillars.join(' ')} data-reveal style={`--d:${i % 3}`}>
+              <CaseCard item={c} />
+            </li>
+          ))
+        }
+      </ul>
+      <p class="wk__empty" hidden data-empty><LucideIcon name="Info" size={16} /> No case studies in this category yet.</p>
+    </div>
+  </section>
+
+  <Testimonials />
+
+  <PageCTA
+    title="Have a Similar Challenge?"
+    accent="Let’s Talk About It."
+    text="Tell us what you’re trying to fix or grow. We’ll share how we’d approach it and what a first phase could look like."
+    location="work_page"
+  />
+</Page>
+
+<script>
+  // Filter case studies by service pillar
+  const bar = document.querySelector<HTMLElement>('[data-filters]');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-case-grid] > li')];
+  const empty = document.querySelector<HTMLElement>('[data-empty]');
+  bar?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+    if (!btn) return;
+    const key = btn.dataset.filter!;
+    bar.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) => {
+      const on = b === btn;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    let shown = 0;
+    items.forEach((li) => {
+      const show = key === 'all' || (li.dataset.pillars || '').split(' ').includes(key);
+      li.hidden = !show;
+      if (show) { shown++; li.classList.add('is-in'); }
+    });
+    if (empty) empty.hidden = shown > 0;
+  });
+</script>
+
+<style>
+  .results-sec { padding-block: clamp(3rem, 6vw, 4.5rem); }
+  .results { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.85rem; }
+  .result { display: grid; align-content: start; gap: 0.35rem; height: 100%; padding: 1.25rem 1.1rem; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .result:hover { transform: translateY(-4px); border-color: rgba(201, 149, 74, 0.45); }
+  .result strong { font-family: var(--font-head); font-weight: 700; font-size: clamp(1.5rem, 1.1rem + 1vw, 2.1rem); letter-spacing: -0.03em; line-height: 1.05; color: var(--gold-ink); }
+  .result__l { font-size: 0.82rem; line-height: 1.4; color: var(--ink); }
+  .result__c { margin-top: 0.35rem; padding-top: 0.5rem; border-top: 1px solid var(--line-light); font-size: 0.75rem; color: var(--text-light-muted); }
+
+  .wk__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.25rem 2rem; margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem); }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .filter {
+    display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.95rem; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 500; color: var(--text-light-muted); border: 1px solid var(--surface-line); background: var(--surface);
+    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+  }
+  .filter span { font-size: 0.72rem; opacity: 0.7; }
+  .filter:hover { border-color: rgba(201, 149, 74, 0.5); color: var(--ink); }
+  .filter.is-on { color: var(--black); background: var(--gold); border-color: var(--gold); }
+  .wgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(0.85rem, 1.6vw, 1.35rem); }
+  .wgrid > li[hidden] { display: none; }
+  .wk__empty { display: flex; align-items: center; gap: 0.5rem; color: var(--text-light-muted); }
+  .wk__empty[hidden] { display: none; }
+
+  @media (max-width: 1100px) { .results { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 1000px) { .wgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .wgrid { grid-template-columns: 1fr; } .results { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

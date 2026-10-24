@@ -1,0 +1,84 @@
+---
+/** Schematic module map of WAREXX (a diagram — not a product screenshot). */
+const R = 150;
+const modules = ['Supplier documents', 'Procurement', 'Receiving', 'Inventory', 'Stock movement', 'Warehouse & stores'];
+const pts = modules.map((label, i) => {
+  const a = (Math.PI / 3) * i - Math.PI / 2;
+  return { label, x: 240 + R * Math.cos(a), y: 240 + R * Math.sin(a), a };
+});
+const ring = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+---
+
+<figure class="wmap">
+  <svg viewBox="-80 -10 640 500" role="img" aria-labelledby="wmap-title">
+    <title id="wmap-title">WAREXX connects supplier documents, procurement, receiving, inventory, stock movement and warehouse and store operations around one source of operational visibility.</title>
+    <defs>
+      <radialGradient id="wmap-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#C9954A" stop-opacity="0.35" />
+        <stop offset="100%" stop-color="#C9954A" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="wmap-line" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#9C6A2C" />
+        <stop offset="50%" stop-color="#E2BD84" />
+        <stop offset="100%" stop-color="#C9954A" />
+      </linearGradient>
+    </defs>
+    <circle cx="240" cy="240" r="200" fill="url(#wmap-glow)" />
+    <polygon class="wmap__hex" points={ring} fill="none" stroke="url(#wmap-line)" stroke-width="1.4" pathLength="1" />
+    <polygon points={pts.map((p) => `${(240 + (p.x - 240) * 0.55).toFixed(1)},${(240 + (p.y - 240) * 0.55).toFixed(1)}`).join(' ')} fill="none" style="stroke: var(--ink)" stroke-opacity="0.08" />
+    {pts.map((p) => <line class="wmap__spoke" x1="240" y1="240" x2={p.x} y2={p.y} stroke="#C9954A" stroke-opacity="0.45" stroke-dasharray="3 6" />)}
+
+    <!-- flowing packets around the ring -->
+    <path id="wmap-ring-path" d={`M ${ring.split(' ').join(' L ')} Z`} fill="none" stroke="none" />
+    {[0, 1.6, 3.2].map((b) => (
+      <circle class="wmap__pkt" r="3.5" fill="#E2BD84">
+        <animateMotion dur="9s" begin={`${b}s`} repeatCount="indefinite"><mpath href="#wmap-ring-path" /></animateMotion>
+      </circle>
+    ))}
+
+    <g class="wmap__hub">
+      <circle cx="240" cy="240" r="58" style="fill: var(--node-bg)" stroke="url(#wmap-line)" stroke-width="1.6" />
+      <circle cx="240" cy="240" r="70" fill="none" stroke="#C9954A" stroke-opacity="0.25" />
+      <text x="240" y="236" text-anchor="middle" class="wmap__hub-t">Operational</text>
+      <text x="240" y="256" text-anchor="middle" class="wmap__hub-t">visibility</text>
+    </g>
+
+    {
+      pts.map((p) => {
+        const right = Math.cos(p.a) > 0.2;
+        const left = Math.cos(p.a) < -0.2;
+        const dx = right ? 18 : left ? -18 : 0;
+        const dy = Math.sin(p.a) < -0.5 ? -22 : Math.sin(p.a) > 0.5 ? 30 : 5;
+        return (
+          <g class="wmap__node">
+            <circle cx={p.x} cy={p.y} r="12" style="fill: var(--node-bg)" stroke="#C9954A" stroke-width="1.2" />
+            <circle cx={p.x} cy={p.y} r="4" fill="#C9954A" />
+            <text x={p.x + dx} y={p.y + dy} text-anchor={right ? 'start' : left ? 'end' : 'middle'} class="wmap__label">{p.label}</text>
+          </g>
+        );
+      })
+    }
+  </svg>
+  <figcaption class="caption">Schematic overview of WAREXX modules.</figcaption>
+</figure>
+
+<style>
+  .wmap { display: grid; gap: 0.75rem; justify-items: center; }
+  .wmap svg { width: 100%; height: auto; overflow: hidden; }
+  .wmap figcaption { color: var(--text-dark-faint); }
+  .wmap__label { font-family: var(--font-body); font-weight: 500; font-size: 13px; fill: var(--ink); fill-opacity: 0.82; }
+  .wmap__hub-t { font-family: var(--font-head); font-weight: 600; font-size: 14px; fill: var(--gold-light); }
+  :global(:root[data-theme='light']) .wmap__hub-t { fill: var(--gold-ink); }
+  .wmap__hex { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2.4s var(--ease); }
+  :global(.in-view) .wmap__hex { stroke-dashoffset: 0; }
+  .wmap__hub { transform-origin: 240px 240px; animation: wmap-pulse 5s var(--ease-soft) infinite alternate; }
+  @keyframes wmap-pulse { from { transform: scale(0.97); } to { transform: scale(1.03); } }
+  @media (max-width: 560px) {
+    .wmap__label { font-size: 19px; }
+    .wmap__hub-t { font-size: 17px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wmap__hex { stroke-dashoffset: 0; }
+    .wmap__pkt { display: none; }
+  }
+</style>

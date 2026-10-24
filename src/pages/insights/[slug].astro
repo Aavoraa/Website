@@ -1,0 +1,172 @@
+---
+import Page from '../../layouts/Page.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import Icon from '../../components/Icon.astro';
+import PageCTA from '../../components/PageCTA.astro';
+import { pillars } from '../../data/site';
+import { articles, type Article } from '../../data/insights';
+import { articleImage, servicePath, pillarPage } from '../../data/pages';
+
+export function getStaticPaths() {
+  return articles.map((a) => ({ params: { slug: a.slug }, props: { a } }));
+}
+const { a } = Astro.props as { a: Article };
+const pillar = pillars.find((p) => p.key === a.category)!;
+const others = articles.filter((x) => x.slug !== a.slug).slice(0, 3);
+const fmt = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+const anchor = (i: number) => `s${i + 1}`;
+const shareUrl = new URL(`/insights/${a.slug}/`, 'https://aavoraa.com').href;
+---
+
+<Page
+  title={`${a.title} | AAVORAA Insights`}
+  description={a.excerpt}
+  path={`/insights/${a.slug}/`}
+  eyebrow={`Insights · ${pillar.label}`}
+  heading={a.title}
+  intro={a.excerpt}
+  crumbs={[{ label: 'Insights', href: '/insights/' }, { label: pillar.label }]}
+>
+  <p slot="head" class="meta">
+    <span><LucideIcon name="Calendar" size={14} /> {fmt(a.date)}</span>
+    <span><LucideIcon name="Clock" size={14} /> {a.readMinutes} min read</span>
+    <span><LucideIcon name="PenTool" size={14} /> AAVORAA Team</span>
+  </p>
+
+  <article class="section theme-dark flip" data-theme="dark">
+    <div class="container art">
+      <div class="art__main">
+        <div class="art__photo tone"><img src={articleImage(a)} alt="" width="900" height="600" decoding="async" /></div>
+        <p class="art__intro">{a.intro}</p>
+        {
+          a.sections.map((s, i) => (
+            <section class="art__sec" id={anchor(i)} aria-labelledby={`${anchor(i)}-h`}>
+              <h2 id={`${anchor(i)}-h`}>{s.heading}</h2>
+              {s.paragraphs.map((p) => <p>{p}</p>)}
+              {s.points && <ul class="ticks">{s.points.map((x) => <li>{x}</li>)}</ul>}
+            </section>
+          ))
+        }
+        <section class="art__take pcard" aria-labelledby="take-h">
+          <h2 id="take-h"><LucideIcon name="Lightbulb" size={20} /> Key Takeaways</h2>
+          <ul class="ticks">{a.takeaways.map((t) => <li>{t}</li>)}</ul>
+        </section>
+      </div>
+
+      <aside class="art__side">
+        <nav class="toc pcard" aria-label="On this page" data-spy>
+          <p class="toc__k">On this page</p>
+          <ol>{a.sections.map((s, i) => <li><a href={`#${anchor(i)}`}>{s.heading}</a></li>)}</ol>
+        </nav>
+        <div class="share pcard">
+          <p class="toc__k">Share this article</p>
+          <div class="share__row">
+            <a class="share__btn" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener" aria-label="Share on LinkedIn"><LucideIcon name="Linkedin" size={17} /></a>
+            <a class="share__btn" href={`https://wa.me/?text=${encodeURIComponent(`${a.title} ${shareUrl}`)}`} target="_blank" rel="noopener" aria-label="Share on WhatsApp"><LucideIcon name="MessageCircle" size={17} /></a>
+            <a class="share__btn" href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(a.title)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener" aria-label="Share on X"><LucideIcon name="Twitter" size={17} /></a>
+            <button class="share__btn share__copy" type="button" data-copy={shareUrl} aria-label="Copy link"><LucideIcon name="Link" size={17} /><span class="share__ok" aria-live="polite"></span></button>
+          </div>
+        </div>
+        <div class="side-cta pcard">
+          <span class="ico-tile"><LucideIcon name="MessagesSquare" size={20} /></span>
+          <p class="side-cta__t">Want this applied to your business?</p>
+          <p class="side-cta__s">{pillarPage[a.category].startsWith}</p>
+          <a class="btn btn--sm" href={`/contact/?interest=${encodeURIComponent(pillarPage[a.category].interest)}`} data-track="cta_primary" data-track-location={`article_${a.slug}`}>Talk to Us <Icon name="arrow" class="arrow" /></a>
+          <a class="side-cta__link" href={servicePath(a.category)}>Explore {pillar.label} <LucideIcon name="ArrowRight" size={14} /></a>
+        </div>
+      </aside>
+    </div>
+  </article>
+
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="more-h">
+    <div class="container">
+      <div class="more__head">
+        <h2 id="more-h" class="ph2">More <span class="accent">Insights.</span></h2>
+        <a class="btn btn--outline" href="/insights/">All Articles <Icon name="arrow" class="arrow" /></a>
+      </div>
+      <ul class="others">
+        {
+          others.map((o, i) => (
+            <li data-reveal style={`--d:${i}`}>
+              <a class="other pcard" href={`/insights/${o.slug}/`}>
+                <span class="other__cat">{pillars.find((p) => p.key === o.category)!.label} · {o.readMinutes} min</span>
+                <strong>{o.title}</strong>
+                <span class="other__more">Read <LucideIcon name="ArrowRight" size={14} /></span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <script>
+    // copy the article link
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const ok = btn.querySelector('.share__ok');
+        try {
+          await navigator.clipboard.writeText(btn.dataset.copy || location.href);
+          if (ok) ok.textContent = 'Link copied';
+        } catch {
+          if (ok) ok.textContent = 'Copy failed';
+        }
+        setTimeout(() => ok && (ok.textContent = ''), 1800);
+      });
+    });
+  </script>
+
+  <PageCTA title="Turn Ideas Into a Plan" accent="for Your Business." location={`article_${a.slug}_footer`} />
+</Page>
+
+<style>
+  .meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.5rem; font-size: 0.85rem; color: var(--text-light-muted); }
+  .meta span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .meta :global(svg) { color: var(--gold-ink); }
+
+  .art { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+  .art__main { display: grid; gap: 2.5rem; max-width: 46rem; }
+  .art__photo { aspect-ratio: 16 / 8; border-radius: var(--radius-lg); border: 1px solid var(--frame-line); }
+  .art__intro { font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem); line-height: 1.7; color: var(--ink); font-weight: 400; padding-left: 1.25rem; border-left: 2px solid var(--gold); }
+  .art__sec { display: grid; gap: 1rem; scroll-margin-top: 110px; }
+  .art__sec h2 { font-size: clamp(1.4rem, 1.15rem + 0.9vw, 1.9rem); line-height: 1.2; }
+  .art__sec p { font-size: 1.04rem; line-height: 1.85; color: var(--text-light-muted); }
+  .art__sec .ticks { margin: 0.25rem 0 0.25rem; padding: 1.25rem 1.4rem; border-radius: var(--radius-sm); background: rgba(201, 149, 74, 0.05); border: 1px solid rgba(201, 149, 74, 0.15); }
+  .art__sec .ticks li { color: var(--ink); font-size: 0.98rem; }
+  .art__take { display: grid; gap: 1rem; padding: clamp(1.5rem, 3vw, 2rem); background: radial-gradient(120% 120% at 0% 0%, rgba(201, 149, 74, 0.12), transparent 60%), var(--card-bg); border-color: rgba(201, 149, 74, 0.3); }
+  .art__take h2 { display: flex; align-items: center; gap: 0.6rem; font-size: 1.3rem; }
+  .art__take h2 :global(svg) { color: var(--gold-ink); }
+  .art__take .ticks li { color: var(--ink); }
+
+  .art__side { position: sticky; top: 100px; display: grid; gap: 1rem; }
+  .toc { padding: 1.4rem; }
+  .toc__k { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); margin-bottom: 0.75rem; }
+  .toc ol { display: grid; gap: 0.6rem; counter-reset: toc; }
+  .toc li { counter-increment: toc; display: flex; gap: 0.6rem; font-size: 0.85rem; line-height: 1.45; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); flex: none; font-family: var(--font-head); font-weight: 600; font-size: 0.75rem; color: var(--gold-ink); padding-top: 0.1rem; }
+  .toc a { color: var(--text-light-muted); transition: color 0.2s; }
+  .toc a:hover { color: var(--ink); }
+  .toc li:has(a:global(.is-spy))::before { color: var(--ink); }
+  .toc a:global(.is-spy) { color: var(--gold-ink); font-weight: 500; }
+  .share { display: grid; gap: 0.7rem; padding: 1.2rem 1.4rem; }
+  .share .toc__k { margin: 0; }
+  .share__row { display: flex; gap: 0.5rem; }
+  .share__btn { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; color: var(--gold-ink); border: 1px solid rgba(201, 149, 74, 0.3); transition: background-color 0.3s, color 0.3s, transform 0.3s var(--ease); }
+  .share__btn:hover { background: var(--gold); color: var(--black); transform: translateY(-2px); }
+  .share__ok { position: absolute; bottom: calc(100% + 6px); left: 50%; translate: -50% 0; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; white-space: nowrap; color: var(--black); background: var(--gold); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .share__ok:not(:empty) { opacity: 1; }
+  .side-cta { display: grid; gap: 0.75rem; justify-items: start; padding: 1.4rem; }
+  .side-cta__t { font-family: var(--font-head); font-weight: 600; font-size: 1.1rem; line-height: 1.3; }
+  .side-cta__s { font-size: 0.85rem; line-height: 1.55; color: var(--text-light-muted); }
+  .side-cta__link { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; font-weight: 500; color: var(--gold-ink); }
+
+  .more__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.25rem; margin-bottom: clamp(1.5rem, 3vw, 2.25rem); }
+  .others { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .other { display: grid; align-content: start; gap: 0.75rem; height: 100%; padding: 1.5rem; transition: border-color 0.4s, transform 0.5s var(--ease); }
+  .other:hover { border-color: rgba(201, 149, 74, 0.45); transform: translateY(-4px); }
+  .other__cat { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-ink); }
+  .other strong { font-family: var(--font-head); font-weight: 600; font-size: 1.15rem; line-height: 1.3; }
+  .other__more { display: inline-flex; align-items: center; gap: 0.35rem; margin-top: auto; font-size: 0.82rem; font-weight: 500; color: var(--gold-ink); }
+
+  @media (max-width: 1000px) { .art { grid-template-columns: 1fr; } .art__side { position: static; } .others { grid-template-columns: 1fr; } }
+</style>

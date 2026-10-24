@@ -1,0 +1,32 @@
+---
+/* INTERIM PAGE — replace with the legally reviewed Terms & Conditions before launch. */
+import Page from '../layouts/Page.astro';
+import { site } from '../data/site';
+---
+
+<Page
+  title="Terms & Conditions | AAVORAA"
+  description="Terms for using the AAVORAA website."
+  path="/terms/"
+  eyebrow="Legal"
+  heading="Terms & Conditions"
+  intro="Our full Terms & Conditions are being finalised. The summary below applies to the use of this website."
+>
+  <section class="section theme-dark flip" data-theme="dark">
+    <div class="container legal">
+      <h2>Website content</h2>
+      <p>The content on this website is provided for general information about AAVORAA and its services. It does not form an offer or a contract. The scope, pricing and timelines of any engagement are agreed separately in writing.</p>
+      <h2>Intellectual property</h2>
+      <p>The AAVORAA and WAREXX names, logos and website content belong to AAVORAA and may not be reused without permission. Client names and project information are shown with reference to work delivered by the AAVORAA team.</p>
+      <h2>Questions</h2>
+      <p>For any questions about these terms, contact <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .legal { max-width: 46rem; display: grid; gap: 1rem; }
+  .legal h2 { font-size: 1.4rem; margin-top: 1.25rem; }
+  .legal p { color: var(--text-light-muted); }
+  .legal a { color: var(--gold-ink); text-decoration: underline; text-underline-offset: 3px; }
+</style>

@@ -1,0 +1,190 @@
+---
+import Page from '../layouts/Page.astro';
+import LucideIcon from '../components/LucideIcon.astro';
+import StepGrid from '../components/StepGrid.astro';
+import Clients from '../components/Clients.astro';
+import Testimonials from '../components/Testimonials.astro';
+import PageCTA from '../components/PageCTA.astro';
+import { pillars, stats, aboutFacts } from '../data/site';
+import { growthMethod, reasons, markets, servicePath } from '../data/pages';
+const pillarIcon = { build: 'CodeXml', brand: 'Palette', grow: 'Megaphone', transform: 'Workflow' } as const;
+---
+
+<Page
+  title="About AAVORAA | One Team. Every Digital Capability."
+  description="AAVORAA is a Coimbatore-based, AI-enabled business transformation company that brings software, branding, marketing and automation together in one accountable team."
+  path="/about/"
+  eyebrow="About AAVORAA"
+  heading="One Team."
+  accent="Every Digital Capability."
+  intro="A Coimbatore-based growth partner that brings strategy, design, development, software, marketing and automation together — so you never juggle multiple vendors again."
+  crumbs={[{ label: 'About' }]}
+>
+  <!-- Story -->
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="story-title">
+    <div class="container story">
+      <div class="story__text">
+        <p class="eyebrow" data-reveal>Our Story</p>
+        <h2 id="story-title" class="ph2" data-reveal style="--d:1">From a Technology Studio to a <span class="accent">Transformation Partner.</span></h2>
+        <p data-reveal style="--d:2">
+          AAVORAA evolved from Phoenixx IT. Over more than a decade of building software, websites and campaigns, one pattern kept
+          repeating: businesses rarely struggle because of a single missing service. They struggle because their technology,
+          brand, marketing and operations are run by different people who never talk to each other.
+        </p>
+        <p data-reveal style="--d:3">
+          So we brought it all under one roof. Strategy, creative, code, campaigns and automation are delivered by one
+          accountable team, working from one plan — with the goal of turning your digital presence into a predictable engine for growth.
+        </p>
+        <p class="story__motto" data-reveal style="--d:4">No silos. No guesswork. One accountable team obsessed with your results.</p>
+      </div>
+
+      <div class="story__side">
+        <ul class="stats">
+          {
+            stats.map((s, i) => (
+              <li class="stat pcard" data-reveal style={`--d:${i}`}>
+                <span class="ico-tile"><LucideIcon name={s.icon} size={20} /></span>
+                <span class="stat__value"><span data-count={s.value}>{s.value}</span>{s.suffix}</span>
+                <span class="stat__label">{s.label}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <ul class="facts" data-reveal>
+          {aboutFacts.map((f) => <li><LucideIcon name={f.icon} size={16} />{f.text}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- What we bring together -->
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="bring-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>What We Bring Together</p>
+        <h2 id="bring-title" class="ph2" data-reveal style="--d:1">Four Capabilities. <span class="accent">One Business Strategy.</span></h2>
+      </header>
+      <ul class="bring">
+        {
+          pillars.map((p, i) => (
+            <li data-reveal style={`--d:${i}`}>
+              <a class="bring__card pcard" href={servicePath(p.key)}>
+                <span class="ico-tile"><LucideIcon name={pillarIcon[p.key]} size={22} /></span>
+                <span class="bring__n">0{i + 1}</span>
+                <h3>{p.label}</h3>
+                <p>{p.description}</p>
+                <span class="bring__more">Explore <LucideIcon name="ArrowRight" size={15} /></span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Growth method -->
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="method-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>How We Think</p>
+        <h2 id="method-title" class="ph2" data-reveal style="--d:1">The AAVORAA <span class="accent">Growth Method.</span></h2>
+        <p class="lead" data-reveal style="--d:2">A repeatable system — not random tactics — behind every result.</p>
+      </header>
+      <StepGrid items={growthMethod} />
+    </div>
+  </section>
+
+  <!-- Reasons clients stay -->
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="reasons-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>Why Clients Stay</p>
+        <h2 id="reasons-title" class="ph2" data-reveal style="--d:1">How We <span class="accent">Work With You.</span></h2>
+      </header>
+      <ul class="reasons">
+        {
+          reasons.map((r, i) => (
+            <li class="reason pcard" data-reveal style={`--d:${i % 3}`}>
+              <span class="ico-tile"><LucideIcon name={r.icon} size={22} /></span>
+              <h3>{r.title}</h3>
+              <p>{r.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Where we work + WAREXX -->
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="where-title">
+    <div class="container where">
+      <div class="where__text">
+        <p class="eyebrow" data-reveal>Where We Work</p>
+        <h2 id="where-title" class="ph2" data-reveal style="--d:1">Rooted in Coimbatore. <span class="accent">Working Globally.</span></h2>
+        <p class="lead" data-reveal style="--d:2">
+          Based in Coimbatore, Tamil Nadu, we work with businesses across India and internationally, with a growing focus on the GCC.
+        </p>
+        <ul class="where__markets" data-reveal style="--d:3">
+          {markets.map((m) => <li class="chip"><LucideIcon name="MapPin" size={13} /> {m}</li>)}
+        </ul>
+      </div>
+      <a class="wx pcard" href="/warexx/" data-reveal="scale" data-track="warexx" data-track-location="about_page">
+        <img class="only-dark" src="/brand/warexx-logo-light.png" alt="WAREXX by AAVORAA" width="900" height="267" />
+        <img class="only-light" src="/brand/warexx-logo-dark.png" alt="WAREXX by AAVORAA" width="900" height="329" />
+        <p>We don’t only build for clients. WAREXX — our warehouse and operations platform — came from solving real problems on a real warehouse floor.</p>
+        <span class="bring__more">Discover WAREXX <LucideIcon name="ArrowRight" size={15} /></span>
+      </a>
+    </div>
+  </section>
+
+  <Clients />
+  <Testimonials alt />
+
+  <PageCTA
+    title="Let’s Build What’s Next"
+    accent="for Your Business."
+    text="Tell us where you want the business to go. We’ll map how technology, brand, marketing and automation can get it there."
+    location="about_page"
+  />
+</Page>
+
+<style>
+  .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
+
+  .story { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
+  .story__text { display: grid; gap: 1.25rem; }
+  .story__text > p:not(.eyebrow) { color: var(--text-light-muted); line-height: 1.75; }
+  .story__motto { padding-left: 1rem; border-left: 2px solid var(--gold); font-family: var(--font-head); font-weight: 600; font-size: 1.15rem; color: var(--ink) !important; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  .stat { display: grid; gap: 0.5rem; padding: 1.4rem; }
+  .stat__value { font-family: var(--font-head); font-weight: 700; font-size: clamp(2rem, 1.5rem + 1.5vw, 2.8rem); letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
+  .stat__label { font-size: 0.85rem; color: var(--text-light-muted); }
+  .facts { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-light-muted); }
+  .facts li { display: inline-flex; align-items: center; gap: 0.45rem; }
+  .facts :global(svg) { color: var(--gold-ink); }
+
+  .bring { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+  .bring__card { display: grid; align-content: start; gap: 0.75rem; height: 100%; padding: 1.6rem; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .bring__card:hover { transform: translateY(-5px); border-color: rgba(201, 149, 74, 0.45); }
+  .bring__n { font-family: var(--font-head); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; color: var(--gold-ink); }
+  .bring__card h3 { font-size: 1.3rem; }
+  .bring__card p { font-size: 0.9rem; line-height: 1.6; color: var(--text-light-muted); }
+  .bring__more { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; padding-top: 0.5rem; font-size: 0.85rem; font-weight: 500; color: var(--gold-ink); }
+
+  .reasons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .reason { display: grid; align-content: start; gap: 0.75rem; padding: 1.6rem; }
+  .reason h3 { font-size: 1.2rem; }
+  .reason p { font-size: 0.92rem; line-height: 1.6; color: var(--text-light-muted); }
+
+  .where { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+  .where__text { display: grid; gap: 1.25rem; }
+  .where__markets { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .wx { display: grid; gap: 1.1rem; padding: clamp(1.75rem, 4vw, 2.5rem); transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .wx:hover { transform: translateY(-5px); border-color: rgba(201, 149, 74, 0.45); }
+  .wx img { width: 220px; height: auto; }
+  .wx p { color: var(--text-light-muted); line-height: 1.65; }
+
+  @media (max-width: 1000px) { .bring { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reasons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 860px) { .story, .where { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .bring, .reasons { grid-template-columns: 1fr; } }
+</style>

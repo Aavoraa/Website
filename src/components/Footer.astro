@@ -1,0 +1,109 @@
+---
+import { pillars, site } from '../data/site';
+import { servicePath, solutions } from '../data/pages';
+import Icon from './Icon.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer theme-dark flip" data-theme="dark">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="/" aria-label="AAVORAA home">
+          <img src="/brand/aavoraa-logo-tagline-gold.png" alt={`AAVORAA — ${site.logoTagline}`} width="1200" height="339" loading="lazy" />
+        </a>
+        <p>
+          An AI-enabled business transformation company helping businesses build, transform and grow through software,
+          branding, marketing, automation and business consulting.
+        </p>
+        <p class="footer__tagline">Build. Transform. Grow.</p>
+      </div>
+
+      <nav class="footer__cols" aria-label="Footer">
+        <div>
+          <h2>Services</h2>
+          <ul>
+            <li><a href="/services/">All Services</a></li>
+            {pillars.map((p) => <li><a href={servicePath(p.key)}>{p.label}</a></li>)}
+            <li><a href="/services/marketing-lead-generation/#svc-2">Digital & Performance Marketing</a></li>
+            <li><a href="/services/marketing-lead-generation/#svc-1">SEO & AI Search Visibility</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Solutions</h2>
+          <ul>
+            {solutions.slice(0, 5).map((x) => <li><a href={`/solutions/#${x.key}`}>{x.title}</a></li>)}
+            <li><a href="/industries/">Industries</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Company</h2>
+          <ul>
+            <li><a href="/about/">About</a></li>
+            <li><a href="/work/">Our Work</a></li>
+            <li><a href="/insights/">Insights</a></li>
+            <li><a href="/warexx/" data-track="warexx" data-track-location="footer">WAREXX</a></li>
+            <li><a href="/contact/">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Contact</h2>
+          <ul class="footer__contact">
+            <li><Icon name="mail" size={16} /><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+            <li><Icon name="phone" size={16} /><a href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a></li>
+            <li><Icon name="pin" size={16} /><span>{site.contact.location}</span></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} AAVORAA. All rights reserved.</p>
+      <ul>
+        <li><a href="/privacy/">Privacy Policy</a></li>
+        <li><a href="/terms/">Terms & Conditions</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { position: relative; padding: clamp(4rem, 8vw, 6rem) 0 2rem; border-top: 1px solid var(--line-dark); }
+  .footer::before {
+    content: ''; position: absolute; left: 20%; right: 20%; top: -1px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .footer__top { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 2.4fr); gap: clamp(2.5rem, 6vw, 6rem); }
+  .footer__brand { display: grid; gap: 1.25rem; align-content: start; }
+  .footer__brand img { width: 220px; height: auto; }
+  .footer__brand p { color: var(--text-dark-muted); font-size: 0.9rem; max-width: 22rem; }
+  .footer__tagline { font-family: var(--font-head); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.8rem; color: var(--gold) !important; }
+  .footer__cols { display: grid; grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.25fr) minmax(0, 0.7fr) minmax(0, 1.35fr); gap: 2rem; }
+  .footer__cols h2 { font-family: var(--font-body); font-size: var(--fs-cap); font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.1rem; }
+  .footer__cols ul { display: grid; gap: 0.7rem; }
+  .footer__cols a, .footer__cols span { font-size: 0.875rem; color: var(--text-dark-muted); transition: color 0.3s; overflow-wrap: break-word; }
+  .footer__cols a:hover { color: var(--ink); }
+  .footer__contact li { display: flex; gap: 0.6rem; align-items: flex-start; }
+  .footer__contact :global(svg) { flex: none; color: var(--gold); margin-top: 0.2rem; }
+  .footer__bottom {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: 1.5rem; border-top: 1px solid var(--line-dark-soft); font-size: 0.8rem; color: var(--text-dark-faint);
+  }
+  .footer__bottom ul { display: flex; gap: 1.5rem; }
+  .footer__bottom a:hover { color: var(--ink); }
+  @media (max-width: 1000px) {
+    .footer__top { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .footer__cols { grid-template-columns: 1fr 1fr; }
+    .footer__cols a, .footer__cols span { overflow-wrap: anywhere; }
+  }
+  @media (max-width: 400px) {
+    .footer__cols { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Light theme ---------- */
+  :global(:root[data-theme='light']) .footer { background: var(--white); }
+  :global(:root[data-theme='light']) .footer__tagline, :global(:root[data-theme='light']) .footer__cols h2 { color: var(--gold-ink) !important; }
+  :global(:root[data-theme='light']) .footer__contact :global(svg) { color: var(--gold-ink); }
+</style>

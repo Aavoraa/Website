@@ -1,0 +1,52 @@
+---
+import BrandIcon from './BrandIcon.astro';
+import LucideIcon from './LucideIcon.astro';
+import { tools } from '../data/site';
+---
+
+<section class="tools theme-dark flip" id="tools" data-theme="dark" aria-labelledby="tools-title">
+  <div class="container tools__head">
+    <p class="eyebrow" id="tools-title">Tools &amp; Platforms We Work With</p>
+  </div>
+  <div class="tools__marquee">
+    <ul class="tools__track">
+      {
+        [...tools, ...tools].map((t, i) => (
+          <li class="tool" aria-hidden={i >= tools.length ? 'true' : undefined}>
+            {'lucide' in t && t.lucide ? <LucideIcon name={t.lucide} size={22} /> : <BrandIcon icon={t.si} size={22} />}
+            <span>{t.name}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .tools { overflow: hidden; padding-block: clamp(3rem, 6vw, 4.5rem); border-block: 1px solid var(--surface-line); }
+  .tools__head { display: flex; justify-content: center; margin-bottom: 1.75rem; }
+  .tools__marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .tools__track { display: flex; gap: 0.75rem; width: max-content; animation: tools-scroll 55s linear infinite; }
+  .tools__marquee:hover .tools__track { animation-play-state: paused; }
+  @keyframes tools-scroll { to { transform: translateX(calc(-50% - 0.375rem)); } }
+
+  .tool {
+    flex: none; display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.7rem 1.15rem; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--surface-line);
+    color: var(--text-light-muted); font-size: 0.9rem; font-weight: 500; white-space: nowrap;
+    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+  }
+  .tool :global(svg) { color: var(--ink); opacity: 0.8; transition: color 0.3s, opacity 0.3s; }
+  .tool:hover { color: var(--ink); border-color: rgba(201, 149, 74, 0.5); }
+  .tool:hover :global(svg) { color: var(--gold); opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tools__marquee { -webkit-mask-image: none; mask-image: none; }
+    .tools__track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; padding-inline: var(--gutter); }
+    .tools__track [aria-hidden='true'] { display: none; }
+  }
+</style>

@@ -1,0 +1,25 @@
+---
+import Page from '../layouts/Page.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<Page
+  title="Page not found | AAVORAA"
+  description="The page you were looking for could not be found."
+  path="/404/"
+  eyebrow="404"
+  heading="This page doesn’t exist."
+  accent="Let’s get you back on track."
+  noindex
+>
+  <section class="section theme-dark flip section--alt" data-theme="dark">
+    <div class="container nf">
+      <a class="btn btn--outline" href="/">Back to the homepage <Icon name="arrow" class="arrow" /></a>
+      <a class="link-arrow" href="/contact/">Contact us <Icon name="arrow" /></a>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .nf { display: flex; flex-wrap: wrap; gap: 1.5rem 2rem; justify-content: center; align-items: center; }
+</style>
