@@ -1,0 +1,33 @@
+---
+import Page from '../layouts/Page.astro';
+import FAQ from '../components/FAQ.astro';
+import PageCTA from '../components/PageCTA.astro';
+import { faqs } from '../data/site';
+
+// FAQPage structured data so search engines can show the answers
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+---
+
+<Page
+  title="FAQ | AAVORAA"
+  description="Answers to common questions about AAVORAA: what we do, the software we build, branding and marketing, AI automation, pricing, timelines and how to get started."
+  path="/faq/"
+  eyebrow="FAQ"
+  heading="Questions Before"
+  accent="We Get Started?"
+  intro="Straight answers about how we work, what we build and how engagements begin."
+  crumbs={[{ label: 'FAQ' }]}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+  <FAQ />
+  <PageCTA
+    title="Still Have a Question?"
+    accent="Ask Us Directly."
+    text="If your question isn’t here, send it over — we’ll give you a straight answer."
+    location="faq_page"
+  />
+</Page>

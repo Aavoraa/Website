@@ -34,6 +34,7 @@ function initSmoothScroll() {
   gsap.ticker.add((time) => lenis!.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
   document.documentElement.classList.add('has-lenis');
+  if (import.meta.env.DEV) (window as unknown as Record<string, unknown>).__lenis = lenis; // dev-only, for automated checks
 
   // in-page links glide to their target and clear the fixed navigation
   document.addEventListener('click', (e) => {
@@ -47,6 +48,83 @@ function initSmoothScroll() {
     t.classList.add('is-target'); // replays the "jumped-to" glow that :target would give
     setTimeout(() => t.classList.remove('is-target'), 2200);
   });
+
+  initSectionSnap();
+}
+
+/* ---------- every page: one wheel step moves to the next section ----------
+ * Sections taller than the screen scroll normally until their end, then the next step snaps on.
+ * Thin strips (shorter than ~45% of the screen) are passed over. Keyboard, scrollbar and touch are untouched. */
+function initSectionSnap() {
+  if (!lenis) return;
+  const EDGE = 6;
+  let busy = false;
+  let coolUntil = 0;
+
+  const stops = () => {
+    const vh = window.innerHeight;
+    // page sections in order: page header, sections, articles, section-styled navs, pinned sections (wrapped by GSAP), footer
+    const els = [...document.querySelectorAll<HTMLElement>('main > header, main > section, main > article, main > nav.section, main > .pin-spacer, body > .footer')].filter(
+      (el) => el.offsetHeight > vh * 0.45 || el.classList.contains('footer'),
+    );
+    const y = window.scrollY;
+    return els.map((el) => {
+      const top = Math.round(el.getBoundingClientRect().top + y);
+      return { top, bottom: top + el.offsetHeight };
+    });
+  };
+
+  const go = (target: number) => {
+    busy = true;
+    lenis!.scrollTo(target, {
+      duration: 1.1,
+      lock: true,
+      onComplete: () => {
+        busy = false;
+        coolUntil = performance.now() + 450; // swallow the tail of trackpad momentum
+      },
+    });
+  };
+
+  window.addEventListener(
+    'wheel',
+    (e) => {
+      if (e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return; // pinch-zoom / sideways
+      if ((e.target as HTMLElement).closest('textarea, select, [data-no-snap]')) return;
+      const swallow = () => {
+        e.preventDefault();
+        e.stopImmediatePropagation(); // keep Lenis from also scrolling
+      };
+      if (busy || performance.now() < coolUntil) return swallow();
+      if (Math.abs(e.deltaY) < 4) return;
+
+      const list = stops();
+      if (!list.length) return;
+      const y = window.scrollY;
+      const vh = window.innerHeight;
+      let cur = 0;
+      list.forEach((st, i) => { if (st.top <= y + EDGE) cur = i; });
+      const c = list[cur];
+
+      if (e.deltaY > 0) {
+        // still a real amount of this section below — scroll normally (a small overhang isn't worth a step)
+        if (c.bottom > y + vh + Math.max(EDGE, vh * 0.15)) return;
+        const next = list[cur + 1];
+        if (!next) return;
+        swallow();
+        go(next.top);
+      } else {
+        if (y - c.top > vh * 0.6) return; // deep inside a tall section — scroll normally
+        if (y > c.top + EDGE) { swallow(); go(c.top); return; } // back to this section's start
+        const prev = list[cur - 1];
+        if (!prev) return;
+        swallow();
+        // a section that fits on screen is shown from its top; a taller one from its last screen
+        go(prev.bottom - prev.top <= vh * 1.15 ? prev.top : Math.max(prev.top, prev.bottom - vh));
+      }
+    },
+    { passive: false, capture: true },
+  );
 }
 
 /* ---------- helpers ---------- */
@@ -151,7 +229,6 @@ function homeEffects() {
     mark(el);
     gsap.to(el, { '--py': `${y}px`, ease: 'none', scrollTrigger: st });
   };
-  layer('.hero__eyebrow', -110);
   layer('.hero__copy', 40);
   layer('.hero__ctas', 80);
   layer('.hero__micro', 120);
@@ -196,8 +273,8 @@ function homeEffects() {
       mark(logo);
       gsap.fromTo(logo, { '--ps': 0.82 }, { '--ps': 1, ease: 'none', scrollTrigger: { trigger: wx, start: 'top bottom', end: 'top 30%', scrub: 0.8 } });
     });
-    const line = wx.querySelector<HTMLElement>('.flowline');
-    if (line) drift(line, 120, -40, wx);
+    const win = wx.querySelector<HTMLElement>('.win');
+    if (win) parallax(win, 0.08, wx); // the product window floats against its copy
   }
 
   // enquiry: the intro and the form travel at different depths
@@ -218,7 +295,7 @@ function innerEffects() {
   $$('.svc__media').forEach((m) => parallax(m, 0.12, m.closest('.svc') || m));
   $$('.wxp__visual').forEach((m) => parallax(m, 0.12, m.closest('section') || m));
   $$('.story__side, .wx.pcard').forEach((m) => parallax(m, 0.09, m.closest('section') || m));
-  $$('.svc__word').forEach((w, i) => drift(w, i % 2 ? -60 : 60, i % 2 ? 40 : -40, w.closest('.svc') || w));
+  $$('.pa__label').forEach((w, i) => drift(w, i % 2 ? -26 : 26, i % 2 ? 26 : -26, w.closest('.svc') || w)); // outline word slides across its illustration
   // service pages: the big outline numbers move ahead of their cards
   $$('.dive__n').forEach((n) => parallax(n, -0.2, n.closest('.dive') || n));
   // solutions: each problem card scales up to full size as it arrives

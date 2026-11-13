@@ -1,0 +1,55 @@
+---
+import Page from '../layouts/Page.astro';
+import Approach from '../components/Approach.astro';
+import StepGrid from '../components/StepGrid.astro';
+import Why from '../components/Why.astro';
+import PageCTA from '../components/PageCTA.astro';
+import { growthMethod, startSteps } from '../data/pages';
+---
+
+<Page
+  title="The AAVORAA Approach | One Business Vision. Connected Solutions."
+  description="How AAVORAA works: understand, strategize, build, connect and grow — strategy and execution connected in one continuous system."
+  path="/approach/"
+  eyebrow="The AAVORAA Approach"
+  heading="One Business Vision."
+  accent="Connected Solutions."
+  intro="Strategy and execution connected in one continuous system — not five disconnected service boxes."
+  crumbs={[{ label: 'Approach' }]}
+>
+  <Approach />
+
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="method-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>How We Think</p>
+        <h2 id="method-title" class="ph2" data-reveal style="--d:1">The AAVORAA <span class="accent">Growth Method.</span></h2>
+        <p class="lead" data-reveal style="--d:2">A repeatable system — not random tactics — behind every result.</p>
+      </header>
+      <StepGrid items={growthMethod} />
+    </div>
+  </section>
+
+  <Why />
+
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="start-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>How We Start</p>
+        <h2 id="start-title" class="ph2" data-reveal style="--d:1">From Hello to Growth <span class="accent">in Five Moves.</span></h2>
+      </header>
+      <StepGrid items={startSteps} />
+    </div>
+  </section>
+
+  <PageCTA
+    title="Ready to Stop Running"
+    accent="Business as Usual?"
+    text="Tell us where the business is stuck. We’ll show you how the pieces connect — and where to start."
+    location="approach_page"
+  />
+</Page>
+
+<style>
+  .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
+</style>

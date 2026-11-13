@@ -14,6 +14,8 @@ export function GET() {
     ...cases.map((c): [string, string, string] => [`/work/${c.slug}/`, 'monthly', '0.7']),
     ['/warexx/', 'monthly', '0.8'],
     ['/about/', 'monthly', '0.7'],
+    ['/approach/', 'monthly', '0.7'],
+    ['/faq/', 'monthly', '0.6'],
     ['/insights/', 'weekly', '0.7'],
     ...articles.map((a): [string, string, string] => [`/insights/${a.slug}/`, 'monthly', '0.6']),
     ['/contact/', 'yearly', '0.7'],
