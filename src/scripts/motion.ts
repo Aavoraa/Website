@@ -117,7 +117,15 @@ function initHeadings() {
 function initPhotos() {
   const photos = [...document.querySelectorAll<HTMLElement>('.tone')];
   photos.forEach((p) => p.classList.add('wipe'));
-  onView(photos, (p) => {
+  // Watch each photo's (unclipped) parent: a fully clipped element never reports as intersecting.
+  const hosts = new Map<Element, HTMLElement[]>();
+  photos.forEach((p) => {
+    const h = p.parentElement || p;
+    hosts.set(h, [...(hosts.get(h) || []), p]);
+  });
+  onView([...hosts.keys()], (h) => hosts.get(h)?.forEach(reveal), { threshold: 0.15 });
+
+  function reveal(p: HTMLElement) {
     p.classList.add('wipe-in');
     // drop the clip once revealed so shadows and rounded corners render normally again
     p.addEventListener('transitionend', function done(e) {
@@ -126,7 +134,7 @@ function initPhotos() {
         p.removeEventListener('transitionend', done);
       }
     });
-  }, { threshold: 0.15 });
+  }
 
 }
 
