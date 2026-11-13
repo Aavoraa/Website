@@ -1,0 +1,31 @@
+---
+/** The framed line-art for a service pillar (outline word + drawing), as used in the homepage solution sections. */
+import PillarVisual from './PillarVisual.astro';
+import type { PillarKey } from '../data/site';
+interface Props { kind: PillarKey; word: string }
+const { kind, word } = Astro.props;
+---
+
+<div class="pa" data-inview>
+  <span class="pa__label" aria-hidden="true" style={`--chars:${word.length}`}>{word}</span>
+  <PillarVisual kind={kind} />
+</div>
+
+<style>
+  .pa {
+    position: relative; aspect-ratio: 1; width: 100%; border-radius: 36px; padding: clamp(1.5rem, 4vw, 3rem);
+    display: grid; place-items: center; container-type: inline-size;
+    color: var(--ink);
+    background: var(--frame-bg);
+    border: 1px solid var(--frame-line);
+    box-shadow: 0 50px 90px -50px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  .pa__label {
+    position: absolute; top: 1.4rem; left: 1.6rem; right: 1.6rem; white-space: nowrap; overflow: hidden;
+    font-family: var(--font-head); font-weight: 700; letter-spacing: -0.05em; line-height: 0.8;
+    /* long words (e.g. TRANSFORM) shrink to stay inside the frame */
+    font-size: min(clamp(3rem, 2rem + 4vw, 6rem), calc((100cqi - 3.2rem) / (var(--chars) * 0.57)));
+    color: transparent; -webkit-text-stroke: 1px var(--frame-label);
+    text-transform: uppercase;
+  }
+</style>

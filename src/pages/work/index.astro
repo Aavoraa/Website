@@ -4,6 +4,7 @@ import LucideIcon from '../../components/LucideIcon.astro';
 import CaseCard from '../../components/CaseCard.astro';
 import Testimonials from '../../components/Testimonials.astro';
 import PageCTA from '../../components/PageCTA.astro';
+import Warexx from '../../components/Warexx.astro';
 import { cases, pillars } from '../../data/site';
 const highlights = cases.filter((c) => c.metric).slice(0, 6);
 ---
@@ -18,6 +19,9 @@ const highlights = cases.filter((c) => c.metric).slice(0, 6);
   intro="Selected projects delivered by the AAVORAA team. Every number below is traceable to a real engagement."
   crumbs={[{ label: 'Our Work' }]}
 >
+  <!-- our own product leads the page -->
+  <Warexx eyebrow="Featured Product · Built by AAVORAA" featured />
+
   <section class="section theme-dark flip results-sec" data-theme="dark" aria-labelledby="results-title">
     <div class="container">
       <h2 id="results-title" class="sr-only">Highlighted results</h2>

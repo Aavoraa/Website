@@ -1,4 +1,5 @@
 ---
+import { servicePath } from '../data/pages';
 import Icon from './Icon.astro';
 import LucideIcon from './LucideIcon.astro';
 import { pillars } from '../data/site';
@@ -73,7 +74,7 @@ const motif = (key: string) => {
         {
           pillars.map((p, i) => (
             <li style={`--i:${i}`} data-caps-card>
-              <a class="cap" href={`#pillar-${p.key}`} data-track="service_card" data-track-label={p.key}>
+              <a class="cap" href={servicePath(p.key)} data-track="service_card" data-track-label={p.key}>
                 <span class="cap__top">
                   <span class="cap__tag" aria-hidden="true"><Icon name={p.key} size={18} /></span>
                   <span class="cap__n">0{i + 1}</span>

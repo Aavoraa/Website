@@ -5,8 +5,8 @@ const ext = bookingIsExternal ? { target: '_blank', rel: 'noopener' } : {};
 
 // Headline words are revealed one by one from behind a mask.
 const lines = [
-  { words: ['Build', 'Smarter.', 'Transform', 'Faster.'], accent: false },
-  { words: ['Grow', 'Further.'], accent: true },
+  { words: ['Business', 'as', 'Usual?'], accent: false },
+  { words: ['Not', 'Here.'], accent: true },
 ];
 let wi = 0;
 ---
@@ -31,8 +31,7 @@ let wi = 0;
   </div>
 
   <div class="hero__content container">
-    <p class="eyebrow hero__eyebrow" style="--h:0">AI-Enabled Business Transformation</p>
-    <h1 id="hero-title" aria-label="Build Smarter. Transform Faster. Grow Further.">
+    <h1 id="hero-title" aria-label="Business as usual? Not here.">
       {
         lines.map((l) => (
           <span class="line" aria-hidden="true">
@@ -46,16 +45,16 @@ let wi = 0;
       }
     </h1>
     <p class="hero__copy lead" style="--h:5">
-      AAVORAA brings software, branding, marketing and automation together to help businesses build better digital
-      experiences, streamline operations and unlock new growth opportunities.
+      Scattered tools, manual work and marketing that hopes for the best — that’s how most businesses still run.
+      We replace it with connected software, a sharper brand, growth you can measure and AI that does the busywork.
     </p>
     <div class="hero__ctas" style="--h:6">
       <a class="btn hero__primary" data-magnetic href={bookingHref} data-track="cta_primary" data-track-location="hero" {...ext}>
         Book a Discovery Call <Icon name="arrow" class="arrow" />
       </a>
-      <a class="btn btn--ghost" data-magnetic href="#solutions" data-track="cta_secondary" data-track-location="hero">Explore Our Solutions</a>
+      <a class="btn btn--ghost" data-magnetic href="#services" data-track="cta_secondary" data-track-location="hero">See What We Do</a>
     </div>
-    <p class="hero__micro caption" style="--h:7">For ambitious businesses ready to connect technology, operations and growth.</p>
+    <p class="hero__micro caption" style="--h:7">For leaders done hearing “that’s how we’ve always done it.”</p>
   </div>
 
   <a class="hero__scroll" href="#services" aria-label="Scroll to our capabilities">

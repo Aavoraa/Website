@@ -9,3 +9,9 @@ dist/
 
 # local editor / assistant tooling
 .claude/
+
+# Vercel project link (local)
+.vercel
+
+.vercel
+.env*

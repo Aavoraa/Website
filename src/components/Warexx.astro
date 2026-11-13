@@ -2,130 +2,339 @@
 import Icon from './Icon.astro';
 import LucideIcon from './LucideIcon.astro';
 
-// The WAREXX operations flow, end to end. A truck travels the line and lights each stage it reaches.
-const stages = [
-  { title: 'Supplier documents', icon: 'FileText' },
-  { title: 'Procurement', icon: 'ShoppingCart' },
-  { title: 'Receiving', icon: 'PackageCheck' },
-  { title: 'Inventory', icon: 'Boxes' },
-  { title: 'Stock movement', icon: 'ArrowLeftRight' },
-  { title: 'Warehouse & stores', icon: 'Store' },
+interface Props { eyebrow?: string; featured?: boolean }
+const { eyebrow = 'Built by AAVORAA', featured = false } = Astro.props;
+// on the homepage the enquiry form is on the page; elsewhere it lives at /contact/
+const contactHref = Astro.url.pathname === '/' ? '#contact' : `/contact/?interest=${encodeURIComponent('Software / Website / App')}`;
+
+// WAREXX module explorer: pick a module (or let it auto-play) and the product window shows what it does.
+// The window is an illustration of each module's job, not a screenshot. Facts come from the live ESSA build.
+const modules = [
+  { key: 'docs', icon: 'ScanLine', title: 'Supplier Document Intake', text: 'Photograph or scan any supplier invoice. WAREXX reads it into structured data and learns each supplier’s format.' },
+  { key: 'grn', icon: 'ClipboardCheck', title: 'Purchases & GRN', text: 'LR and invoice entry with mandatory attributes checked before a GRN can be saved. No more half-filled receipts.' },
+  { key: 'qr', icon: 'QrCode', title: 'Inventory & QR Traceability', text: 'Every piece gets a QR code and every carton a label, so stock can be traced from receipt to sale.' },
+  { key: 'move', icon: 'ArrowLeftRight', title: 'Warehouse → Store', text: 'Outward and inward movement between warehouse and stores, with one live view of where stock sits.' },
+  { key: 'pos', icon: 'Store', title: 'Store POS', text: 'A point of sale on the same inventory, so the shop floor and the warehouse always see the same numbers.' },
+  { key: 'reports', icon: 'ChartColumnBig', title: 'Reports & Voice Queries', text: '33 operational reports. Ask questions in English or Tamil — typed or spoken — and get the answer.' },
+];
+const facts = [
+  { value: '33', label: 'operational reports' },
+  { value: 'EN + தமிழ்', label: 'natural-language & voice' },
+  { value: 'AWS', label: 'cloud, role-based access' },
+  { value: 'Live', label: 'at ESSA Garments' },
 ];
 ---
 
-<section class="wx section theme-dark section--alt flip" id="warexx" data-theme="dark" aria-labelledby="wx-title">
+<section class:list={['wx section theme-dark section--alt flip', { 'wx--featured': featured }]} id="warexx" data-theme="dark" aria-labelledby="wx-title">
   <div class="wx__bg" aria-hidden="true"></div>
-  <div class="container">
-    <header class="wx__head">
-      <p class="eyebrow" data-reveal>Built by AAVORAA</p>
+  <div class="container wx__grid">
+    <div class="wx__copy">
+      <p class="eyebrow" data-reveal>{eyebrow}</p>
       <img class="wx__logo only-dark" src="/brand/warexx-logo-light.png" alt="WAREXX by AAVORAA" width="900" height="267" loading="lazy" decoding="async" data-reveal style="--d:1" />
       <img class="wx__logo only-light" src="/brand/warexx-logo-dark.png" alt="WAREXX by AAVORAA" width="900" height="329" loading="lazy" decoding="async" data-reveal style="--d:1" />
-      <h2 id="wx-title" data-reveal style="--d:2">From Connected Thinking to <span class="accent">Connected Operations.</span></h2>
-      <p class="lead" data-reveal style="--d:3">One platform from the supplier's document to the store shelf.</p>
-    </header>
+      <h2 id="wx-title" data-reveal style="--d:2">We Don’t Just Advise on Operations. <span class="accent">We Built the Platform.</span></h2>
+      <p class="lead" data-reveal style="--d:3">From the supplier’s invoice to the store shelf — one connected platform, running on a real warehouse floor.</p>
 
-    <div class="flowline" data-reveal style="--d:2">
-      <div class="flowline__track" aria-hidden="true">
-        <span class="flowline__road"></span>
-        <span class="flowline__truck"><LucideIcon name="Truck" size={22} stroke={1.75} /></span>
-      </div>
-      <ol class="flowline__stages">
+      <div class="wx__tabs" role="tablist" aria-label="WAREXX modules" data-wx-tabs data-reveal style="--d:3">
         {
-          stages.map((s, i) => (
-            <li class="stage" style={`--i:${i}`}>
-              <span class="stage__node"><LucideIcon name={s.icon} size={22} /></span>
-              <span class="stage__n">0{i + 1}</span>
-              <span class="stage__title">{s.title}</span>
-            </li>
+          modules.map((m, i) => (
+            <button
+              class="wx__tab"
+              type="button"
+              role="tab"
+              id={`wx-tab-${m.key}`}
+              aria-controls="wx-window"
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              data-key={m.key}
+            >
+              <span class="wx__tab-icon"><LucideIcon name={m.icon} size={18} /></span>
+              <span class="wx__tab-text">
+                <strong>{m.title}</strong>
+                <small><span>{m.text}</span></small>
+              </span>
+              <span class="wx__tab-bar" aria-hidden="true"></span>
+            </button>
           ))
         }
-      </ol>
-      <p class="flowline__out" aria-hidden="true"><LucideIcon name="ChartLine" size={16} /> Operational visibility across every step</p>
+      </div>
     </div>
 
-    <div class="wx__ctas" data-reveal>
-      <a class="btn" href="/warexx/" data-track="warexx" data-track-location="home_section">
-        Explore WAREXX <Icon name="arrow" class="arrow" />
-      </a>
-      <a class="btn btn--outline" href="#contact" data-entry="Software / Website / App" data-track="cta_secondary" data-track-location="warexx">
-        Discuss a Custom Software Solution
-      </a>
+    <!-- product window: an illustration of the selected module -->
+    <div class="wx__stage" data-reveal="scale" style="--d:2">
+      <div class="win" id="wx-window" role="tabpanel" aria-live="polite" data-wx-window data-active="docs">
+        <div class="win__bar" aria-hidden="true">
+          <span class="win__dots"><i></i><i></i><i></i></span>
+          <span class="win__title">WAREXX · <b data-wx-title>{modules[0].title}</b></span>
+          <span class="win__live"><i></i> Live</span>
+        </div>
+        <div class="win__body" aria-hidden="true">
+          <!-- 1. document intake: an invoice is scanned and its fields are extracted -->
+          <div class="pane pane--docs">
+            <div class="doc">
+              <div class="doc__head"><span></span><span></span></div>
+              {Array.from({ length: 6 }).map((_, k) => <div class="doc__row" style={`--k:${k}`}><span></span><span></span><span></span></div>)}
+              <div class="doc__scan"></div>
+            </div>
+            <ul class="fields">
+              {['Supplier', 'Invoice no.', 'Items', 'GST', 'Total'].map((f, k) => <li style={`--k:${k}`}><span>{f}</span><i></i><LucideIcon name="Check" size={14} stroke={2.2} /></li>)}
+            </ul>
+          </div>
+          <!-- 2. GRN: required attributes tick off before save -->
+          <div class="pane pane--grn">
+            <div class="grn">
+              {['LR entry', 'Invoice matched', 'Size & colour set', 'MRP calculated', 'Quantity verified'].map((f, k) => <p style={`--k:${k}`}><LucideIcon name="CircleCheck" size={18} /> {f}</p>)}
+              <span class="grn__save">GRN saved <LucideIcon name="Check" size={14} stroke={2.4} /></span>
+            </div>
+          </div>
+          <!-- 3. QR: piece labels print in a grid -->
+          <div class="pane pane--qr">
+            <div class="qr">{Array.from({ length: 12 }).map((_, k) => <span style={`--k:${k}`}><LucideIcon name="QrCode" size={26} /></span>)}</div>
+          </div>
+          <!-- 4. movement: stock travels from warehouse to stores -->
+          <div class="pane pane--move">
+            <div class="move">
+              <span class="move__node"><LucideIcon name="Warehouse" size={26} /> Warehouse</span>
+              <span class="move__path"><i></i><i></i><i></i></span>
+              <span class="move__stores">
+                <span class="move__node"><LucideIcon name="Store" size={22} /> Store 1</span>
+                <span class="move__node"><LucideIcon name="Store" size={22} /> Store 2</span>
+              </span>
+            </div>
+          </div>
+          <!-- 5. POS: a receipt prints -->
+          <div class="pane pane--pos">
+            <div class="rcpt">
+              {Array.from({ length: 5 }).map((_, k) => <p style={`--k:${k}`}><span></span><span></span></p>)}
+              <p class="rcpt__total" style="--k:5"><span>Total</span><span></span></p>
+            </div>
+          </div>
+          <!-- 6. reports: a question in English / Tamil, and a chart answers -->
+          <div class="pane pane--reports">
+            <p class="ask"><LucideIcon name="Mic" size={15} /> “இன்று சப்ளையர் வாரியாக GRN காட்டு”</p>
+            <div class="chart">{[46, 72, 38, 88, 60, 94, 54].map((h, k) => <span style={`--h:${h}%; --k:${k}`}></span>)}</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="wx__facts" data-reveal style="--d:4">
+        {facts.map((f) => <li><strong>{f.value}</strong><span>{f.label}</span></li>)}
+      </ul>
     </div>
+  </div>
+
+  <div class="container wx__ctas" data-reveal>
+    <a class="btn" href="/warexx/" data-track="warexx" data-track-location="home_section">
+      Explore WAREXX <Icon name="arrow" class="arrow" />
+    </a>
+    <a class="btn btn--outline" href={contactHref} data-entry="Software / Website / App" data-track="cta_secondary" data-track-location="warexx">
+      Discuss a Custom Software Solution
+    </a>
   </div>
 </section>
 
+<script>
+  // tabs: click / arrow keys to choose, auto-advance every few seconds, pause while the visitor is reading
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-wx-tabs] .wx__tab')];
+  const win = document.querySelector<HTMLElement>('[data-wx-window]');
+  const title = document.querySelector<HTMLElement>('[data-wx-title]');
+  const DWELL = 5200;
+  let i = 0;
+  let timer = 0;
+  let paused = false;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const show = (n: number, focus = false) => {
+    i = (n + tabs.length) % tabs.length;
+    tabs.forEach((t, k) => {
+      const on = k === i;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      t.classList.remove('is-run');
+    });
+    const t = tabs[i];
+    if (win) {
+      win.dataset.active = t.dataset.key!;
+      // replay the selected module's little animation from the start
+      win.querySelector(`.pane--${t.dataset.key}`)?.getAnimations({ subtree: true }).forEach((a) => { a.cancel(); a.play(); });
+    }
+    if (title) title.textContent = t.querySelector('strong')?.textContent || '';
+    if (focus) t.focus();
+    if (!reduce && !paused) {
+      void t.offsetWidth; // restart the progress bar
+      t.classList.add('is-run');
+    }
+  };
+  const tick = () => {
+    clearTimeout(timer);
+    if (reduce || paused) return;
+    timer = window.setTimeout(() => { show(i + 1); tick(); }, DWELL);
+  };
+
+  tabs.forEach((t, k) => {
+    t.addEventListener('click', () => { show(k); tick(); });
+    t.addEventListener('keydown', (e) => {
+      const next = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? k + 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? k - 1 : null;
+      if (next === null) return;
+      e.preventDefault();
+      show(next, true);
+      tick();
+    });
+  });
+  const box = document.querySelector<HTMLElement>('.wx__grid');
+  box?.addEventListener('pointerenter', () => { paused = true; clearTimeout(timer); tabs[i]?.classList.remove('is-run'); });
+  box?.addEventListener('pointerleave', () => { paused = false; show(i); tick(); });
+
+  // only auto-play while the section is on screen
+  const sec = document.getElementById('warexx');
+  if (sec && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { show(i); tick(); } else clearTimeout(timer);
+    }, { threshold: 0.35 }).observe(sec);
+  }
+  show(0);
+</script>
+
 <style>
-  .wx { overflow: hidden; isolation: isolate; --T: 9s; /* one truck journey */ }
+  .wx { overflow: hidden; isolation: isolate; }
+  /* featured on the Our Work page: framed by gold hairlines so it reads as the headline project */
+  .wx--featured { border-block: 1px solid rgba(201, 149, 74, 0.35); }
   .wx__bg {
     position: absolute; inset: 0; z-index: -1;
     background:
-      radial-gradient(ellipse 50% 45% at 50% 20%, rgba(201, 149, 74, 0.14), transparent 70%),
-      radial-gradient(ellipse 60% 30% at 50% 100%, rgba(201, 149, 74, 0.06), transparent 70%);
+      radial-gradient(ellipse 45% 50% at 78% 45%, rgba(201, 149, 74, 0.16), transparent 70%),
+      radial-gradient(ellipse 60% 30% at 20% 100%, rgba(201, 149, 74, 0.06), transparent 70%);
+  }
+  .wx__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(2.5rem, 5vw, 5rem); align-items: center; }
+  .wx__copy { display: grid; gap: 1.1rem; justify-items: start; }
+  .wx__logo { width: clamp(220px, 24vw, 340px); height: auto; }
+  .wx__copy h2 { font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.6rem); }
+  .wx__copy h2 .accent { display: block; }
+
+  /* module tabs */
+  .wx__tabs { display: grid; gap: 0.4rem; width: 100%; margin-top: 0.5rem; }
+  .wx__tab {
+    position: relative; overflow: hidden; display: flex; gap: 0.85rem; align-items: flex-start; width: 100%; text-align: left;
+    padding: 0.8rem 1rem; border-radius: 14px; border: 1px solid transparent; color: inherit;
+    transition: background-color 0.35s, border-color 0.35s;
+  }
+  .wx__tab:hover { background: rgba(201, 149, 74, 0.05); }
+  .wx__tab[aria-selected='true'] { background: rgba(201, 149, 74, 0.08); border-color: rgba(201, 149, 74, 0.3); }
+  .wx__tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .wx__tab-icon {
+    flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px;
+    color: var(--gold-ink); border: 1px solid rgba(201, 149, 74, 0.3); transition: background-color 0.35s, color 0.35s;
+  }
+  .wx__tab[aria-selected='true'] .wx__tab-icon { background: var(--gold); color: var(--black); border-color: var(--gold); }
+  .wx__tab-text { display: grid; gap: 0.15rem; padding-top: 0.15rem; }
+  .wx__tab strong { font-family: var(--font-head); font-weight: 600; font-size: 1rem; letter-spacing: -0.01em; }
+  .wx__tab small { display: grid; grid-template-rows: 0fr; font-size: 0.85rem; line-height: 1.5; color: var(--text-light-muted); transition: grid-template-rows 0.45s var(--ease); }
+  .wx__tab small > span { min-height: 0; overflow: hidden; } /* lets the row collapse to zero */
+  .wx__tab[aria-selected='true'] small { grid-template-rows: 1fr; }
+  .wx__tab-bar { position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; transform: scaleX(0); transform-origin: 0 50%; background: var(--gold); }
+  .wx__tab.is-run .wx__tab-bar { animation: wx-run 5.2s linear forwards; }
+  @keyframes wx-run { to { transform: scaleX(1); } }
+
+  /* product window */
+  .wx__stage { display: grid; gap: 1rem; }
+  .win {
+    border-radius: 20px; overflow: hidden;
+    background: linear-gradient(180deg, #161312, #0c0b0a); border: 1px solid rgba(201, 149, 74, 0.28);
+    box-shadow: 0 60px 100px -50px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  }
+  .win__bar { display: flex; align-items: center; gap: 0.9rem; padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06); font-size: 0.78rem; color: rgba(255, 255, 255, 0.55); }
+  .win__dots { display: flex; gap: 6px; }
+  .win__dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, 0.14); }
+  .win__dots i:first-child { background: rgba(201, 149, 74, 0.7); }
+  .win__title b { color: #fff; font-weight: 500; }
+  .win__live { margin-left: auto; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--gold); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .win__live i { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px var(--gold); animation: wx-blink 1.6s ease-in-out infinite; }
+  @keyframes wx-blink { 50% { opacity: 0.3; } }
+  .win__body { position: relative; height: clamp(300px, 30vw, 380px); color: #fff; }
+
+  .pane { position: absolute; inset: 0; display: grid; place-items: center; padding: 1.5rem; opacity: 0; visibility: hidden; transform: translateY(14px); transition: opacity 0.45s var(--ease), transform 0.6s var(--ease), visibility 0s linear 0.45s; }
+  .win[data-active='docs'] .pane--docs, .win[data-active='grn'] .pane--grn, .win[data-active='qr'] .pane--qr,
+  .win[data-active='move'] .pane--move, .win[data-active='pos'] .pane--pos, .win[data-active='reports'] .pane--reports {
+    opacity: 1; visibility: visible; transform: none; transition: opacity 0.45s var(--ease), transform 0.6s var(--ease), visibility 0s;
   }
 
-  /* logo leads the section — larger than the headline */
-  .wx__head { display: grid; justify-items: center; text-align: center; gap: 1.1rem; max-width: 48rem; margin: 0 auto; }
-  .wx__logo { width: clamp(260px, 32vw, 440px); height: auto; margin: 0.5rem 0 0.25rem; }
-  .wx__head h2 { font-size: clamp(1.4rem, 1.05rem + 1.2vw, 2rem); letter-spacing: -0.02em; }
-  .wx__head .lead { font-size: 0.95rem; }
+  /* 1. document intake */
+  .pane--docs { grid-template-columns: 1fr 1fr; gap: 1.5rem; justify-items: stretch; }
+  .pane--docs > * { width: 100%; }
+  .doc { position: relative; overflow: hidden; display: grid; gap: 0.6rem; padding: 1.1rem; border-radius: 10px; background: #f4f0e8; height: 100%; max-height: 260px; align-content: start; }
+  .doc__head { display: flex; justify-content: space-between; margin-bottom: 0.4rem; }
+  .doc__head span { height: 10px; border-radius: 3px; background: #c9954a; width: 40%; }
+  .doc__head span + span { width: 22%; background: rgba(10, 9, 9, 0.25); }
+  .doc__row { display: grid; grid-template-columns: 3fr 1fr 1fr; gap: 0.5rem; }
+  .doc__row span { height: 7px; border-radius: 3px; background: rgba(10, 9, 9, 0.16); }
+  .doc__scan { position: absolute; left: 0; right: 0; top: 0; height: 26px; background: linear-gradient(180deg, transparent, rgba(201, 149, 74, 0.55), transparent); border-bottom: 2px solid #c9954a; animation: wx-scan 2.4s ease-in-out infinite; }
+  @keyframes wx-scan { 0% { top: -10%; } 100% { top: 100%; } }
+  .fields { display: grid; gap: 0.55rem; width: 100%; }
+  .fields li { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.75rem; border-radius: 9px; border: 1px solid rgba(201, 149, 74, 0.2); font-size: 0.82rem; color: rgba(255, 255, 255, 0.7); opacity: 0; animation: wx-in 0.5s var(--ease) forwards; animation-delay: calc(0.5s + var(--k) * 0.35s); }
+  .fields i { flex: 1; height: 6px; border-radius: 3px; background: rgba(201, 149, 74, 0.35); }
+  .fields :global(svg) { color: var(--gold); }
+  @keyframes wx-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
 
-  /* ---------- the flow line ---------- */
-  .flowline { position: relative; margin-top: clamp(3rem, 6vw, 4.5rem); --node: 64px; }
-  .flowline__track { position: absolute; left: calc(100% / 12); right: calc(100% / 12); top: calc(var(--node) / 2); height: 0; }
-  .flowline__road {
-    position: absolute; left: 0; right: 0; top: -1px; height: 2px;
-    background: repeating-linear-gradient(90deg, rgba(201, 149, 74, 0.55) 0 10px, transparent 10px 18px);
-  }
-  .flowline__truck {
-    /* wheels sit on the road (Lucide truck wheels end ~23px down this 32px box); it passes behind each stage block */
-    position: absolute; top: -23px; left: 0; translate: -50% 0;
-    display: grid; place-items: center; width: 40px; height: 32px; color: var(--gold);
-    filter: drop-shadow(0 4px 10px rgba(201, 149, 74, 0.45));
-    animation: truck-x var(--T) linear infinite; /* linear so it stays in sync with the stages */
-  }
-  .flowline__truck::after { /* little dust trail */
-    content: ''; position: absolute; right: 78%; bottom: 8px; width: 22px; height: 2px; border-radius: 2px;
-    background: linear-gradient(90deg, transparent, rgba(201, 149, 74, 0.6));
-  }
-  @keyframes truck-x {
-    0% { left: 0; opacity: 0; } 4% { opacity: 1; } 92% { opacity: 1; } 100% { left: 100%; opacity: 0; }
-  }
+  /* 2. GRN */
+  .grn { display: grid; gap: 0.7rem; width: min(100%, 340px); }
+  .grn p { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.9rem; border-radius: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07); font-size: 0.9rem; opacity: 0; animation: wx-in 0.5s var(--ease) forwards; animation-delay: calc(0.2s + var(--k) * 0.45s); }
+  .grn p :global(svg) { color: var(--gold); }
+  .grn__save { justify-self: end; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; border-radius: 999px; background: var(--gold); color: #0a0909; font-size: 0.8rem; font-weight: 600; opacity: 0; animation: wx-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 2.7s; }
+  @keyframes wx-pop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: none; } }
 
-  .flowline__stages { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.75rem; }
-  .stage { display: grid; justify-items: center; text-align: center; gap: 0.45rem; }
-  .stage__node {
-    position: relative; display: grid; place-items: center; width: var(--node); height: var(--node); border-radius: 18px;
-    color: var(--gold-ink); background: var(--node-bg); border: 1px solid rgba(201, 149, 74, 0.35);
-    box-shadow: 0 14px 30px -20px var(--shadow);
-    /* lights up as the truck arrives (truck reaches stage i at i/5 of the journey) */
-    animation: stage-lit var(--T) linear infinite; animation-delay: calc(var(--i) * var(--T) / 5.6);
-  }
-  @keyframes stage-lit {
-    0%, 12% { background: var(--gold); color: var(--black); border-color: var(--gold); box-shadow: 0 0 0 6px rgba(201, 149, 74, 0.18), 0 14px 30px -18px rgba(201, 149, 74, 0.8); }
-    22%, 100% { background: var(--node-bg); color: var(--gold-ink); border-color: rgba(201, 149, 74, 0.35); box-shadow: 0 14px 30px -20px var(--shadow); }
-  }
-  .stage__n { margin-top: 0.4rem; font-family: var(--font-head); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--gold-ink); }
-  .stage__title { font-family: var(--font-head); font-weight: 600; font-size: 0.98rem; letter-spacing: -0.01em; line-height: 1.25; }
-  .flowline__out { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 2rem; font-size: 0.85rem; color: var(--text-light-muted); }
-  .flowline__out :global(svg) { color: var(--gold-ink); }
+  /* 3. QR */
+  .qr { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
+  .qr span { display: grid; place-items: center; width: clamp(54px, 5.5vw, 70px); aspect-ratio: 1; border-radius: 10px; background: #f4f0e8; color: #0a0909; opacity: 0; animation: wx-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; animation-delay: calc(var(--k) * 0.18s); }
+
+  /* 4. warehouse → store */
+  .move { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem; width: 100%; }
+  .move__node { display: grid; justify-items: center; gap: 0.4rem; padding: 0.9rem 1rem; border-radius: 12px; border: 1px solid rgba(201, 149, 74, 0.35); background: rgba(201, 149, 74, 0.06); font-size: 0.8rem; color: rgba(255, 255, 255, 0.8); }
+  .move__node :global(svg) { color: var(--gold); }
+  .move__stores { display: grid; gap: 0.8rem; }
+  .move__path { position: relative; height: 2px; background: repeating-linear-gradient(90deg, rgba(201, 149, 74, 0.5) 0 8px, transparent 8px 14px); }
+  .move__path i { position: absolute; top: -5px; left: 0; width: 12px; height: 12px; border-radius: 3px; background: var(--gold); box-shadow: 0 0 12px rgba(201, 149, 74, 0.8); animation: wx-ship 2.4s linear infinite; }
+  .move__path i:nth-child(2) { animation-delay: 0.8s; }
+  .move__path i:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes wx-ship { 0% { left: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: calc(100% - 12px); opacity: 0; } }
+
+  /* 5. POS receipt */
+  .rcpt { display: grid; gap: 0.6rem; width: min(100%, 260px); padding: 1.2rem; border-radius: 6px 6px 0 0; background: #f4f0e8; color: #0a0909; -webkit-mask: linear-gradient(#000 92%, transparent); mask: linear-gradient(#000 92%, transparent); }
+  .rcpt p { display: flex; justify-content: space-between; gap: 1rem; opacity: 0; animation: wx-in 0.4s var(--ease) forwards; animation-delay: calc(var(--k) * 0.35s); }
+  .rcpt p span { height: 7px; border-radius: 3px; background: rgba(10, 9, 9, 0.2); width: 60%; }
+  .rcpt p span + span { width: 22%; }
+  .rcpt__total { padding-top: 0.6rem; border-top: 1px dashed rgba(10, 9, 9, 0.3); font-weight: 600; font-size: 0.85rem; }
+  .rcpt__total span:first-child { background: none !important; height: auto !important; width: auto !important; }
+  .rcpt__total span + span { background: #c9954a !important; }
+
+  /* 6. reports */
+  .pane--reports { align-content: center; gap: 1.4rem; }
+  .ask { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1rem; border-radius: 999px; border: 1px solid rgba(201, 149, 74, 0.35); background: rgba(201, 149, 74, 0.08); font-size: 0.85rem; opacity: 0; animation: wx-in 0.5s var(--ease) forwards; }
+  .ask :global(svg) { color: var(--gold); }
+  .chart { display: flex; align-items: flex-end; gap: 10px; height: 170px; width: min(100%, 360px); border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+  .chart span { flex: 1; height: var(--h); border-radius: 6px 6px 0 0; background: linear-gradient(180deg, var(--gold-light), var(--gold) 50%, var(--gold-deep)); transform-origin: bottom; transform: scaleY(0); animation: wx-grow 0.8s var(--ease) forwards; animation-delay: calc(0.6s + var(--k) * 0.12s); }
+  @keyframes wx-grow { to { transform: scaleY(1); } }
+
+  .wx__facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.6rem; }
+  .wx__facts li { display: grid; gap: 0.15rem; padding: 0.85rem 0.9rem; border-radius: 14px; border: 1px solid var(--surface-line); background: var(--surface); }
+  .wx__facts strong { font-family: var(--font-head); font-size: 1.15rem; color: var(--gold-ink); }
+  .wx__facts span { font-size: 0.75rem; line-height: 1.35; color: var(--text-light-muted); }
 
   .wx__ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: clamp(2.5rem, 5vw, 3.5rem); }
 
-  /* ---------- mobile: the line runs downward ---------- */
-  @media (max-width: 760px) {
-    .flowline { --node: 54px; max-width: 360px; margin-inline: auto; }
-    .flowline__track { left: calc(var(--node) / 2); right: auto; top: calc(var(--node) / 2); bottom: calc(var(--node) / 2 + 3.5rem); height: auto; width: 0; }
-    .flowline__road { left: -1px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; background: repeating-linear-gradient(180deg, rgba(201, 149, 74, 0.55) 0 10px, transparent 10px 18px); }
-    .flowline__truck { left: 0; top: 0; translate: -50% -50%; rotate: 90deg; animation-name: truck-y; }
-    .flowline__truck::after { display: none; }
-    @keyframes truck-y { 0% { top: 0; opacity: 0; } 4% { opacity: 1; } 92% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-    .flowline__stages { grid-template-columns: 1fr; gap: 1.1rem; }
-    .stage { grid-template-columns: var(--node) auto 1fr; justify-items: start; align-items: center; text-align: left; column-gap: 1rem; }
-    .stage__n { margin: 0; }
-    .flowline__out { justify-content: flex-start; }
+  /* the window stays dark in the light theme (it's a product UI); the copy side follows the theme */
+  :global(:root[data-theme='light']) .win { box-shadow: 0 50px 90px -50px rgba(10, 9, 9, 0.45); }
+
+  @media (max-width: 960px) {
+    .wx__grid { grid-template-columns: 1fr; }
+    .wx__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .pane--docs { grid-template-columns: 1fr; }
+    .doc { display: none; }
     .wx__ctas .btn { width: 100%; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .flowline__truck { display: none; }
+    .pane *, .fields li, .grn p, .grn__save, .qr span, .rcpt p, .ask, .chart span { animation: none !important; opacity: 1 !important; transform: none !important; }
+    .doc__scan, .move__path i { display: none; }
   }
 </style>
