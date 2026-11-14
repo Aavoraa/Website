@@ -140,7 +140,7 @@ function initPhotos() {
 
 /* ---------- Cards: a soft gold spotlight follows the cursor ---------- */
 function initSpotlight() {
-  const cards = document.querySelectorAll<HTMLElement>('.pcard, .case, .proj, .cap-card, .stat, .entry, .ind__tile, .tool');
+  const cards = document.querySelectorAll<HTMLElement>('.pcard, .case, .proj, .cap-card, .stat, .entry, .ind__tile, .tool, .about__facts li');
   cards.forEach((card) => {
     if (card.querySelector(':scope > .spot')) return;
     const glow = document.createElement('span');

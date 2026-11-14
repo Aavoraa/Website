@@ -1,0 +1,137 @@
+---
+/** Branding — "editorial brand book": a big-type numbered capability index and alternating brand-book spreads. */
+import LucideIcon from '../LucideIcon.astro';
+import { subServicePath, type ServiceDetail } from '../../data/pages';
+import type { PillarKey } from '../../data/site';
+interface Props {
+  pillarKey: PillarKey;
+  label: string;
+  description: string;
+  outcomes: string[];
+  capabilities: { name: string; icon: string }[];
+  details: ServiceDetail[];
+}
+const { pillarKey, label, description, outcomes, capabilities, details } = Astro.props;
+const swatches = ['#0A0909', '#3A2A17', '#8A5C24', '#C9954A', '#E2BD84', '#F4F0E8'];
+---
+
+<section class="section theme-dark flip edi" data-theme="dark" aria-labelledby="edi-title">
+  <span class="edi__word" aria-hidden="true">Identity</span>
+  <div class="container edi__grid">
+    <div class="edi__intro">
+      <p class="eyebrow" data-reveal>The Brand Index</p>
+      <h2 id="edi-title" class="ph2" data-reveal style="--d:1">{label} <span class="accent">With Intent.</span></h2>
+      <p class="lead" data-reveal style="--d:2">{description}</p>
+      <blockquote class="edi__quote" data-reveal style="--d:3">
+        {outcomes.map((o) => <p>{o}.</p>)}
+      </blockquote>
+    </div>
+    <ol class="idx">
+      {
+        capabilities.map((c, i) => (
+          <li data-reveal style={`--d:${i}`}>
+            <span class="idx__n">{String(i + 1).padStart(2, '0')}</span>
+            <span class="idx__t">{c.name}</span>
+            <LucideIcon name={c.icon} size={20} />
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="section theme-dark section--alt flip book-sec" id="services-detail" data-theme="dark" aria-labelledby="book-title">
+  <div class="container">
+    <header class="section-head section-head--center book-head">
+      <p class="eyebrow" data-reveal>Inside the Brand Book</p>
+      <h2 id="book-title" class="ph2" data-reveal style="--d:1">Every Chapter <span class="accent">of Your Brand.</span></h2>
+    </header>
+    <div class="book">
+      {
+        details.map((d, i) => (
+          <article class:list={['spread', { 'spread--rev': i % 2 === 1 }]} data-reveal>
+            <div class="spread__cover">
+              <span class="spread__ch">Chapter {String(i + 1).padStart(2, '0')}</span>
+              <h3><a href={subServicePath(pillarKey, d.name)}>{d.name}</a></h3>
+              <p>{d.summary}</p>
+              <a class="sub-link sub-link--light" href={subServicePath(pillarKey, d.name)}>Explore {d.name} <LucideIcon name="ArrowRight" size={15} /></a>
+              <ul class="spread__sw" aria-hidden="true">
+                {swatches.map((c, j) => <li style={`--c:${c}; --j:${j}`}></li>)}
+              </ul>
+              <p class="spread__meta"><span>{d.stack}</span><span>{d.model}</span></p>
+            </div>
+            <div class="spread__page">
+              <p class="spread__k">What you receive</p>
+              <ol class="spread__list">
+                {d.deliverables.map((x) => <li>{x}</li>)}
+              </ol>
+              {d.proof && (
+                <a class="spread__proof" href={d.proof.slug ? `/work/${d.proof.slug}/` : undefined}>
+                  <span class="spread__qm" aria-hidden="true">“</span>
+                  <span>{d.proof.text}</span>
+                  <cite>— {d.proof.client}</cite>
+                </a>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .edi { position: relative; overflow: hidden; }
+  .edi__word {
+    position: absolute; right: -2vw; top: 50%; translate: 0 -50%; pointer-events: none;
+    font-family: var(--font-head); font-weight: 700; font-size: clamp(6rem, 16vw, 15rem); letter-spacing: -0.06em; line-height: 0.8;
+    color: transparent; -webkit-text-stroke: 1px rgba(201, 149, 74, 0.13); writing-mode: vertical-rl; text-transform: uppercase;
+  }
+  .edi__grid { position: relative; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(2.5rem, 6vw, 5.5rem); align-items: center; }
+  .edi__intro { display: grid; gap: 1.2rem; }
+  .edi__quote { display: grid; gap: 0.35rem; padding: 0.4rem 0 0.4rem 1.25rem; border-left: 2px solid var(--gold); }
+  .edi__quote p { font-family: var(--font-head); font-size: 1.08rem; font-weight: 500; color: var(--ink); }
+
+  .idx { border-top: 1px solid var(--line-light); }
+  .idx li {
+    display: grid; grid-template-columns: 3.2rem 1fr auto; align-items: center; gap: 1rem;
+    padding: 1.05rem 0.4rem; border-bottom: 1px solid var(--line-light);
+    transition: padding 0.45s var(--ease), background-color 0.45s;
+  }
+  .idx li:hover { padding-left: 1.1rem; background: linear-gradient(90deg, rgba(201, 149, 74, 0.1), transparent 70%); }
+  .idx__n { font-family: var(--font-head); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.08em; color: var(--gold-ink); }
+  .idx__t { font-family: var(--font-head); font-weight: 600; font-size: clamp(1.25rem, 0.95rem + 1.1vw, 1.9rem); letter-spacing: -0.02em; line-height: 1.15; }
+  .idx li :global(svg) { color: var(--gold-ink); opacity: 0.5; transition: opacity 0.4s, transform 0.45s var(--ease); }
+  .idx li:hover :global(svg) { opacity: 1; transform: rotate(-12deg) scale(1.1); }
+
+  .book-head { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+  .book { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
+  .spread { display: grid; grid-template-columns: 1fr 1fr; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(201, 149, 74, 0.22); box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.9); }
+  .spread--rev .spread__cover { order: 2; }
+  .spread__cover {
+    display: grid; align-content: space-between; gap: 1rem; padding: clamp(1.75rem, 4vw, 3rem);
+    background: radial-gradient(120% 90% at 0% 0%, rgba(201, 149, 74, 0.28), transparent 60%), linear-gradient(160deg, #1d1712, #0d0b0a);
+  }
+  .spread__ch { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); }
+  .spread__cover h3 { font-size: clamp(1.8rem, 1.2rem + 2vw, 2.8rem); line-height: 1.05; letter-spacing: -0.03em; color: #fff; }
+  .spread__cover > p { color: rgba(255, 255, 255, 0.68); line-height: 1.65; }
+  .spread__sw { display: flex; gap: 0; height: 34px; border-radius: 8px; overflow: hidden; margin-top: 0.5rem; }
+  .spread__sw li { flex: 1; background: var(--c); transition: flex 0.5s var(--ease); }
+  .spread:hover .spread__sw li { flex: calc(1 + var(--j) * 0.25); }
+  .spread__meta { display: grid; gap: 0.2rem; font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); }
+  .spread__page { display: grid; align-content: start; gap: 1.1rem; padding: clamp(1.75rem, 4vw, 3rem); background: var(--surface); }
+  .spread__k { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-ink); }
+  .spread__list { counter-reset: d; display: grid; gap: 0.75rem; }
+  .spread__list li { counter-increment: d; display: grid; grid-template-columns: 2rem 1fr; gap: 0.5rem; font-size: 0.97rem; color: var(--ink); line-height: 1.45; }
+  .spread__list li::before { content: counter(d, upper-roman) '.'; font-family: var(--font-head); font-weight: 600; font-size: 0.82rem; color: var(--gold-ink); padding-top: 0.12rem; }
+  .spread__proof { position: relative; display: grid; gap: 0.35rem; margin-top: 0.5rem; padding: 1.1rem 1.2rem 1.1rem 2.6rem; border-radius: 12px; background: rgba(201, 149, 74, 0.06); font-size: 0.92rem; color: var(--text-light-muted); }
+  .spread__qm { position: absolute; left: 0.8rem; top: 0.2rem; font-family: Georgia, serif; font-size: 2.6rem; line-height: 1; color: var(--gold); }
+  .spread__proof cite { font-style: normal; font-weight: 500; color: var(--ink); }
+  a.spread__proof[href]:hover { background: rgba(201, 149, 74, 0.11); }
+
+  @media (max-width: 900px) {
+    .edi__grid, .spread { grid-template-columns: 1fr; }
+    .spread--rev .spread__cover { order: 0; }
+    .edi__word { display: none; }
+  }
+</style>

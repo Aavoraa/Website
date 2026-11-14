@@ -18,8 +18,11 @@ import Footer from '../components/Footer.astro';
     <Hero />
     <About />
     <Capabilities />
-    <Clients />
-    <Tools />
+    <!-- Clients + Tools share one screen on desktop (see fitScreens in cinematic.ts) -->
+    <div class="fit-group theme-dark" data-theme="dark" data-fit-group>
+      <Clients />
+      <Tools />
+    </div>
     <Why />
     <Industries />
     <Enquiry />

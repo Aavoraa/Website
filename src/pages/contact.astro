@@ -9,7 +9,8 @@ import { startSteps, markets } from '../data/pages';
 
 const channels = [
   { icon: 'Mail', label: 'Email us', value: site.contact.email, href: `mailto:${site.contact.email}`, note: 'Best for detailed requirements and documents.' },
-  { icon: 'Phone', label: 'Call us', value: site.contact.phoneDisplay, href: site.contact.phoneHref, note: 'Speak to the team about your project.' },
+  { icon: 'Phone', label: 'Call us', value: site.contact.phoneDisplay, href: site.contact.phoneHref, note: 'Speak to the team directly.' },
+  { icon: 'MessageCircle', label: 'WhatsApp us', value: site.contact.phoneDisplay, href: site.contact.whatsappHref, note: 'Quick questions and updates on chat.' },
   { icon: 'MapPin', label: 'Visit us', value: site.contact.location, note: 'Working with businesses in India and internationally.' },
 ];
 ---
@@ -32,7 +33,7 @@ const channels = [
             <li class="ch__card pcard" data-reveal style={`--d:${i}`}>
               <span class="ico-tile"><LucideIcon name={c.icon} size={22} /></span>
               <span class="ch__label">{c.label}</span>
-              {c.href ? <a class="ch__value" href={c.href}>{c.value}</a> : <span class="ch__value">{c.value}</span>}
+              {c.href ? <a class="ch__value" href={c.href} {...(c.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{c.value}</a> : <span class="ch__value">{c.value}</span>}
               <span class="ch__note">{c.note}</span>
             </li>
           ))
@@ -63,7 +64,8 @@ const channels = [
 <style>
   .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
   .ch-sec { padding-block: clamp(3rem, 6vw, 4.5rem) clamp(1rem, 3vw, 2rem); }
-  .ch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .ch { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+  @media (max-width: 1100px) { .ch { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .ch__card { display: grid; align-content: start; gap: 0.5rem; padding: 1.6rem; }
   .ch__card .ico-tile { margin-bottom: 0.4rem; }
   .ch__label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }

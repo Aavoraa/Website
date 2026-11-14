@@ -227,6 +227,20 @@ const motif = (key: string) => {
   .cap:hover .cap__more, .cap:focus-visible .cap__more { background-size: 100% 1px; color: var(--gold-light); }
   .cap:hover .cap__more :global(svg), .cap:focus-visible .cap__more :global(svg) { transform: translateX(4px); }
 
+  /* text glows gold where the cursor touches it; the title gets a soft glow while the card is hovered */
+  .cap__title, .cap__desc, .cap__list span, .cap__more { transition: color 0.35s var(--ease), text-shadow 0.35s var(--ease); }
+  .cap:hover .cap__title, .cap:focus-visible .cap__title { text-shadow: 0 0 18px rgba(226, 189, 132, 0.45); }
+  .cap__title:hover, .cap__desc:hover, .cap__list span:hover {
+    color: var(--gold-light);
+    text-shadow: 0 0 10px rgba(226, 189, 132, 0.75), 0 0 26px rgba(201, 149, 74, 0.5);
+  }
+  .cap__more:hover { text-shadow: 0 0 10px rgba(226, 189, 132, 0.75), 0 0 24px rgba(201, 149, 74, 0.45); }
+  .cap__list span:hover :global(svg) { filter: drop-shadow(0 0 6px rgba(226, 189, 132, 0.9)); }
+  :global(:root[data-theme='light']) .cap__title:hover, :global(:root[data-theme='light']) .cap__desc:hover, :global(:root[data-theme='light']) .cap__list span:hover {
+    color: var(--gold-deep); text-shadow: 0 0 14px rgba(201, 149, 74, 0.45);
+  }
+  :global(:root[data-theme='light']) .cap:hover .cap__title { text-shadow: 0 0 16px rgba(201, 149, 74, 0.3); }
+
   @media (max-width: 1000px) {
     .caps__grid { grid-template-columns: repeat(2, 1fr); }
     .cap { min-height: 380px; }

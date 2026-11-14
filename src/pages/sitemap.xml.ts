@@ -1,6 +1,7 @@
 /** sitemap.xml, generated at build time from every page so new pages are never missed. */
 import { site, cases } from '../data/site';
-import { pillarSlug } from '../data/pages';
+import { pillarSlug, serviceDetails, subServicePath, subSlug } from '../data/pages';
+import type { PillarKey } from '../data/site';
 import { articles } from '../data/insights';
 
 export function GET() {
@@ -8,6 +9,7 @@ export function GET() {
     ['/', 'weekly', '1.0'],
     ['/services/', 'monthly', '0.9'],
     ...Object.values(pillarSlug).map((s): [string, string, string] => [`/services/${s}/`, 'monthly', '0.9']),
+    ...(Object.keys(serviceDetails) as PillarKey[]).flatMap((k) => serviceDetails[k].flatMap((d): [string, string, string][] => [[subServicePath(k, d.name), 'monthly', '0.8'], ...(d.children || []).map((c): [string, string, string] => [`${subServicePath(k, d.name)}${subSlug(c.name)}/`, 'monthly', '0.7'])])),
     ['/solutions/', 'monthly', '0.8'],
     ['/industries/', 'monthly', '0.8'],
     ['/work/', 'monthly', '0.8'],

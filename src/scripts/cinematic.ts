@@ -49,29 +49,103 @@ function initSmoothScroll() {
     setTimeout(() => t.classList.remove('is-target'), 2200);
   });
 
+  fitScreens();
   initSectionSnap();
 }
 
-/* ---------- every page: one wheel step moves to the next section ----------
- * Sections taller than the screen scroll normally until their end, then the next step snaps on.
- * Thin strips (shorter than ~45% of the screen) are passed over. Keyboard, scrollbar and touch are untouched. */
+/* ---------- desktop: every section is exactly one screen ----------
+ * Each page section gets the viewport's height with its content centred. When the content is taller than the
+ * screen (common on laptops), it is scaled down with `zoom` so the whole section still fits. Sections that would
+ * need to shrink below MIN_ZOOM keep their natural height and scroll normally instead. */
+const FIT_SEL = 'main > header, main > section, main > [data-fit-group]';
+const MIN_ZOOM = 0.62;
+function fitScreens() {
+  const root = document.documentElement;
+  const ok = () => window.innerWidth >= 1000 && window.innerHeight >= 560;
+  const flowKids = (el: HTMLElement) =>
+    ([...el.children] as HTMLElement[]).filter((c) => !['absolute', 'fixed'].includes(getComputedStyle(c).position) && c.tagName !== 'SCRIPT' && c.tagName !== 'STYLE');
+
+  const fit = () => {
+    const secs = $$(FIT_SEL).filter((el) => !el.classList.contains('pin-spacer') && !el.querySelector('.pin-spacer') && !el.hasAttribute('data-no-fit'));
+    secs.forEach((el) => { el.style.minHeight = ''; flowKids(el).forEach((k) => (k.style.zoom = '')); });
+    root.classList.toggle('fit-screens', ok());
+    if (!ok()) return;
+    const vh = window.innerHeight;
+    secs.forEach((el) => {
+      el.style.minHeight = `${vh}px`;
+      const cs = getComputedStyle(el);
+      const pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      for (let pass = 0; pass < 3 && el.offsetHeight > vh + 1; pass++) {
+        const kids = flowKids(el);
+        const cur = parseFloat(kids[0]?.style.zoom || '1');
+        const need = ((vh - pad) / (el.offsetHeight - pad)) * cur * 0.995; // a hair under, so rounding never spills a pixel
+        if (need < MIN_ZOOM) { kids.forEach((k) => (k.style.zoom = '')); break; }
+        kids.forEach((k) => (k.style.zoom = need.toFixed(4)));
+      }
+    });
+    ScrollTrigger.refresh();
+  };
+
+  fit();
+  window.addEventListener('load', fit, { once: true });
+  document.fonts?.ready.then(fit);
+  let t = 0;
+  window.addEventListener('resize', () => { clearTimeout(t); t = window.setTimeout(fit, 200); });
+}
+
+/* ---------- every page: one wheel step = one screen, up or down ----------
+ * Each section that fits on screen is one stop (its top). A section taller than the screen gets extra stops one
+ * screen apart, each placed at the top of the first card/row that would otherwise be cut off at the bottom edge,
+ * so nothing is sliced in half; its last stop shows its end. Scrolling up walks the same stops backwards.
+ * Keyboard, scrollbar and touch are untouched. */
+const STEP_ITEMS = 'li, article, [data-reveal], .pcard, .card, tr, figure';
 function initSectionSnap() {
   if (!lenis) return;
   const EDGE = 6;
+  const NAV_CLEAR = 104; // inner stops leave room under the fixed navigation
   let busy = false;
   let coolUntil = 0;
 
+  const innerStops = (el: HTMLElement, top: number, bottom: number, vh: number, y0: number) => {
+    const out: number[] = [];
+    const pinned = el.classList.contains('pin-spacer');
+    const items = pinned
+      ? []
+      : ([...el.querySelectorAll<HTMLElement>(STEP_ITEMS)]
+          .map((n) => { const r = n.getBoundingClientRect(); return { t: r.top + y0, b: r.bottom + y0, h: r.height, w: r.width }; })
+          .filter((r) => r.h > 24 && r.w > 80 && r.h < vh * 0.85)
+          .sort((p, q) => p.t - q.t));
+    let pos = top;
+    const last = bottom - vh;
+    while (pos < last - EDGE) {
+      const edge = pos + vh;
+      // first item that starts on this screen (below the nav) but is cut at the bottom edge
+      const cut = items.find((r) => r.t > pos + Math.max(NAV_CLEAR + 8, vh * 0.4) && r.t < edge && r.b > edge);
+      let next = cut ? cut.t - NAV_CLEAR : pos + vh;
+      if (next < pos + vh * 0.3) next = pos + vh - NAV_CLEAR; // keep each step a real screen's worth
+      next = Math.min(Math.round(next), last);
+      out.push(next);
+      pos = next;
+    }
+    return out;
+  };
+
   const stops = () => {
     const vh = window.innerHeight;
-    // page sections in order: page header, sections, articles, section-styled navs, pinned sections (wrapped by GSAP), footer
-    const els = [...document.querySelectorAll<HTMLElement>('main > header, main > section, main > article, main > nav.section, main > .pin-spacer, body > .footer')].filter(
+    const y0 = window.scrollY;
+    const maxY = document.documentElement.scrollHeight - vh;
+    // page sections in order: page header, sections, grouped screens, articles, section-styled navs, pinned sections, footer
+    const els = [...document.querySelectorAll<HTMLElement>('main > header, main > section, main > [data-fit-group], main > article, main > nav.section, main > .pin-spacer, body > .footer')].filter(
       (el) => el.offsetHeight > vh * 0.45 || el.classList.contains('footer'),
     );
-    const y = window.scrollY;
-    return els.map((el) => {
-      const top = Math.round(el.getBoundingClientRect().top + y);
-      return { top, bottom: top + el.offsetHeight };
+    const list: number[] = [];
+    els.forEach((el) => {
+      const top = Math.round(el.getBoundingClientRect().top + y0);
+      const bottom = top + el.offsetHeight;
+      list.push(Math.min(top, maxY));
+      if (el.offsetHeight > vh + EDGE && !el.classList.contains('footer')) list.push(...innerStops(el, top, bottom, vh, y0));
     });
+    return [...new Set(list)].sort((p, q) => p - q);
   };
 
   const go = (target: number) => {
@@ -90,7 +164,7 @@ function initSectionSnap() {
     'wheel',
     (e) => {
       if (e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return; // pinch-zoom / sideways
-      if ((e.target as HTMLElement).closest('textarea, select, [data-no-snap]')) return;
+      if ((e.target as Element | null)?.closest?.('textarea, select, [data-no-snap]')) return;
       const swallow = () => {
         e.preventDefault();
         e.stopImmediatePropagation(); // keep Lenis from also scrolling
@@ -101,27 +175,11 @@ function initSectionSnap() {
       const list = stops();
       if (!list.length) return;
       const y = window.scrollY;
-      const vh = window.innerHeight;
-      let cur = 0;
-      list.forEach((st, i) => { if (st.top <= y + EDGE) cur = i; });
-      const c = list[cur];
-
-      if (e.deltaY > 0) {
-        // still a real amount of this section below — scroll normally (a small overhang isn't worth a step)
-        if (c.bottom > y + vh + Math.max(EDGE, vh * 0.15)) return;
-        const next = list[cur + 1];
-        if (!next) return;
-        swallow();
-        go(next.top);
-      } else {
-        if (y - c.top > vh * 0.6) return; // deep inside a tall section — scroll normally
-        if (y > c.top + EDGE) { swallow(); go(c.top); return; } // back to this section's start
-        const prev = list[cur - 1];
-        if (!prev) return;
-        swallow();
-        // a section that fits on screen is shown from its top; a taller one from its last screen
-        go(prev.bottom - prev.top <= vh * 1.15 ? prev.top : Math.max(prev.top, prev.bottom - vh));
-      }
+      const minStep = window.innerHeight * 0.25; // ignore stops that only nudge the page (reveal animations shift items a little)
+      const target = e.deltaY > 0 ? list.find((s) => s > y + minStep) : [...list].reverse().find((s) => s < y - minStep) ?? (y > EDGE && list[0] < y ? list[0] : undefined);
+      if (target === undefined) return;
+      swallow();
+      go(target);
     },
     { passive: false, capture: true },
   );
@@ -145,24 +203,6 @@ function parallax(el: HTMLElement, speed: number, trigger: Element = el.parentEl
 function drift(el: HTMLElement, from: number, to: number, trigger: Element = el.parentElement || el) {
   mark(el);
   gsap.fromTo(el, { '--px': `${from}px` }, { '--px': `${to}px`, ease: 'none', scrollTrigger: { trigger, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
-}
-
-/** Grid items rise into place in a column-by-column wave as the grid scrolls in. */
-function cascade(grid: HTMLElement, step = 55, base = 50) {
-  const kids = [...grid.children] as HTMLElement[];
-  if (kids.length < 2) return;
-  const colOf = (k: HTMLElement) => {
-    const lefts = [...new Set(kids.map((c) => Math.round(c.offsetLeft)))].sort((a, b) => a - b);
-    return Math.max(0, lefts.indexOf(Math.round(k.offsetLeft)));
-  };
-  kids.forEach((k) => {
-    mark(k);
-    gsap.fromTo(
-      k,
-      { '--py': () => `${base + colOf(k) * step}px` },
-      { '--py': '0px', ease: 'none', scrollTrigger: { trigger: grid, start: 'top 98%', end: 'top 30%', scrub: 0.9, invalidateOnRefresh: true } },
-    );
-  });
 }
 
 /* ---------- applied to every page ---------- */
@@ -193,9 +233,7 @@ function globalEffects() {
     gsap.fromTo(phead, { '--hp': 0 }, { '--hp': 1, ease: 'none', scrollTrigger: { trigger: phead, start: 'top top', end: 'bottom top', scrub: true } });
   }
 
-  // grids cascade in column by column
-  $$('.about__stats, .ind__grid, .projects, .inds, .bring, .reasons, .mods, .entries, .posts, .wgrid, .rel, .ch, .others, .results, .stats, .fits, .tst__grid, .ins__grid').forEach((g) => cascade(g));
-  $$('.caps__grid').filter((g) => !g.closest('[data-caps]')).forEach((g) => cascade(g)); // not the homepage ribbon grid, which has its own scroll choreography
+  // (grid column cascade removed: cards in a row stay level — they still fade in via [data-reveal])
 
   // the closing CTA panel rises and settles to full size
   $$('.pcta__panel').forEach((p) => {

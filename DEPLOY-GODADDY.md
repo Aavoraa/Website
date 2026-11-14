@@ -6,7 +6,7 @@ website: plain HTML, CSS, JavaScript, images, plus three server files:
 | File | Purpose |
 |---|---|
 | `.htaccess` | Apache settings: custom 404 page, compression, caching, security headers, optional HTTPS redirect |
-| `contact.php` | Sends enquiry-form submissions to **info@aavoraa.com** |
+| `contact.php` | Sends enquiry-form submissions to **business@aavoraa.com** |
 | `web.config` | Only used if your GoDaddy plan is **Windows (Plesk)** hosting; ignored otherwise |
 
 You need a GoDaddy **Web Hosting (cPanel)** plan with the domain **aavoraa.com** connected to it.
@@ -48,10 +48,10 @@ Open **https://aavoraa.com** — the site should load. (DNS changes on a new dom
 
 ## 3. Make the enquiry form deliver email
 
-The form sends enquiries to **info@aavoraa.com** through `contact.php`.
+The form sends enquiries to **business@aavoraa.com** through `contact.php`.
 
 1. Submit a test enquiry on the live site. You should see **"Thank you — your enquiry has been received."**
-2. Check the info@aavoraa.com inbox **and its spam folder**.
+2. Check the business@aavoraa.com inbox **and its spam folder**.
 3. **If your email is hosted somewhere else** (Microsoft 365 / GoDaddy Professional Email / Google
    Workspace): in cPanel open **Email Routing**, select aavoraa.com and choose
    **Remote Mail Exchanger**. Without this, the server tries to deliver the message to itself and it never

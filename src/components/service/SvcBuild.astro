@@ -1,0 +1,153 @@
+---
+/** Software Development — "engineering blueprint": a code-editor capability panel and a build pipeline of services. */
+import LucideIcon from '../LucideIcon.astro';
+import { subServicePath, type ServiceDetail } from '../../data/pages';
+import type { PillarKey } from '../../data/site';
+interface Props {
+  pillarKey: PillarKey;
+  label: string;
+  description: string;
+  outcomes: string[];
+  capabilities: { name: string; icon: string }[];
+  details: ServiceDetail[];
+}
+const { pillarKey, label, description, outcomes, capabilities, details } = Astro.props;
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+---
+
+<section class="section theme-dark flip bld" data-theme="dark" aria-labelledby="bld-title">
+  <div class="bld__grid-bg" aria-hidden="true"></div>
+  <div class="container bld__top">
+    <div class="bld__intro">
+      <p class="eyebrow" data-reveal>What We Build</p>
+      <h2 id="bld-title" class="ph2" data-reveal style="--d:1">{label}, <span class="accent">Engineered.</span></h2>
+      <p class="lead" data-reveal style="--d:2">{description}</p>
+      <ul class="bld__out" data-reveal style="--d:3">
+        {outcomes.map((o) => <li><span class="bld__ok">✓</span>{o}</li>)}
+      </ul>
+    </div>
+
+    <div class="ide" data-reveal="scale" aria-label="Capabilities">
+      <div class="ide__bar" aria-hidden="true">
+        <i></i><i></i><i></i>
+        <span>aavoraa/build.config.ts</span>
+      </div>
+      <ol class="ide__code">
+        <li><span class="k">export const</span> <span class="v">capabilities</span> = [</li>
+        {capabilities.map((c) => (
+          <li class="ide__cap">
+            <LucideIcon name={c.icon} size={15} />
+            <span class="s">'{c.name}'</span>,
+          </li>
+        ))}
+        <li>];</li>
+        <li><span class="c">// built around how your business actually works</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="section theme-dark section--alt flip pipe-sec" id="services-detail" data-theme="dark" aria-labelledby="pipe-title">
+  <div class="container">
+    <header class="section-head section-head--center pipe-head">
+      <p class="eyebrow" data-reveal>The Build Pipeline</p>
+      <h2 id="pipe-title" class="ph2" data-reveal style="--d:1">From Requirement <span class="accent">to Release.</span></h2>
+    </header>
+    <ol class="pipe">
+      {
+        details.map((d, i) => (
+          <li class="stage" data-reveal>
+            <div class="stage__rail" aria-hidden="true">
+              <span class="stage__node"><LucideIcon name={d.icon} size={18} /></span>
+            </div>
+            <article class="stage__card pcard">
+              <header class="stage__head">
+                <span class="stage__tag">stage_0{i + 1}</span>
+                <h3><a href={subServicePath(pillarKey, d.name)}>{d.name}</a></h3>
+                <p>{d.summary}</p>
+                <a class="sub-link " href={subServicePath(pillarKey, d.name)}>Explore {d.name} <LucideIcon name="ArrowRight" size={15} /></a>
+              </header>
+              <ul class="stage__ticks">
+                {d.deliverables.map((x) => <li><LucideIcon name="SquareCheck" size={15} />{x}</li>)}
+              </ul>
+              <div class="stage__foot">
+                <div class="stage__stack">
+                  {d.stack.split(' · ').map((t) => <code>{t}</code>)}
+                </div>
+                <span class="stage__model"><LucideIcon name="Timer" size={15} />{d.model}</span>
+              </div>
+              {d.proof && (
+                <a class="stage__proof" href={d.proof.slug ? `/work/${d.proof.slug}/` : undefined}>
+                  <span class="stage__cmd"><span class="p">$</span> shipped <span class="v">--client</span>="{d.proof.client}"</span>
+                  <span class="stage__proof-t">{d.proof.text}</span>
+                </a>
+              )}
+            </article>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .bld { position: relative; overflow: hidden; }
+  .bld__grid-bg {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+    background-image: linear-gradient(rgba(201, 149, 74, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(201, 149, 74, 0.07) 1px, transparent 1px);
+    background-size: 44px 44px; mask-image: radial-gradient(ellipse 70% 70% at 70% 50%, #000, transparent);
+  }
+  .bld__top { position: relative; display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(2.5rem, 6vw, 5rem); align-items: center; }
+  .bld__intro { display: grid; gap: 1.2rem; }
+  .bld__out { display: grid; gap: 0.7rem; }
+  .bld__out li { display: flex; gap: 0.7rem; align-items: baseline; font-weight: 500; color: var(--ink); }
+  .bld__ok { font-family: ui-monospace, monospace; color: var(--gold-ink); }
+
+  .ide { border-radius: 18px; overflow: hidden; background: #0d0c0b; border: 1px solid rgba(201, 149, 74, 0.25); box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.8), 0 0 60px -30px rgba(201, 149, 74, 0.4); }
+  .ide__bar { display: flex; align-items: center; gap: 0.45rem; padding: 0.8rem 1rem; background: #151311; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+  .ide__bar i { width: 10px; height: 10px; border-radius: 50%; background: rgba(201, 149, 74, 0.35); }
+  .ide__bar i:first-child { background: rgba(201, 149, 74, 0.8); }
+  .ide__bar span { margin-left: 0.6rem; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.75rem; color: rgba(255, 255, 255, 0.5); }
+  .ide__code { counter-reset: ln; padding: 1.1rem 0; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.86rem; line-height: 1.95; color: rgba(255, 255, 255, 0.82); }
+  .ide__code li { counter-increment: ln; display: flex; align-items: center; gap: 0.5rem; padding-right: 1rem; white-space: nowrap; }
+  .ide__code li::before { content: counter(ln); flex: none; width: 2.6rem; padding-right: 1rem; text-align: right; color: rgba(255, 255, 255, 0.22); }
+  .ide__cap { padding-left: 1.6rem; transition: background-color 0.3s; }
+  .ide__cap:hover { background: rgba(201, 149, 74, 0.08); }
+  .ide__cap :global(svg) { color: var(--gold); flex: none; }
+  .ide .k { color: #c9954a; }
+  .ide .v { color: #e2bd84; }
+  .ide .s { color: #f1dcb4; }
+  .ide .c { color: rgba(255, 255, 255, 0.35); font-style: italic; }
+
+  .pipe-head { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+  .pipe { display: grid; gap: 1.25rem; max-width: 980px; margin-inline: auto; }
+  .stage { display: grid; grid-template-columns: 56px 1fr; gap: 1.25rem; }
+  .stage__rail { position: relative; display: flex; justify-content: center; }
+  .stage__rail::before { content: ''; position: absolute; top: 0; bottom: -1.25rem; width: 1px; background: linear-gradient(rgba(201, 149, 74, 0.6), rgba(201, 149, 74, 0.1)); }
+  .stage:last-child .stage__rail::before { bottom: 50%; }
+  .stage__node { position: relative; z-index: 1; display: grid; place-items: center; width: 48px; height: 48px; margin-top: 1.4rem; border-radius: 14px; background: #14110f; border: 1px solid rgba(201, 149, 74, 0.5); color: var(--gold); box-shadow: 0 0 24px -6px rgba(201, 149, 74, 0.6); }
+  .stage__card { display: grid; gap: 1.1rem; padding: clamp(1.4rem, 3vw, 2rem); }
+  .stage__head { display: grid; gap: 0.5rem; }
+  .stage__tag { font-family: ui-monospace, monospace; font-size: 0.75rem; color: var(--gold-ink); }
+  .stage__head h3 { font-size: clamp(1.3rem, 1.05rem + 0.9vw, 1.7rem); }
+  .stage__head p { color: var(--text-light-muted); line-height: 1.65; }
+  .stage__ticks { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.25rem; }
+  .stage__ticks li { display: flex; gap: 0.55rem; align-items: flex-start; font-size: 0.9rem; color: var(--ink); }
+  .stage__ticks :global(svg) { flex: none; margin-top: 0.15rem; color: var(--gold-ink); }
+  .stage__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--line-light); }
+  .stage__stack { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .stage__stack code { font-family: ui-monospace, monospace; font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: 6px; background: rgba(201, 149, 74, 0.08); border: 1px solid rgba(201, 149, 74, 0.2); color: var(--gold-ink); }
+  .stage__model { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--text-light-muted); }
+  .stage__model :global(svg) { color: var(--gold-ink); }
+  .stage__proof { display: grid; gap: 0.3rem; padding: 0.9rem 1.1rem; border-radius: 10px; background: #0d0c0b; border: 1px solid rgba(201, 149, 74, 0.18); font-family: ui-monospace, monospace; font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); transition: border-color 0.3s; }
+  a.stage__proof[href]:hover { border-color: rgba(201, 149, 74, 0.5); }
+  .stage__proof .p { color: var(--gold); }
+  .stage__proof .v { color: #e2bd84; }
+  .stage__proof-t { font-family: var(--font-body); font-size: 0.88rem; color: rgba(255, 255, 255, 0.6); }
+
+  :global(:root[data-theme='light']) .ide, :global(:root[data-theme='light']) .stage__proof { background: #16130f; }
+  :global(:root[data-theme='light']) .stage__node { background: #fff; }
+
+  @media (max-width: 900px) { .bld__top { grid-template-columns: 1fr; } .stage__ticks { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .stage { grid-template-columns: 1fr; } .stage__rail { display: none; } .ide__code { font-size: 0.78rem; } .ide__code li { white-space: normal; } }
+</style>

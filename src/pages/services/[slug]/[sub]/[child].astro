@@ -1,0 +1,31 @@
+---
+/** Third level: a specialist service inside a sub-service, e.g. /services/marketing-lead-generation/digital-marketing/linkedin-marketing/ */
+import SubPage from '../../../../components/service/SubPage.astro';
+import { pillars, type PillarKey } from '../../../../data/site';
+import { pillarSlug, serviceDetails, servicePath, subSlug, subServicePath } from '../../../../data/pages';
+
+export function getStaticPaths() {
+  return (Object.keys(pillarSlug) as PillarKey[]).flatMap((key) =>
+    serviceDetails[key].flatMap((parent, pi) =>
+      (parent.children || []).map((c, ci) => ({ params: { slug: pillarSlug[key], sub: subSlug(parent.name), child: subSlug(c.name) }, props: { key, pi, ci } })),
+    ),
+  );
+}
+
+const { key, pi, ci } = Astro.props as { key: PillarKey; pi: number; ci: number };
+const p = pillars.find((x) => x.key === key)!;
+const parent = serviceDetails[key][pi];
+const d = parent.children![ci];
+const parentPath = subServicePath(key, parent.name);
+const siblings = parent.children!.filter((_, i) => i !== ci).map((s) => ({ name: s.name, summary: s.summary, icon: s.icon, href: `${parentPath}${subSlug(s.name)}/` }));
+---
+
+<SubPage
+  pillarKey={key}
+  d={d}
+  path={`${parentPath}${subSlug(d.name)}/`}
+  crumbs={[{ label: 'Services', href: '/services/' }, { label: p.label, href: servicePath(key) }, { label: parent.name, href: parentPath }, { label: d.name }]}
+  siblings={siblings}
+  siblingsTitle={`More in ${parent.name}`}
+  back={{ label: `All of ${parent.name}`, href: parentPath }}
+/>

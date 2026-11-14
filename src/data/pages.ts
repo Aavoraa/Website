@@ -3,6 +3,7 @@
  * Facts come from AAVORAA's portfolio deck ("AAVORAA_Portfolio_BlackGold.pptx"); nothing here is invented proof.
  */
 import type { PillarKey, Case } from './site';
+import { copyFor } from './serviceCopy';
 
 /** URL slug for each service pillar: /services/<slug>/ */
 export const pillarSlug: Record<PillarKey, string> = {
@@ -12,6 +13,9 @@ export const pillarSlug: Record<PillarKey, string> = {
   transform: 'ai-business-automation',
 };
 export const servicePath = (k: PillarKey) => `/services/${pillarSlug[k]}/`;
+/** Each sub-service has its own page: /services/<pillar>/<sub>/ */
+export const subSlug = (name: string) => name.toLowerCase().replace(/&/g, 'and').replace(/[()]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+export const subServicePath = (k: PillarKey, name: string) => `${servicePath(k)}${subSlug(name)}/`;
 
 /** Pillar-page extras: hero copy and what each engagement usually starts with. */
 export const pillarPage: Record<PillarKey, { eyebrow: string; intro: string; outcomes: string[]; startsWith: string; interest: string }> = {
@@ -57,6 +61,8 @@ export type ServiceDetail = {
   stack: string;
   model: string;
   proof?: { text: string; client: string; slug?: string };
+  /** optional sub-services, each with its own page under this one */
+  children?: ServiceDetail[];
 };
 
 /** Service deep-dives per pillar — deliverables, stack, timeline/model and proof from the deck (slides 4–10). */
@@ -161,10 +167,18 @@ export const serviceDetails: Record<PillarKey, ServiceDetail[]> = {
       model: 'Shoot packages and a monthly content retainer',
       proof: { text: 'Customer-testimonial video tracks for the festive campaign and shoot packages for three property projects.', client: 'Taqua Silks · Greens Properties', slug: 'taqua-silks-social' },
     },
+    {
+      name: 'Personal Branding',
+      icon: 'UserRoundCheck',
+      summary: 'Founder and leadership branding — a clear personal position, a consistent voice and a visible presence that builds trust in you and your business.',
+      deliverables: [],
+      stack: 'LinkedIn · Canva · Adobe CC · Notion',
+      model: '2–3 week positioning sprint, then a monthly content retainer',
+    },
   ],
   grow: [
     {
-      name: 'SEO & AI Search (GEO)',
+      name: 'SEO & AI Search Visibility',
       icon: 'Search',
       summary:
         'Audit-first SEO — technical, on-page, local / Google Business Profile, content and Generative Engine Optimisation for single sites and multi-branch networks.',
@@ -181,52 +195,148 @@ export const serviceDetails: Record<PillarKey, ServiceDetail[]> = {
       proof: { text: 'GEO + SEO + GBP audit across 7 branches and 17+ loan officers.', client: 'Fairway Heritage Group, USA', slug: 'fairway-heritage-group' },
     },
     {
+      name: 'Digital Marketing',
+      icon: 'Megaphone',
+      summary: 'Always-on brand presence across social media, content, LinkedIn and WhatsApp — one calendar, one voice, measured in enquiries rather than likes.',
+      deliverables: [
+        'Channel audit and content pillars',
+        'Social media calendars and community management',
+        'Content that ranks, gets shared and feeds every channel',
+        'LinkedIn authority for B2B decision-makers',
+        'WhatsApp journeys and consent-led broadcasts',
+        'Monthly reach → enquiry reporting',
+      ],
+      stack: 'Meta Business Suite · LinkedIn · WhatsApp Business API · Canva',
+      model: '2-week set-up, then a monthly retainer',
+      proof: { text: 'Instagram as a walk-in driver — around 16K followers and a catchment reaching Kerala.', client: 'Taqua Silks', slug: 'taqua-silks-social' },
+      children: [
+        {
+          name: 'Social Media Marketing',
+          icon: 'Share2',
+          summary: 'Platform strategy, calendars, community and boosting across Instagram, Facebook, YouTube and LinkedIn — measured in enquiries and walk-ins.',
+          deliverables: [
+            'Channel audit and content pillars',
+            'Monthly calendar across four platforms',
+            'Daily stories and community replies',
+            'Launch, festive and offer campaign arcs',
+            'Boost strategy for top organic posts',
+            'Monthly reach → enquiry reporting',
+          ],
+          stack: 'Meta Business Suite · Later · Canva · LinkedIn',
+          model: '2-week set-up, then a monthly retainer',
+          proof: { text: 'Instagram as a walk-in driver — around 16K followers and a catchment reaching Kerala.', client: 'Taqua Silks', slug: 'taqua-silks-social' },
+        },
+        {
+          name: 'Content Marketing',
+          icon: 'FileText',
+          summary: 'Blogs, guides, case stories, reels and newsletters planned around what your buyers search for and ask — content that ranks, gets shared and feeds every other channel.',
+          deliverables: [
+            'Content strategy and topic clusters',
+            'Monthly blog and article production',
+            'Case stories and sales collateral',
+            'Short-form video and reel scripts',
+            'Repurposing across social, email and WhatsApp',
+            'Content performance reporting',
+          ],
+          stack: 'Notion · Canva · Adobe CC · GA4 · Search Console',
+          model: 'Monthly content retainer',
+        },
+        {
+          name: 'LinkedIn Marketing',
+          icon: 'Linkedin',
+          summary: 'Company-page and founder-led LinkedIn programmes that build authority with decision-makers and open B2B conversations.',
+          deliverables: [
+            'Company and founder profile optimisation',
+            'Thought-leadership post calendar',
+            'Carousels, document and video posts',
+            'LinkedIn Ads for targeted accounts',
+            'Connection and engagement routines',
+            'Monthly follower, engagement and lead reporting',
+          ],
+          stack: 'LinkedIn · Sales Navigator · Canva · LinkedIn Analytics',
+          model: '2-week set-up, then a monthly retainer',
+        },
+        {
+          name: 'WhatsApp Marketing',
+          icon: 'MessageCircleMore',
+          summary: 'Verified WhatsApp Business API set-ups that book, follow up and retain — bots, journeys and consent-led broadcasts.',
+          deliverables: [
+            'WABA set-up and template approvals',
+            'Booking and enquiry chatbots',
+            'Lifecycle journeys — reminders, reviews and offers',
+            'Segmented broadcasts with frequency caps',
+            'Website and ad click-to-WhatsApp',
+            'Opt-in growth and CRM sync',
+          ],
+          stack: 'WhatsApp Business API · WATI · n8n / Make · CRM',
+          model: '2–4 week set-up, then monthly management',
+        },
+      ],
+    },
+    {
       name: 'Performance Marketing',
       icon: 'ChartColumnIncreasing',
-      summary: 'Google, Meta and programmatic campaigns engineered for return — real-time bid and creative optimisation with transparent dashboards.',
+      summary: 'Paid ads, email and lead generation working as one return-focused engine — every rupee tracked from first click to qualified lead.',
       deliverables: [
         'Campaign architecture by funnel stage',
-        'Creative and copy testing',
-        'Geo / pincode targeting for stores and projects',
-        'Lead-sheet automation',
+        'Paid ads across Google and Meta',
+        'Email nurture and offer campaigns',
+        'Lead funnels flowing into your CRM',
         'Weekly optimisation',
         'Monthly ROAS / CPL reporting',
       ],
-      stack: 'Google Ads · Meta Ads · GA4 · CAPI · Looker',
+      stack: 'Google Ads · Meta Ads · GA4 · Mail automation · CRM',
       model: 'Monthly retainer; ad spend at actuals',
       proof: { text: 'Google + Meta lead funnels with ROAS reporting for a property investment brand.', client: 'Property Wealth', slug: 'property-wealth' },
-    },
-    {
-      name: 'B2B & B2C Lead Generation',
-      icon: 'Users',
-      summary: 'Intent-based B2B outbound (email + LinkedIn) and B2C funnels that deliver purchase-ready leads into a CRM you own.',
-      deliverables: [
-        'ICP and account list building',
-        'Cold email + LinkedIn cadences',
-        'Landing funnels and lead forms',
-        'CRM nurturing workflows',
-        'Dealer / distributor acquisition campaigns',
-        'Lead-quality reporting',
+      children: [
+        {
+          name: 'Paid Ads',
+          icon: 'MousePointerClick',
+          summary: 'Google Search, Display, YouTube and Meta ad campaigns engineered for return — real-time bid and creative optimisation with transparent dashboards.',
+          deliverables: [
+            'Campaign architecture by funnel stage',
+            'Creative and copy testing',
+            'Geo / pincode targeting for stores and projects',
+            'Lead-sheet automation',
+            'Weekly optimisation',
+            'Monthly ROAS / CPL reporting',
+          ],
+          stack: 'Google Ads · Meta Ads · GA4 · CAPI · Looker',
+          model: 'Monthly retainer; ad spend at actuals',
+          proof: { text: 'Google + Meta lead funnels with ROAS reporting for a property investment brand.', client: 'Property Wealth', slug: 'property-wealth' },
+        },
+        {
+          name: 'Email Marketing',
+          icon: 'Mail',
+          summary: 'Newsletters, automated nurture sequences and offer campaigns that keep leads warm and bring customers back.',
+          deliverables: [
+            'List audit, segmentation and consent',
+            'Welcome and nurture sequences',
+            'Monthly newsletters and offer campaigns',
+            'Templates designed to match your brand',
+            'Deliverability set-up (SPF, DKIM, DMARC)',
+            'Open, click and revenue reporting',
+          ],
+          stack: 'Mailchimp · Brevo · Zoho Campaigns · CRM',
+          model: '2–3 week set-up, then monthly campaigns',
+        },
+        {
+          name: 'Lead Generation',
+          icon: 'Users',
+          summary: 'Intent-based B2B outbound (email + LinkedIn) and B2C funnels that deliver purchase-ready leads into a CRM you own.',
+          deliverables: [
+            'ICP and account list building',
+            'Cold email + LinkedIn cadences',
+            'Landing funnels and lead forms',
+            'CRM nurturing workflows',
+            'Dealer / distributor acquisition campaigns',
+            'Lead-quality reporting',
+          ],
+          stack: 'Sales Navigator · Apollo · Mail automation · CRM',
+          model: '30-day launch; retainer with a performance option',
+          proof: { text: '500+ qualified leads turned into 250+ booked site visits.', client: 'Nova Pinnacle', slug: 'nova-pinnacle' },
+        },
       ],
-      stack: 'Sales Navigator · Apollo · Mail automation · CRM',
-      model: '30-day launch; retainer with a performance option',
-      proof: { text: '500+ qualified leads turned into 250+ booked site visits.', client: 'Nova Pinnacle', slug: 'nova-pinnacle' },
-    },
-    {
-      name: 'Social Media Marketing',
-      icon: 'Share2',
-      summary: 'Platform strategy, calendars, community and boosting across Instagram, Facebook, YouTube and LinkedIn — measured in enquiries and walk-ins.',
-      deliverables: [
-        'Channel audit and content pillars',
-        'Monthly calendar across four platforms',
-        'Daily stories and community replies',
-        'Launch, festive and offer campaign arcs',
-        'Boost strategy for top organic posts',
-        'Monthly reach → enquiry reporting',
-      ],
-      stack: 'Meta Business Suite · Later · Canva · LinkedIn',
-      model: '2-week set-up, then a monthly retainer',
-      proof: { text: 'Instagram as a walk-in driver — around 16K followers and a catchment reaching Kerala.', client: 'Taqua Silks', slug: 'taqua-silks-social' },
     },
     {
       name: 'E-commerce Marketing',
@@ -243,21 +353,6 @@ export const serviceDetails: Record<PillarKey, ServiceDetail[]> = {
       stack: 'Shopify · Meta · Google Shopping · WhatsApp API',
       model: 'One-time revamp, then a growth retainer',
       proof: { text: 'essa.in D2C store revamp, photoshoot and growth-marketing programme.', client: 'ESSA Garments', slug: 'essa-garments-d2c' },
-    },
-    {
-      name: 'WhatsApp Marketing',
-      icon: 'MessageCircleMore',
-      summary: 'Verified WhatsApp Business API set-ups that book, follow up and retain — bots, journeys and consent-led broadcasts.',
-      deliverables: [
-        'WABA set-up and template approvals',
-        'Booking and enquiry chatbots',
-        'Lifecycle journeys — reminders, reviews and offers',
-        'Segmented broadcasts with frequency caps',
-        'Website and ad click-to-WhatsApp',
-        'Opt-in growth and CRM sync',
-      ],
-      stack: 'WhatsApp Business API · WATI · n8n / Make · CRM',
-      model: '2–4 week set-up, then monthly management',
     },
   ],
   transform: [
@@ -312,6 +407,15 @@ export const serviceDetails: Record<PillarKey, ServiceDetail[]> = {
   ],
 };
 
+// The client's service-page document is the source for "What You Receive" wherever it covers a service.
+const useDocCopy = (list: ServiceDetail[]) =>
+  list.forEach((d) => {
+    const c = copyFor(d.name);
+    if (c) d.deliverables = c.receive;
+    if (d.children) useDocCopy(d.children);
+  });
+Object.values(serviceDetails).forEach(useDocCopy);
+
 /** The AAVORAA Growth Method (deck slide 21). */
 export const growthMethod = [
   { n: '01', title: 'Listen & Audit', text: 'We dig into your goals, data and funnel to find where growth is leaking.', icon: 'Ear' },
@@ -346,7 +450,7 @@ export const testimonials = [
   { quote: 'The funnel automation they built cut our manual work dramatically. They truly understand how a tech business runs.', who: 'Director', org: 'i-Cons Technologies' },
 ];
 
-export const markets = ['India', 'USA', 'United Kingdom', 'UAE', 'Australia', 'Southeast Asia'];
+export const markets = ['India', 'USA', 'United Kingdom', 'Europe', 'UAE', 'Australia', 'Southeast Asia'];
 
 /** Industries page detail: how AAVORAA typically helps, and related case studies (slugs). */
 export const industryDetail: Record<string, { text: string; needs: string[]; cases?: string[] }> = {

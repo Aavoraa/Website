@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import LucideIcon from './LucideIcon.astro';
+import BrandIcon from './BrandIcon.astro';
 const entryIcons = ['Search', 'CodeXml', 'Bot'];
 import { entryPoints, interestOptions, integrations, site, bookingIsExternal, bookingHref } from '../data/site';
 ---
@@ -30,8 +31,9 @@ import { entryPoints, interestOptions, integrations, site, bookingIsExternal, bo
       </ul>
 
       <ul class="enq__direct" data-reveal>
-        <li><Icon name="mail" size={18} /><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
-        <li><Icon name="phone" size={18} /><a href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a></li>
+        <li><Icon name="mail" size={18} /><a href={`mailto:${site.contact.email}?subject=${encodeURIComponent("Enquiry from the AAVORAA website")}`}>{site.contact.email}</a></li>
+        <li><Icon name="phone" size={18} /><a href={site.contact.phoneHref} aria-label={`Call ${site.contact.phoneDisplay}`}>{site.contact.phoneDisplay}</a></li>
+        <li><BrandIcon icon="siWhatsapp" size={18} /><a href={site.contact.whatsappHref} target="_blank" rel="noopener" aria-label={`Chat on WhatsApp: ${site.contact.phoneDisplay}`} data-track="whatsapp" data-track-location="enquiry_direct">{site.contact.phoneDisplay}</a></li>
         {bookingIsExternal && (
           <li><Icon name="arrow-up-right" size={18} /><a href={bookingHref} target="_blank" rel="noopener" data-track="cta_primary" data-track-location="enquiry_direct">Book a discovery call online</a></li>
         )}

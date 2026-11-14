@@ -174,8 +174,8 @@ function initCapsTransition() {
     ticking = false;
     const vh = window.innerHeight;
     const gt = grid.getBoundingClientRect().top;
-    // ribbon draws while the cards travel from 90% to 30% of the viewport height
-    const q = clamp01((vh * 0.9 - gt) / (vh * 0.6));
+    // ribbon draws while the cards travel from 95% to 55% of the viewport height, so it is complete when the section snaps into view
+    const q = clamp01((vh * 0.95 - gt) / (vh * 0.4));
     caps.style.setProperty('--cards-q', q.toFixed(3));
     const singleColumn = window.innerWidth <= 560;
     cards.forEach((c, i) => {

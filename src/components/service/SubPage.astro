@@ -1,0 +1,304 @@
+---
+/** Page body for a sub-service (or a sub-service of a sub-service). Used by services/[slug]/[sub] and [slug]/[sub]/[child]. */
+import Page from '../../layouts/Page.astro';
+import LucideIcon from '../LucideIcon.astro';
+import Icon from '../Icon.astro';
+import BrandIcon from '../BrandIcon.astro';
+import PillarArt from '../PillarArt.astro';
+import CaseCard from '../CaseCard.astro';
+import StepGrid from '../StepGrid.astro';
+import PageCTA from '../PageCTA.astro';
+import { pillars, cases, site, type PillarKey } from '../../data/site';
+import { pillarPage, subSlug, growthMethod, type ServiceDetail } from '../../data/pages';
+import { copyFor } from '../../data/serviceCopy';
+
+type Link = { name: string; summary: string; icon: string; href: string };
+interface Props {
+  pillarKey: PillarKey;
+  d: ServiceDetail;
+  path: string;
+  crumbs: { label: string; href?: string }[];
+  siblings: Link[];
+  siblingsTitle: string;
+  back: { label: string; href: string };
+  children?: Link[];
+}
+const { pillarKey: key, d, path, crumbs, siblings, siblingsTitle, back, children = [] } = Astro.props;
+const p = pillars.find((x) => x.key === key)!;
+const page = pillarPage[key];
+const proofCase = d.proof?.slug ? cases.find((c) => c.slug === d.proof!.slug) : undefined;
+const words = d.name.split(' ');
+const cut = Math.max(1, Math.ceil(words.length / 2));
+const contactHref = `/contact/?interest=${encodeURIComponent(page.interest)}`;
+const stack = d.stack.split(' · ');
+const copy = copyFor(d.name); // client-supplied page copy, where the document covers this service
+const stepIcon: Record<string, string> = {
+  Discover: 'Search', Define: 'Target', Design: 'PenTool', Deliver: 'PackageCheck', Brief: 'ClipboardList', Direction: 'Compass',
+  Create: 'Sparkles', 'Refine & deliver': 'PackageCheck', Plan: 'Map', Concept: 'Lightbulb', Produce: 'Clapperboard',
+  'Edit & publish-ready delivery': 'Film', Specify: 'FileText', Build: 'Hammer', 'Test & launch': 'Rocket', Improve: 'TrendingUp',
+  Understand: 'Ear', Structure: 'Network', Develop: 'CodeXml', 'Validate & launch': 'Rocket', Prioritise: 'ListOrdered',
+  'Launch & learn': 'Rocket', Audit: 'ScanSearch', Research: 'Search', Optimise: 'SlidersHorizontal', Measure: 'ChartLine',
+  Align: 'Handshake', Prepare: 'ClipboardList', Launch: 'Rocket', Report: 'FileChartColumn', Activate: 'Rocket', Qualify: 'Users',
+  Publish: 'Send', Review: 'Eye', Map: 'Map', Connect: 'Cable', Test: 'FlaskConical', 'Deploy & support': 'ShieldCheck',
+  Assess: 'Stethoscope', Prototype: 'FlaskConical', Integrate: 'Cable', Monitor: 'Activity', Diagnose: 'Stethoscope',
+  Analyse: 'Microscope', Implement: 'Wrench',
+};
+const steps = copy
+  ? copy.process.map((s, i) => ({ n: String(i + 1).padStart(2, '0'), title: s.step, text: s.desc, icon: stepIcon[s.step] || 'CircleDot' }))
+  : growthMethod;
+---
+
+<Page
+  title={`${d.name} | ${p.label} | AAVORAA`}
+  description={(copy ? `${copy.tagline} ${copy.lead}` : d.summary).slice(0, 158)}
+  path={path}
+  eyebrow={p.label}
+  heading={words.slice(0, cut).join(' ')}
+  accent={words.slice(cut).join(' ') || undefined}
+  intro={copy?.tagline ?? d.summary}
+  crumbs={crumbs}
+>
+  <div slot="head" class="hero-btns">
+    <a class="btn" href={contactHref} data-track="cta_primary" data-track-location={`sub_${subSlug(d.name)}_hero`}>{copy?.heroCta ?? 'Book Free Strategic Consultation'} <Icon name="arrow" class="arrow" /></a>
+    <a class="btn btn--ghost" href={site.contact.whatsappHref} target="_blank" rel="noopener" data-track="whatsapp" data-track-location={`sub_${subSlug(d.name)}_hero`}><BrandIcon icon="siWhatsapp" size={17} /> WhatsApp Us</a>
+  </div>
+
+  {
+    children.length > 0 && (
+      <section class="section theme-dark flip" data-theme="dark" aria-labelledby="kids-title">
+        <div class="container">
+          <header class="section-head section-head--center head-gap">
+            <p class="eyebrow" data-reveal>Inside {d.name}</p>
+            <h2 id="kids-title" class="ph2" data-reveal style="--d:1">{children.length} Specialist <span class="accent">Services.</span></h2>
+          </header>
+          <ul class="kids">
+            {children.map((c, i) => (
+              <li data-reveal style={`--d:${i % 4}`}>
+                <a class="kid pcard" href={c.href}>
+                  <span class="kid__n">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="ico-tile"><LucideIcon name={c.icon} size={22} /></span>
+                  <strong>{c.name}</strong>
+                  <small>{c.summary}</small>
+                  <span class="kid__more">Explore <LucideIcon name="ArrowRight" size={15} /></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Overview -->
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="ov-title">
+    <div class="container inc">
+      <div class="inc__art" data-reveal="scale"><PillarArt kind={key} word={p.visual} /></div>
+      <div class="inc__body">
+        <p class="eyebrow" data-reveal>Overview</p>
+        <h2 id="ov-title" class="ph2" data-reveal style="--d:1">{copy ? copy.headline : <>Everything in <span class="accent">{d.name}.</span></>}</h2>
+        <p class="lead" data-reveal style="--d:2">{copy ? copy.lead : d.summary}</p>
+        {copy && <p class="ov__intro" data-reveal style="--d:3">{copy.intro}</p>}
+      </div>
+    </div>
+  </section>
+
+  {
+    copy && (
+      <!-- data-no-fit: shown at full size (and stepped through) instead of being shrunk to one screen -->
+      <section class="section theme-dark section--alt flip" data-theme="dark" data-no-fit aria-labelledby="wwd-title">
+        <div class="container">
+          <header class="section-head section-head--center head-gap">
+            <p class="eyebrow" data-reveal>What We Do</p>
+            <h2 id="wwd-title" class="ph2" data-reveal style="--d:1">{copy.whatHead ?? <>Inside <span class="accent">{d.name}.</span></>}</h2>
+            {copy.whatIntro && <p class="lead" data-reveal style="--d:2">{copy.whatIntro}</p>}
+          </header>
+          <ul class="wwd">
+            {copy.whatWeDo.map((w, i) => (
+              <li class="wwd__card pcard" data-reveal style={`--d:${i % 3}`}>
+                <h3><span class="wwd__n">{String(i + 1).padStart(2, '0')}</span>{w.name}</h3>
+                <p>{w.desc}</p>
+                {w.points && <ul class="wwd__pts">{w.points.slice(0, 3).map((x) => <li>{x}</li>)}</ul>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- What you receive -->
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="inc-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>What You Receive</p>
+        <h2 id="inc-title" class="ph2" data-reveal style="--d:1">Clear Deliverables, <span class="accent">No Guesswork.</span></h2>
+      </header>
+      <ol class="inc__list inc__list--wide">
+        {d.deliverables.map((x, i) => (
+          <li data-reveal style={`--d:${i % 3}`}>
+            <span class="inc__n">{String(i + 1).padStart(2, '0')}</span>
+            <span>{x}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Stack, model and proof -->
+  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="how-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>How It’s Delivered</p>
+        <h2 id="how-title" class="ph2" data-reveal style="--d:1">Tools, Timeline <span class="accent">and Proof.</span></h2>
+      </header>
+      <div class="how">
+        <div class="how__card pcard" data-reveal>
+          <span class="ico-tile"><LucideIcon name="Layers" size={22} /></span>
+          <h3>Tools &amp; Stack</h3>
+          <ul class="how__chips">{stack.map((t) => <li>{t}</li>)}</ul>
+          {copy && <p class="how__note">{copy.tools}</p>}
+        </div>
+        <div class="how__card pcard" data-reveal style="--d:1">
+          <span class="ico-tile"><LucideIcon name="Clock" size={22} /></span>
+          <h3>Timeline &amp; Model</h3>
+          <p>{d.model}</p>
+          <p class="how__start">{page.startsWith}</p>
+        </div>
+        {d.proof && (
+          <a class="how__card how__proof pcard" href={d.proof.slug ? `/work/${d.proof.slug}/` : undefined} data-reveal style="--d:2">
+            <span class="ico-tile"><LucideIcon name="BadgeCheck" size={22} /></span>
+            <h3>Proof</h3>
+            <p>{d.proof.text}</p>
+            <strong>— {d.proof.client}</strong>
+            {d.proof.slug && <span class="how__more">Read the case study <LucideIcon name="ArrowRight" size={15} /></span>}
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- Method -->
+  <section class="section theme-dark flip" data-theme="dark" aria-labelledby="method-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+            <p class="eyebrow" data-reveal>Our Process</p>
+        <h2 id="method-title" class="ph2" data-reveal style="--d:1">A Clear Path <span class="accent">From Brief to Results.</span></h2>
+      </header>
+      <StepGrid items={steps} />
+    </div>
+  </section>
+
+  {
+    proofCase && (
+      <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="case-title">
+        <div class="container case-wrap">
+          <header class="section-head">
+            <p class="eyebrow" data-reveal>Selected Work</p>
+            <h2 id="case-title" class="ph2" data-reveal style="--d:1">{d.name} <span class="accent">in Practice.</span></h2>
+            <p class="lead" data-reveal style="--d:2">{d.proof!.text}</p>
+          </header>
+          <div data-reveal style="--d:1"><CaseCard item={proofCase} /></div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Siblings -->
+  <section class="section theme-dark flip sib-sec" data-theme="dark" aria-labelledby="sib-title">
+    <div class="container">
+      <div class="sib__head">
+        <h2 id="sib-title" class="sib__h" data-reveal>{siblingsTitle}</h2>
+        <a class="btn btn--outline" href={back.href} data-reveal>{back.label} <Icon name="arrow" class="arrow" /></a>
+      </div>
+      {siblings.length > 0 && (
+        <ul class="sib">
+          {siblings.map((s, i) => (
+            <li data-reveal style={`--d:${i % 3}`}>
+              <a class="sib__card pcard" href={s.href}>
+                <span class="ico-tile"><LucideIcon name={s.icon} size={20} /></span>
+                <span class="sib__t"><strong>{s.name}</strong><small>{s.summary}</small></span>
+                <LucideIcon name="ArrowUpRight" size={20} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <PageCTA
+    title={copy?.closing?.eyebrow ?? `Interested in ${d.name}?`}
+    accent={copy?.closing?.title ?? 'Let’s Scope It Together.'}
+    text={copy?.cta ?? page.startsWith}
+    primary={{ label: copy?.closing?.label ?? 'Book Free Strategic Consultation', href: contactHref }}
+    location={`sub_${subSlug(d.name)}`}
+  />
+</Page>
+
+<style>
+  .head-gap { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+  .hero-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 0.75rem; }
+  .hero-btns .btn--ghost { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .hero-btns :global(svg) { color: var(--gold); }
+
+  .inc { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: clamp(2.5rem, 6vw, 5rem); align-items: center; }
+  .inc__art { max-width: 460px; width: 100%; justify-self: center; }
+  .inc__body { display: grid; gap: 1.2rem; }
+  .ov__intro { color: var(--text-light-muted); line-height: 1.75; }
+  /* What We Do: 3 per row; an incomplete last row is centred. Each card shows its 3 key points. */
+  .wwd { --gap: 1.1rem; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap); }
+  .wwd__card { flex: 0 1 calc((100% - 2 * var(--gap)) / 3); position: relative; display: flex; flex-direction: column; gap: 0.7rem; padding: clamp(1.5rem, 2.4vw, 2rem); transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .wwd__card:hover { transform: translateY(-4px); border-color: rgba(201, 149, 74, 0.45); }
+  .wwd__card h3 { display: flex; align-items: baseline; gap: 0.7rem; font-size: clamp(1.15rem, 1rem + 0.45vw, 1.35rem); line-height: 1.3; }
+  .wwd__n { flex: none; font-family: var(--font-head); font-weight: 700; font-size: 1em; letter-spacing: -0.02em; color: var(--gold-ink); }
+  .wwd__card p { font-size: 1rem; line-height: 1.6; color: var(--text-light-muted); }
+  .wwd__pts { display: grid; gap: 0.5rem; margin-top: auto; padding-top: 0.9rem; border-top: 1px solid var(--line-light); }
+  .wwd__pts li { position: relative; padding-left: 1.2rem; font-size: 0.95rem; line-height: 1.45; color: var(--ink); }
+  .wwd__pts li::before { content: ''; position: absolute; left: 0.15rem; top: 0.5em; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); }
+  .inc__list--wide { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1080px; margin-inline: auto; }
+  .how__note { font-size: 0.85rem; line-height: 1.6; }
+  .inc__list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.4rem; }
+  .inc__list li { display: grid; grid-template-columns: auto 1fr; gap: 0.8rem; align-items: start; padding: 1rem 1.1rem; border-radius: 14px; background: var(--surface); border: 1px solid var(--surface-line); font-weight: 500; line-height: 1.4; color: var(--ink); transition: border-color 0.4s, transform 0.5s var(--ease); }
+  .inc__list li:hover { border-color: rgba(201, 149, 74, 0.45); transform: translateY(-3px); }
+  .inc__n { font-family: var(--font-head); font-weight: 700; font-size: 0.85rem; color: var(--gold-ink); padding-top: 0.1rem; }
+
+  .how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .how__card { display: grid; align-content: start; gap: 0.85rem; padding: clamp(1.4rem, 3vw, 2rem); }
+  .how__card h3 { font-size: 1.3rem; }
+  .how__card p { color: var(--text-light-muted); line-height: 1.65; }
+  .how__start { font-size: 0.88rem; padding-top: 0.8rem; border-top: 1px solid var(--line-light); }
+  .how__chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .how__chips li { padding: 0.4rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 500; background: rgba(201, 149, 74, 0.08); border: 1px solid rgba(201, 149, 74, 0.22); color: var(--ink); }
+  .how__proof strong { font-weight: 600; color: var(--ink); }
+  a.how__proof { transition: border-color 0.4s, transform 0.5s var(--ease); }
+  a.how__proof[href]:hover { border-color: rgba(201, 149, 74, 0.5); transform: translateY(-4px); }
+  .how__more { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 500; color: var(--gold-ink); }
+
+  .case-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+
+  .kids { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
+  .kids > li { display: flex; }
+  .kid { position: relative; display: flex; flex-direction: column; gap: 0.8rem; width: 100%; padding: 1.5rem; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .kid:hover { transform: translateY(-5px); border-color: rgba(201, 149, 74, 0.5); }
+  .kid__n { position: absolute; top: 1.2rem; right: 1.3rem; font-family: var(--font-head); font-weight: 700; font-size: 1.6rem; letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 1px rgba(201, 149, 74, 0.45); }
+  .kid strong { font-family: var(--font-head); font-weight: 600; font-size: 1.15rem; }
+  .kid small { font-size: 0.86rem; line-height: 1.55; color: var(--text-light-muted); }
+  .kid__more { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; font-size: 0.85rem; font-weight: 600; color: var(--gold-ink); }
+  .kid__more :global(svg) { transition: transform 0.35s var(--ease); }
+  .kid:hover .kid__more :global(svg) { transform: translateX(4px); }
+
+  .sib-sec { padding-bottom: 0; }
+  .sib__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+  .sib__h { font-size: var(--fs-h3); }
+  .sib { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.85rem; }
+  .sib__card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem; padding: 1.2rem 1.3rem; transition: transform 0.5s var(--ease), border-color 0.4s; }
+  .sib__card:hover { transform: translateY(-4px); border-color: rgba(201, 149, 74, 0.45); }
+  .sib__t { display: grid; gap: 0.25rem; }
+  .sib__t strong { font-family: var(--font-head); font-weight: 600; font-size: 1.05rem; }
+  .sib__t small { font-size: 0.82rem; line-height: 1.45; color: var(--text-light-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .sib__card > :global(svg) { color: var(--gold-ink); }
+
+  @media (max-width: 1000px) { .how { grid-template-columns: 1fr 1fr; } .inc__list--wide { grid-template-columns: 1fr 1fr; } .wwd__card { flex-basis: calc((100% - var(--gap)) / 2); } }
+  @media (max-width: 900px) { .inc, .case-wrap { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .how, .inc__list, .inc__list--wide { grid-template-columns: 1fr; } .wwd__card { flex-basis: 100%; } }
+</style>

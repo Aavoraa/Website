@@ -32,19 +32,19 @@ export const site = {
   contact: {
     phoneDisplay: '+91 93427 21163',
     phoneHref: 'tel:+919342721163',
-    email: 'info@aavoraa.com',
+    whatsappHref: `https://wa.me/919342721163?text=${encodeURIComponent('Hi AAVORAA, I would like to know more about your services.')}`,
+    email: 'business@aavoraa.com',
     location: 'Coimbatore, Tamil Nadu, India',
   },
 };
 
 export const nav = [
   { label: 'Home', href: '/' },
-  { label: 'Solutions', href: '/solutions/' },
-  { label: 'Services', href: '/services/' },
-  { label: 'Industries', href: '/industries/' },
-  { label: 'Our Work', href: '/work/' },
-  { label: 'Insights', href: '/insights/' },
   { label: 'About', href: '/about/' },
+  { label: 'Services', href: '/services/' },
+  { label: 'Solutions', href: '/solutions/' },
+  { label: 'Contact', href: '/contact/' },
+  { label: 'Blogs', href: '/insights/' },
 ];
 
 export type PillarKey = 'build' | 'brand' | 'grow' | 'transform';
@@ -578,14 +578,12 @@ export const aboutFacts = [
   { icon: 'MapPin', text: 'Coimbatore, India' },
   { icon: 'Globe2', text: 'India · GCC · Global' },
   { icon: 'History', text: 'Evolved from Phoenixx IT' },
-  { icon: 'Boxes', text: 'Makers of WAREXX' },
 ];
 
 /** Clients — logos from the AAVORAA portfolio deck (slide 22). Confirm permissions before launch. */
 export const clients: { name: string; logo?: string; src?: string }[] = [
   { name: 'V3 Data Solutions', logo: 'v3-data-solutions' },
   { name: 'Greens Property Developers', logo: 'greens-property-developers' },
-  { name: 'ESSA Garments', logo: 'essa-garments' },
   { name: 'Taqua Silks', logo: 'taqua-silks' },
   { name: 'Pothys', logo: 'pothys' },
   { name: 'KPR Mill', logo: 'kpr-mill' },
@@ -594,8 +592,9 @@ export const clients: { name: string; logo?: string; src?: string }[] = [
   { name: 'MG Motor', logo: 'morris-garages' },
   { name: 'Nova Pinnacle', logo: 'nova-pinnacle' },
   { name: 'Property Wealth', logo: 'property-wealth' },
+  { name: 'ESSA Garments', logo: 'essa-garments' },
   { name: 'MaxCorp', logo: 'maxcorp' },
-  { name: 'Hikigai AI' },
+  { name: 'Hikigai AI', logo: 'hikigai-ai' },
   { name: 'Oceans Talent', logo: 'oceans-talent' },
   { name: 'Prisms Group', logo: 'prisms-group' },
   { name: 'Klassy Homes', logo: 'klassy-homes' },
@@ -603,7 +602,7 @@ export const clients: { name: string; logo?: string; src?: string }[] = [
   { name: 'Ramani Cars', logo: 'ramani-cars' },
   { name: 'i-Cons Technologies', logo: 'i-cons-technologies' },
   { name: 'Coliseum Sports', logo: 'coliseum-sports' },
-  { name: 'WAREXX', src: '/brand/warexx-logo-dark.png' },
+  { name: 'WAREXX', logo: 'warexx' },
   { name: 'Cosmic Park Resorts' },
 ];
 
