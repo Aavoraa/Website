@@ -2,22 +2,29 @@
 import Page from '../layouts/Page.astro';
 import LucideIcon from '../components/LucideIcon.astro';
 import StepGrid from '../components/StepGrid.astro';
-import Clients from '../components/Clients.astro';
 import Testimonials from '../components/Testimonials.astro';
 import PageCTA from '../components/PageCTA.astro';
-import { pillars, stats, aboutFacts } from '../data/site';
-import { growthMethod, reasons, markets, servicePath } from '../data/pages';
-const pillarIcon = { build: 'CodeXml', brand: 'Palette', grow: 'Megaphone', transform: 'Workflow' } as const;
+// From the original long homepage — only sections the current homepage doesn't already show
+// (stats, capabilities, the connected-advantage slider, industries and client logos stay on the homepage only).
+import Approach from '../components/Approach.astro';
+import Work from '../components/Work.astro';
+import FAQ from '../components/FAQ.astro';
+import { growthMethod, reasons, markets } from '../data/pages';
+const principles = [
+  { icon: 'Network', title: 'No silos', text: 'Technology, brand, marketing and operations planned together — not by vendors who never talk to each other.' },
+  { icon: 'Compass', title: 'No guesswork', text: 'Every engagement starts with an audit and a plan, and every result is measured against it.' },
+  { icon: 'Handshake', title: 'One accountable team', text: 'One team owns the outcome from strategy to delivery, so there is always one place to go.' },
+];
 ---
 
 <Page
-  title="About AAVORAA | One Team. Every Digital Capability."
+  title="About AAVORAA | Your Partner Beyond Possibilities"
   description="AAVORAA is a Coimbatore-based, AI-enabled business transformation company that brings software, branding, marketing and automation together in one accountable team."
   path="/about/"
   eyebrow="About AAVORAA"
-  heading="One Team."
-  accent="Every Digital Capability."
-  intro="A Coimbatore-based growth partner that brings strategy, design, development, software, marketing and automation together — so you never juggle multiple vendors again."
+  heading="Your Growth Partner,"
+  accent="Beyond Possibilities."
+  intro="The story, approach and people behind AAVORAA — and how we work with businesses from Coimbatore to the GCC."
   crumbs={[{ label: 'About' }]}
 >
   <!-- Story -->
@@ -39,50 +46,23 @@ const pillarIcon = { build: 'CodeXml', brand: 'Palette', grow: 'Megaphone', tran
       </div>
 
       <div class="story__side">
-        <ul class="stats">
+        <ul class="principles">
           {
-            stats.map((s, i) => (
-              <li class="stat pcard" data-reveal style={`--d:${i}`}>
-                <span class="ico-tile"><LucideIcon name={s.icon} size={20} /></span>
-                <span class="stat__value"><span data-count={s.value}>{s.value}</span>{s.suffix}</span>
-                <span class="stat__label">{s.label}</span>
+            principles.map((x, i) => (
+              <li class="principle pcard" data-reveal style={`--d:${i}`}>
+                <span class="ico-tile"><LucideIcon name={x.icon} size={20} /></span>
+                <span><strong>{x.title}</strong><small>{x.text}</small></span>
               </li>
             ))
           }
-        </ul>
-        <ul class="facts" data-reveal>
-          {aboutFacts.map((f) => <li><LucideIcon name={f.icon} size={16} />{f.text}</li>)}
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- What we bring together -->
-  <section class="section theme-dark section--alt flip" data-theme="dark" aria-labelledby="bring-title">
-    <div class="container">
-      <header class="section-head section-head--center head-gap">
-        <p class="eyebrow" data-reveal>What We Bring Together</p>
-        <h2 id="bring-title" class="ph2" data-reveal style="--d:1">Four Capabilities. <span class="accent">One Business Strategy.</span></h2>
-      </header>
-      <ul class="bring">
-        {
-          pillars.map((p, i) => (
-            <li data-reveal style={`--d:${i}`}>
-              <a class="bring__card pcard" href={servicePath(p.key)}>
-                <span class="ico-tile"><LucideIcon name={pillarIcon[p.key]} size={22} /></span>
-                <span class="bring__n">0{i + 1}</span>
-                <h3>{p.label}</h3>
-                <p>{p.description}</p>
-                <span class="bring__more">Explore <LucideIcon name="ArrowRight" size={15} /></span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
   <!-- Growth method -->
+  <Approach />
+
   <section class="section theme-dark flip" data-theme="dark" aria-labelledby="method-title">
     <div class="container">
       <header class="section-head section-head--center head-gap">
@@ -115,7 +95,7 @@ const pillarIcon = { build: 'CodeXml', brand: 'Palette', grow: 'Megaphone', tran
     </div>
   </section>
 
-  <!-- Where we work + WAREXX -->
+  <!-- Where we work -->
   <section class="section theme-dark flip" data-theme="dark" aria-labelledby="where-title">
     <div class="container where">
       <div class="where__text">
@@ -124,21 +104,16 @@ const pillarIcon = { build: 'CodeXml', brand: 'Palette', grow: 'Megaphone', tran
         <p class="lead" data-reveal style="--d:2">
           Based in Coimbatore, Tamil Nadu, we work with businesses across India and internationally, with a growing focus on the GCC.
         </p>
-        <ul class="where__markets" data-reveal style="--d:3">
-          {markets.map((m) => <li class="chip"><LucideIcon name="MapPin" size={13} /> {m}</li>)}
-        </ul>
       </div>
-      <a class="wx pcard" href="/warexx/" data-reveal="scale" data-track="warexx" data-track-location="about_page">
-        <img class="only-dark" src="/brand/warexx-logo-light.png" alt="WAREXX by AAVORAA" width="900" height="267" />
-        <img class="only-light" src="/brand/warexx-logo-dark.png" alt="WAREXX by AAVORAA" width="900" height="329" />
-        <p>We don’t only build for clients. WAREXX — our warehouse and operations platform — came from solving real problems on a real warehouse floor.</p>
-        <span class="bring__more">Discover WAREXX <LucideIcon name="ArrowRight" size={15} /></span>
-      </a>
+      <ul class="markets">
+        {markets.map((m, i) => <li class="pcard" data-reveal style={`--d:${i % 4}`}><LucideIcon name="MapPin" size={18} />{m}</li>)}
+      </ul>
     </div>
   </section>
 
-  <Clients />
+  <Work />
   <Testimonials alt />
+  <FAQ />
 
   <PageCTA
     title="Let’s Build What’s Next"
@@ -155,21 +130,11 @@ const pillarIcon = { build: 'CodeXml', brand: 'Palette', grow: 'Megaphone', tran
   .story__text { display: grid; gap: 1.25rem; }
   .story__text > p:not(.eyebrow) { color: var(--text-light-muted); line-height: 1.75; }
   .story__motto { padding-left: 1rem; border-left: 2px solid var(--gold); font-family: var(--font-head); font-weight: 600; font-size: 1.15rem; color: var(--ink) !important; }
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
-  .stat { display: grid; gap: 0.5rem; padding: 1.4rem; }
-  .stat__value { font-family: var(--font-head); font-weight: 700; font-size: clamp(2rem, 1.5rem + 1.5vw, 2.8rem); letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
-  .stat__label { font-size: 0.85rem; color: var(--text-light-muted); }
-  .facts { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-light-muted); }
-  .facts li { display: inline-flex; align-items: center; gap: 0.45rem; }
-  .facts :global(svg) { color: var(--gold-ink); }
-
-  .bring { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
-  .bring__card { display: grid; align-content: start; gap: 0.75rem; height: 100%; padding: 1.6rem; transition: transform 0.5s var(--ease), border-color 0.4s; }
-  .bring__card:hover { transform: translateY(-5px); border-color: rgba(201, 149, 74, 0.45); }
-  .bring__n { font-family: var(--font-head); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; color: var(--gold-ink); }
-  .bring__card h3 { font-size: 1.3rem; }
-  .bring__card p { font-size: 0.9rem; line-height: 1.6; color: var(--text-light-muted); }
-  .bring__more { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; padding-top: 0.5rem; font-size: 0.85rem; font-weight: 500; color: var(--gold-ink); }
+  .principles { display: grid; gap: 0.9rem; }
+  .principle { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; padding: 1.35rem 1.4rem; }
+  .principle span:last-child { display: grid; gap: 0.3rem; }
+  .principle strong { font-family: var(--font-head); font-size: 1.15rem; font-weight: 600; color: var(--ink); }
+  .principle small { font-size: 0.92rem; line-height: 1.6; color: var(--text-light-muted); }
 
   .reasons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
   .reason { display: grid; align-content: start; gap: 0.75rem; padding: 1.6rem; }
@@ -178,13 +143,11 @@ const pillarIcon = { build: 'CodeXml', brand: 'Palette', grow: 'Megaphone', tran
 
   .where { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; }
   .where__text { display: grid; gap: 1.25rem; }
-  .where__markets { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-  .wx { display: grid; gap: 1.1rem; padding: clamp(1.75rem, 4vw, 2.5rem); transition: transform 0.5s var(--ease), border-color 0.4s; }
-  .wx:hover { transform: translateY(-5px); border-color: rgba(201, 149, 74, 0.45); }
-  .wx img { width: 220px; height: auto; }
-  .wx p { color: var(--text-light-muted); line-height: 1.65; }
+  .markets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+  .markets li { display: flex; align-items: center; gap: 0.75rem; padding: 1.05rem 1.2rem; font-family: var(--font-head); font-weight: 600; font-size: 1.02rem; color: var(--ink); }
+  .markets :global(svg) { flex: none; color: var(--gold-ink); }
 
-  @media (max-width: 1000px) { .bring { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reasons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 1000px) { .reasons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 860px) { .story, .where { grid-template-columns: 1fr; } }
-  @media (max-width: 560px) { .bring, .reasons { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .reasons { grid-template-columns: 1fr; } }
 </style>

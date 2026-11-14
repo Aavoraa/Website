@@ -1,0 +1,175 @@
+---
+/**
+ * "Aavo" — AAVORAA's on-site assistant. Runs entirely in the browser (no third-party service):
+ * guided menus, service finder, FAQ answers, keyword replies to typed questions and a step-by-step
+ * enquiry that is sent through the same form endpoint as the contact form (contact.php).
+ * Content is baked in at build time from src/data so it always matches the site.
+ */
+import { pillars, faqs, site, integrations, interestOptions, bookingHref, bookingIsExternal } from '../data/site';
+import { serviceDetails, servicePath, subServicePath, subSlug } from '../data/pages';
+
+const data = {
+  endpoint: integrations.formEndpoint,
+  booking: { href: bookingHref, external: bookingIsExternal },
+  contact: {
+    email: site.contact.email,
+    phone: site.contact.phoneDisplay,
+    phoneHref: site.contact.phoneHref,
+    whatsapp: site.contact.whatsappHref,
+  },
+  interests: interestOptions,
+  faqs: faqs.map((f) => ({ q: f.q, a: f.a })),
+  pillars: pillars.map((p) => ({
+    key: p.key,
+    label: p.label,
+    short: p.short,
+    href: servicePath(p.key),
+    subs: serviceDetails[p.key].map((d) => ({
+      name: d.name,
+      summary: d.summary,
+      href: subServicePath(p.key, d.name),
+      children: (d.children || []).map((c) => ({ name: c.name, summary: c.summary, href: `${subServicePath(p.key, d.name)}${subSlug(c.name)}/` })),
+    })),
+  })),
+};
+---
+
+<div class="cb" data-chatbot data-no-snap>
+  <button class="cb__launch" type="button" aria-expanded="false" aria-controls="cb-panel" data-cb-toggle>
+    <span class="cb__launch-ico cb__launch-ico--open" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-5.1A8 8 0 1 1 21 12Z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4"/></svg>
+    </span>
+    <span class="cb__launch-ico cb__launch-ico--close" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </span>
+    <span class="cb__launch-label">Chat with us</span>
+    <span class="cb__ping" aria-hidden="true"></span>
+  </button>
+
+  <section class="cb__panel" id="cb-panel" role="dialog" aria-modal="false" aria-labelledby="cb-title" hidden data-cb-panel>
+    <header class="cb__head">
+      <span class="cb__avatar" aria-hidden="true">A</span>
+      <div class="cb__who">
+        <h2 id="cb-title">Aavo · AAVORAA Assistant</h2>
+        <p><i aria-hidden="true"></i> Typically replies instantly</p>
+      </div>
+      <button class="cb__icon" type="button" aria-label="Restart conversation" title="Restart" data-cb-reset>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+      </button>
+      <button class="cb__icon" type="button" aria-label="Close chat" title="Close" data-cb-close>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+
+    <div class="cb__log" role="log" aria-live="polite" aria-relevant="additions" data-cb-log data-lenis-prevent></div>
+    <div class="cb__chips" data-cb-chips></div>
+
+    <form class="cb__form" data-cb-form autocomplete="on">
+      <label class="sr-only" for="cb-input">Type your message</label>
+      <input id="cb-input" name="message" type="text" placeholder="Type a question…" maxlength="400" autocomplete="off" data-cb-input />
+      <button type="submit" aria-label="Send message" class="cb__send">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+    <p class="cb__foot">Automated assistant · <a href="/privacy/">Privacy</a></p>
+  </section>
+
+  <script type="application/json" data-cb-data set:html={JSON.stringify(data)} />
+</div>
+
+<script>
+  import { initChatBot } from '../scripts/chatbot';
+  initChatBot();
+</script>
+
+<style>
+  .cb { --cb-gap: clamp(14px, 2vw, 28px); position: fixed; right: var(--cb-gap); bottom: var(--cb-gap); z-index: 95; font-family: var(--font-body); }
+
+  /* launcher */
+  .cb__launch {
+    position: relative; display: inline-flex; align-items: center; gap: 0.6rem; height: 54px; padding: 0 1.25rem 0 0.95rem;
+    border-radius: 999px; color: var(--black); background: linear-gradient(135deg, #e2bd84, #c9954a 55%, #a87632);
+    box-shadow: 0 14px 34px -12px rgba(201, 149, 74, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+    font-weight: 600; font-size: 0.92rem; cursor: pointer; transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+  }
+  .cb__launch:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(201, 149, 74, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.2) inset; }
+  .cb__launch-ico { display: grid; place-items: center; }
+  .cb__launch-ico--close, .cb.is-open .cb__launch-ico--open { display: none; }
+  .cb.is-open .cb__launch-ico--close { display: grid; }
+  .cb.is-open .cb__launch { width: 54px; padding: 0; justify-content: center; }
+  .cb.is-open .cb__launch-label, .cb.is-open .cb__ping { display: none; }
+  .cb__ping { position: absolute; top: 6px; right: 8px; width: 10px; height: 10px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); animation: cb-ping 2.4s infinite; }
+  .cb.was-opened .cb__ping { display: none; }
+  @keyframes cb-ping { 70%, 100% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); } }
+
+  /* panel */
+  .cb__panel {
+    position: absolute; right: 0; bottom: calc(100% + 14px); width: min(390px, calc(100vw - 2 * var(--cb-gap)));
+    height: min(600px, calc(100svh - 120px)); display: flex; flex-direction: column; overflow: hidden;
+    border-radius: 22px; background: #110f0e; color: #fff;
+    border: 1px solid rgba(201, 149, 74, 0.3); box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.85), 0 0 60px -30px rgba(201, 149, 74, 0.45);
+    transform-origin: bottom right; animation: cb-in 0.45s var(--ease);
+  }
+  .cb__panel[hidden] { display: none; }
+  @keyframes cb-in { from { opacity: 0; transform: translateY(12px) scale(0.96); } }
+
+  .cb__head { display: flex; align-items: center; gap: 0.75rem; padding: 0.95rem 0.9rem 0.95rem 1.1rem; background: linear-gradient(180deg, rgba(201, 149, 74, 0.16), rgba(201, 149, 74, 0.02)); border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+  .cb__avatar { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; font-family: var(--font-head); font-weight: 700; font-size: 1.1rem; color: var(--black); background: linear-gradient(135deg, #e2bd84, #c9954a); }
+  .cb__who { flex: 1; min-width: 0; }
+  .cb__who h2 { font-size: 0.95rem; font-weight: 600; letter-spacing: 0; line-height: 1.2; color: #fff; }
+  .cb__who p { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.15rem; font-size: 0.75rem; color: rgba(255, 255, 255, 0.55); }
+  .cb__who p i { width: 7px; height: 7px; border-radius: 50%; background: #5fd38a; }
+  .cb__icon { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; color: rgba(255, 255, 255, 0.7); transition: background-color 0.25s, color 0.25s; }
+  .cb__icon:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+
+  .cb__log { flex: 1; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 0.6rem; padding: 1rem 1rem 0.5rem; scroll-behavior: smooth; }
+  .cb__log::-webkit-scrollbar { width: 6px; }
+  .cb__log::-webkit-scrollbar-thumb { background: rgba(201, 149, 74, 0.3); border-radius: 3px; }
+
+  .cb__log :global(.cb-msg) { max-width: 86%; padding: 0.7rem 0.9rem; border-radius: 16px; font-size: 0.88rem; line-height: 1.55; white-space: pre-line; animation: cb-msg 0.35s var(--ease); }
+  .cb__log :global(.cb-msg--bot) { align-self: flex-start; border-bottom-left-radius: 5px; background: #1d1916; border: 1px solid rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.88); }
+  .cb__log :global(.cb-msg--user) { align-self: flex-end; border-bottom-right-radius: 5px; background: linear-gradient(135deg, #d9ae6c, #c9954a); color: #0a0909; font-weight: 500; }
+  .cb__log :global(.cb-msg a) { color: #e2bd84; text-decoration: underline; text-underline-offset: 2px; }
+  .cb__log :global(.cb-msg strong) { color: #fff; font-weight: 600; }
+  @keyframes cb-msg { from { opacity: 0; transform: translateY(6px); } }
+
+  .cb__log :global(.cb-typing) { align-self: flex-start; display: inline-flex; gap: 4px; padding: 0.8rem 0.95rem; border-radius: 16px; border-bottom-left-radius: 5px; background: #1d1916; }
+  .cb__log :global(.cb-typing i) { width: 6px; height: 6px; border-radius: 50%; background: #c9954a; animation: cb-dot 1.1s infinite ease-in-out; }
+  .cb__log :global(.cb-typing i:nth-child(2)) { animation-delay: 0.15s; }
+  .cb__log :global(.cb-typing i:nth-child(3)) { animation-delay: 0.3s; }
+  @keyframes cb-dot { 0%, 80%, 100% { opacity: 0.3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+  /* link cards inside bot messages */
+  .cb__log :global(.cb-cards) { align-self: stretch; display: grid; gap: 0.45rem; }
+  .cb__log :global(.cb-card) { display: grid; grid-template-columns: 1fr auto; gap: 0.15rem 0.6rem; align-items: center; padding: 0.7rem 0.85rem; border-radius: 12px; background: #17130f; border: 1px solid rgba(201, 149, 74, 0.2); transition: border-color 0.25s, background-color 0.25s; }
+  .cb__log :global(.cb-card:hover) { border-color: rgba(201, 149, 74, 0.6); background: #1d1814; }
+  .cb__log :global(.cb-card b) { font-size: 0.86rem; font-weight: 600; color: #fff; }
+  .cb__log :global(.cb-card small) { grid-column: 1; font-size: 0.75rem; line-height: 1.4; color: rgba(255, 255, 255, 0.55); }
+  .cb__log :global(.cb-card span) { grid-row: 1 / span 2; grid-column: 2; color: #c9954a; font-size: 1rem; }
+
+  .cb__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0.5rem 1rem 0.75rem; }
+  .cb__chips:empty { display: none; }
+  .cb__chips :global(button), .cb__chips :global(a) {
+    display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.48rem 0.8rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500;
+    color: #e2bd84; background: rgba(201, 149, 74, 0.08); border: 1px solid rgba(201, 149, 74, 0.35); cursor: pointer;
+    transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+  }
+  .cb__chips :global(button:hover), .cb__chips :global(a:hover) { background: #c9954a; border-color: #c9954a; color: #0a0909; }
+
+  .cb__form { display: flex; gap: 0.5rem; padding: 0.7rem 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.07); background: #0d0b0a; }
+  .cb__form input { flex: 1; min-width: 0; height: 42px; padding: 0 0.95rem; border-radius: 12px; font: inherit; font-size: 0.88rem; color: #fff; background: #1a1714; border: 1px solid rgba(255, 255, 255, 0.08); outline: none; transition: border-color 0.25s; }
+  .cb__form input:focus { border-color: rgba(201, 149, 74, 0.6); }
+  .cb__form input::placeholder { color: rgba(255, 255, 255, 0.35); }
+  .cb__send { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; color: #0a0909; background: #c9954a; transition: background-color 0.25s; }
+  .cb__send:hover { background: #e2bd84; }
+  .cb__foot { padding: 0 1rem 0.65rem; background: #0d0b0a; font-size: 0.68rem; text-align: center; color: rgba(255, 255, 255, 0.35); }
+  .cb__foot a { color: inherit; text-decoration: underline; }
+
+  @media (max-width: 560px) {
+    .cb__launch-label { display: none; }
+    .cb__launch { width: 54px; padding: 0; justify-content: center; }
+    .cb__panel { position: fixed; left: 8px; right: 8px; bottom: 78px; width: calc(100vw - 16px); height: min(640px, calc(100svh - 96px)); }
+    .cb__who h2 { font-size: 0.9rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .cb__panel, .cb__log :global(.cb-msg) { animation: none; } .cb__ping { animation: none; } }
+</style>

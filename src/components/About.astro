@@ -46,6 +46,11 @@ import { stats, aboutFacts, site } from '../data/site';
     transition: transform 0.6s var(--ease), border-color 0.4s, box-shadow 0.6s var(--ease);
   }
   .stat:hover { transform: translateY(-4px); border-color: rgba(201, 149, 74, 0.4); box-shadow: 0 20px 40px -28px var(--shadow); }
+  /* cursor spotlight extras: the icon and number light up */
+  .stat__icon, .stat__value { transition: color 0.4s, background-color 0.4s, box-shadow 0.4s, text-shadow 0.4s; }
+  .stat:hover .stat__icon { color: #ffe2aa; background: rgba(201, 149, 74, 0.28); box-shadow: 0 0 22px -2px rgba(240, 190, 110, 0.75); }
+  .stat:hover .stat__value { color: #fff4dd; text-shadow: 0 0 24px rgba(240, 190, 110, 0.65); }
+  :global(:root[data-theme='light']) .stat:hover .stat__value { color: var(--gold-deep); text-shadow: none; }
   .stat__icon {
     display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; margin-bottom: 0.4rem;
     color: var(--gold-ink); background: rgba(201, 149, 74, 0.1); border: 1px solid rgba(201, 149, 74, 0.25);
@@ -54,8 +59,17 @@ import { stats, aboutFacts, site } from '../data/site';
   .stat__label { font-size: 0.85rem; color: var(--text-light-muted); line-height: 1.35; }
 
   .about__facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem 1.75rem; margin-top: clamp(2rem, 4vw, 3rem); }
-  .about__facts li { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-light-muted); }
-  .about__facts :global(svg) { color: var(--gold-ink); }
+  /* fact chips get the cursor spotlight (motion.ts) and glow on hover */
+  .about__facts li {
+    position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 0.55rem;
+    padding: 0.6rem 1.1rem; border-radius: 999px; font-size: 0.9rem; color: var(--text-light-muted);
+    background: var(--surface); border: 1px solid var(--surface-line);
+    transition: color 0.35s, border-color 0.35s, transform 0.4s var(--ease), box-shadow 0.4s var(--ease), text-shadow 0.35s;
+  }
+  .about__facts li:hover { color: #fff4dd; border-color: rgba(226, 189, 132, 0.6); transform: translateY(-2px); box-shadow: 0 0 26px -6px rgba(240, 190, 110, 0.55); text-shadow: 0 0 14px rgba(240, 190, 110, 0.6); }
+  .about__facts :global(svg) { position: relative; z-index: 1; color: var(--gold-ink); transition: filter 0.35s, color 0.35s; }
+  .about__facts li:hover :global(svg) { color: #ffe2aa; filter: drop-shadow(0 0 6px rgba(240, 190, 110, 0.9)); }
+  :global(:root[data-theme='light']) .about__facts li:hover { color: var(--gold-deep); text-shadow: none; }
 
   @media (max-width: 1000px) { .about__stats { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 520px) { .about__stats { grid-template-columns: repeat(2, 1fr); } }

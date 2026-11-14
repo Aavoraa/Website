@@ -61,6 +61,7 @@ const jsonLd = {
     },
   ],
 };
+import ChatBot from '../components/ChatBot.astro';
 ---
 
 <!doctype html>
@@ -127,5 +128,6 @@ const jsonLd = {
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <slot />
+    <ChatBot />
   </body>
 </html>

@@ -9,7 +9,7 @@
  */
 
 // ---------------------------------------------------------------- settings
-const RECIPIENT = 'info@aavoraa.com';
+const RECIPIENT = 'business@aavoraa.com';
 const SUBJECT_PREFIX = 'Website enquiry';
 const MAX_BODY_BYTES = 12000;
 const RATE_LIMIT_SECONDS = 30; // one enquiry per visitor per 30 seconds

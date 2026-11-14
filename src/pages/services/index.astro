@@ -7,7 +7,7 @@ import Tools from '../../components/Tools.astro';
 import PageCTA from '../../components/PageCTA.astro';
 import { pillars } from '../../data/site';
 import PillarArt from '../../components/PillarArt.astro';
-import { serviceDetails, servicePath, startSteps } from '../../data/pages';
+import { serviceDetails, servicePath, subServicePath, subSlug, startSteps } from '../../data/pages';
 ---
 
 <Page
@@ -34,16 +34,24 @@ import { serviceDetails, servicePath, startSteps } from '../../data/pages';
               </p>
               <h2 data-reveal style="--d:1">{p.headline}</h2>
               <p class="svc__desc" data-reveal style="--d:2">{p.description}</p>
-              <ul class="svc__caps" data-reveal style="--d:3">
-                {p.capabilities.map((c) => (
+              <ul class="svc__dir" data-reveal style="--d:3" aria-label={`${p.label} services`}>
+                {serviceDetails[p.key].map((d) => (
                   <li>
-                    <LucideIcon name={c.icon} size={16} /> {c.name}
+                    <a class="svc__sub" href={subServicePath(p.key, d.name)}>
+                      <LucideIcon name={d.icon} size={17} />
+                      <span>{d.name}</span>
+                      <LucideIcon name="ArrowUpRight" size={16} class="svc__go" />
+                    </a>
+                    {d.children && (
+                      <ul class="svc__kids">
+                        {d.children.map((c) => (
+                          <li><a href={`${subServicePath(p.key, d.name)}${subSlug(c.name)}/`}>{c.name}</a></li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>
-              <p class="svc__inc" data-reveal style="--d:4">
-                <strong>Includes:</strong> {serviceDetails[p.key].map((d) => d.name).join(' · ')}
-              </p>
               <a class="btn btn--outline" href={servicePath(p.key)} data-reveal style="--d:5" data-track="service_card" data-track-label={p.key}>
                 {p.cta} <Icon name="arrow" class="arrow" />
               </a>
@@ -87,14 +95,18 @@ import { serviceDetails, servicePath, startSteps } from '../../data/pages';
   .svc__label span { font-family: var(--font-head); font-weight: 600; letter-spacing: 0.08em; padding-right: 0.75rem; border-right: 1px solid var(--line-light); }
   .svc h2 { font-size: clamp(1.8rem, 1.2rem + 2.2vw, 2.9rem); }
   .svc__desc { color: var(--text-light-muted); font-size: var(--fs-lead); line-height: 1.7; }
-  .svc__caps { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem 1.25rem; width: 100%; }
-  .svc__caps li { display: flex; align-items: center; gap: 0.6rem; font-size: 0.92rem; font-weight: 500; color: var(--ink); }
-  .svc__caps :global(svg) { flex: none; color: var(--gold-ink); }
-  .svc__inc { font-size: 0.85rem; color: var(--text-light-muted); padding-top: 0.9rem; border-top: 1px solid var(--line-light); width: 100%; }
-  .svc__inc strong { color: var(--gold-ink); font-weight: 500; }
+  .svc__dir { display: grid; width: 100%; border-top: 1px solid var(--line-light); }
+  .svc__dir > li { border-bottom: 1px solid var(--line-light); }
+  .svc__sub { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.75rem; padding: 0.8rem 0.25rem; font-family: var(--font-head); font-weight: 600; font-size: 1rem; color: var(--ink); transition: color 0.3s, padding 0.4s var(--ease); }
+  .svc__sub:hover { color: var(--gold-ink); padding-left: 0.6rem; }
+  .svc__sub :global(svg) { color: var(--gold-ink); }
+  .svc__sub :global(.svc__go) { opacity: 0.45; transition: opacity 0.3s, transform 0.4s var(--ease); }
+  .svc__sub:hover :global(.svc__go) { opacity: 1; transform: translate(2px, -2px); }
+  .svc__kids { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0 0.85rem 1.85rem; }
+  .svc__kids a { display: inline-block; padding: 0.32rem 0.7rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; background: rgba(201, 149, 74, 0.08); border: 1px solid rgba(201, 149, 74, 0.22); color: var(--ink); transition: background-color 0.3s, border-color 0.3s; }
+  .svc__kids a:hover { background: rgba(201, 149, 74, 0.16); border-color: rgba(201, 149, 74, 0.5); }
   @media (max-width: 900px) {
     .svc { grid-template-columns: 1fr; }
     .svc--rev .svc__media { order: 0; }
   }
-  @media (max-width: 480px) { .svc__caps { grid-template-columns: 1fr; } }
 </style>

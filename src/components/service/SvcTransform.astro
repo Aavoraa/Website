@@ -1,0 +1,156 @@
+---
+/** AI & Business Automation — "workflow canvas": connected capability nodes and When → Then → Result automation recipes. */
+import LucideIcon from '../LucideIcon.astro';
+import { subServicePath, type ServiceDetail } from '../../data/pages';
+import type { PillarKey } from '../../data/site';
+interface Props {
+  pillarKey: PillarKey;
+  label: string;
+  description: string;
+  outcomes: string[];
+  capabilities: { name: string; icon: string }[];
+  details: ServiceDetail[];
+}
+const { pillarKey, label, description, outcomes, capabilities, details } = Astro.props;
+const roles = ['Trigger', 'Process', 'Connect', 'Design', 'Advise', 'Transform'];
+---
+
+<section class="section theme-dark flip flow-sec" data-theme="dark" aria-labelledby="flow-title">
+  <div class="flow__dots" aria-hidden="true"></div>
+  <div class="container">
+    <div class="flow-top">
+      <header class="flow-head">
+        <p class="eyebrow" data-reveal>The Automation Canvas</p>
+        <h2 id="flow-title" class="ph2" data-reveal style="--d:1">{label}, <span class="accent">Running Itself.</span></h2>
+        <p class="lead" data-reveal style="--d:2">{description}</p>
+      </header>
+      <ul class="flow-out" data-reveal style="--d:3">
+        {outcomes.map((o) => <li><LucideIcon name="Zap" size={16} />{o}</li>)}
+      </ul>
+    </div>
+
+    <ol class="canvas">
+      {
+        capabilities.map((c, i) => (
+          <li class="node" data-reveal style={`--d:${i % 3}`}>
+            <span class="node__role">{roles[i] || 'Step'}</span>
+            <span class="node__ico"><LucideIcon name={c.icon} size={22} /></span>
+            <span class="node__t">{c.name}</span>
+            <span class="node__port node__port--in" aria-hidden="true"></span>
+            <span class="node__port node__port--out" aria-hidden="true"></span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="section theme-dark section--alt flip recipe-sec" id="services-detail" data-theme="dark" aria-labelledby="recipe-title">
+  <div class="container">
+    <header class="section-head section-head--center recipe-head">
+      <p class="eyebrow" data-reveal>Automation Recipes</p>
+      <h2 id="recipe-title" class="ph2" data-reveal style="--d:1">When This Happens, <span class="accent">Work Gets Done.</span></h2>
+    </header>
+    <div class="recipes">
+      {
+        details.map((d) => (
+          <article class="recipe pcard" data-reveal>
+            <div class="recipe__col recipe__when">
+              <span class="recipe__k"><LucideIcon name="Play" size={14} /> When</span>
+              <span class="recipe__ico"><LucideIcon name={d.icon} size={24} /></span>
+              <h3><a href={subServicePath(pillarKey, d.name)}>{d.name}</a></h3>
+              <p>{d.summary}</p>
+              <a class="sub-link " href={subServicePath(pillarKey, d.name)}>Explore {d.name} <LucideIcon name="ArrowRight" size={15} /></a>
+            </div>
+            <div class="recipe__col recipe__then">
+              <span class="recipe__k"><LucideIcon name="Workflow" size={14} /> Then</span>
+              <ol class="steps-flow">
+                {d.deliverables.map((x) => <li>{x}</li>)}
+              </ol>
+            </div>
+            <div class="recipe__col recipe__result">
+              <span class="recipe__k"><LucideIcon name="CircleCheckBig" size={14} /> Result</span>
+              {d.proof ? (
+                <a class="recipe__proof" href={d.proof.slug ? `/work/${d.proof.slug}/` : undefined}>
+                  <span>{d.proof.text}</span>
+                  <strong>{d.proof.client}</strong>
+                </a>
+              ) : (
+                <p class="recipe__proof">Less manual work, cleaner data and faster decisions.</p>
+              )}
+              <dl class="recipe__meta">
+                <div><dt>Stack</dt><dd>{d.stack}</dd></div>
+                <div><dt>Model</dt><dd>{d.model}</dd></div>
+              </dl>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .flow-sec { position: relative; overflow: hidden; }
+  .flow__dots { position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(rgba(201, 149, 74, 0.16) 1px, transparent 1.4px); background-size: 26px 26px; mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); }
+  .flow-top { position: relative; display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: end; margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+  .flow-head { display: grid; gap: 1.1rem; }
+  .flow-out { display: grid; gap: 0.6rem; }
+  .flow-out li { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.75rem 1rem; border-radius: 12px; background: rgba(201, 149, 74, 0.06); border: 1px solid rgba(201, 149, 74, 0.16); font-weight: 500; font-size: 0.92rem; color: var(--ink); }
+  .flow-out :global(svg) { flex: none; margin-top: 0.15rem; color: var(--gold-ink); }
+
+  /* nodes in a 3-column canvas joined by connectors: → along each row, a turn down at the row end */
+  .canvas { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.25rem 3.25rem; }
+  .node {
+    position: relative; display: grid; justify-items: start; gap: 0.6rem; padding: 1.25rem 1.3rem;
+    border-radius: 16px; background: #13100e; border: 1px solid rgba(201, 149, 74, 0.28);
+    box-shadow: 0 20px 40px -30px rgba(0, 0, 0, 0.9); transition: border-color 0.4s, box-shadow 0.4s;
+  }
+  .node:hover { border-color: rgba(201, 149, 74, 0.65); box-shadow: 0 0 40px -14px rgba(201, 149, 74, 0.55); }
+  .node__role { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+  .node__ico { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(201, 149, 74, 0.12); color: var(--gold); }
+  .node__t { font-family: var(--font-head); font-weight: 600; font-size: 1.05rem; line-height: 1.3; color: #fff; }
+  .node__port { position: absolute; top: 50%; width: 10px; height: 10px; margin-top: -5px; border-radius: 50%; background: #13100e; border: 1.5px solid var(--gold); }
+  .node__port--in { left: -6px; }
+  .node__port--out { right: -6px; }
+  .node:nth-child(3n + 1) .node__port--in { display: none; }
+  /* connector line to the next node in the row */
+  .node:not(:nth-child(3n)):not(:last-child)::after {
+    content: ''; position: absolute; top: 50%; right: -3.25rem; width: 3.25rem; height: 2px; margin-top: -1px;
+    background: repeating-linear-gradient(90deg, var(--gold) 0 6px, transparent 6px 11px); background-size: 22px 2px;
+    animation: dash 1.2s linear infinite;
+  }
+  @keyframes dash { to { background-position: 22px 0; } }
+
+  .recipe-head { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+  .recipes { display: grid; gap: 1.1rem; }
+  .recipe { display: grid; grid-template-columns: 1fr 1.15fr 0.9fr; overflow: hidden; }
+  .recipe__col { position: relative; display: grid; align-content: start; gap: 0.8rem; padding: clamp(1.4rem, 3vw, 2rem); }
+  .recipe__col + .recipe__col { border-left: 1px solid var(--line-light); }
+  .recipe__col + .recipe__col::before { content: ''; position: absolute; left: -9px; top: 2rem; width: 16px; height: 16px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(201, 149, 74, 0.18); clip-path: polygon(0 0, 100% 50%, 0 100%); }
+  .recipe__k { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-ink); }
+  .recipe__ico { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: rgba(201, 149, 74, 0.1); color: var(--gold-ink); }
+  .recipe__when h3 { font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.6rem); }
+  .recipe__when p { font-size: 0.92rem; line-height: 1.65; color: var(--text-light-muted); }
+  .steps-flow { display: grid; gap: 0; }
+  .steps-flow li { position: relative; padding: 0 0 0.85rem 1.6rem; font-size: 0.9rem; line-height: 1.45; color: var(--ink); }
+  .steps-flow li::before { content: ''; position: absolute; left: 0.2rem; top: 0.35rem; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--gold); background: var(--surface); z-index: 1; }
+  .steps-flow li::after { content: ''; position: absolute; left: calc(0.2rem + 4px); top: 0.9rem; bottom: -0.1rem; width: 1px; background: rgba(201, 149, 74, 0.35); }
+  .steps-flow li:last-child::after { display: none; }
+  .recipe__result { background: rgba(201, 149, 74, 0.05); }
+  .recipe__proof { display: grid; gap: 0.4rem; font-size: 0.92rem; line-height: 1.55; color: var(--text-light-muted); }
+  .recipe__proof strong { font-weight: 600; color: var(--ink); }
+  a.recipe__proof[href]:hover strong { color: var(--gold-ink); }
+  .recipe__meta { display: grid; gap: 0.5rem; margin-top: 0.4rem; padding-top: 0.8rem; border-top: 1px solid var(--line-light); }
+  .recipe__meta div { display: grid; gap: 0.1rem; font-size: 0.8rem; }
+  .recipe__meta dt { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .recipe__meta dd { color: var(--text-light-muted); }
+
+  :global(:root[data-theme='light']) .node { background: #fff; }
+  :global(:root[data-theme='light']) .node__t { color: var(--black); }
+  :global(:root[data-theme='light']) .node__port { background: #fff; }
+
+  @media (max-width: 1000px) { .flow-top { grid-template-columns: 1fr; } .recipe { grid-template-columns: 1fr; } .recipe__col + .recipe__col { border-left: 0; border-top: 1px solid var(--line-light); } .recipe__col + .recipe__col::before { display: none; } }
+  @media (max-width: 900px) { .canvas { grid-template-columns: 1fr 1fr; gap: 1rem; } .node::after, .node__port { display: none !important; } }
+  @media (max-width: 520px) { .canvas { grid-template-columns: 1fr; } }
+</style>

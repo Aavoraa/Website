@@ -171,8 +171,8 @@ const here = (href: string) => (href === '/' ? Astro.url.pathname === '/' : Astr
   @media (max-width: 520px) {
     .nav { inset-block-start: 10px; }
     .nav__pill { padding-left: 18px; gap: 0.5rem; }
-    .nav__logo { width: 132px; --logo-w: 132px; }
-    .nav__tagline { display: none; } /* too small to read at phone size */
+    .nav__logo { width: 160px; --logo-w: 160px; }
+    .nav__tagline { letter-spacing: 0.04em; }
     .nav__cta { display: none; }
     .nav__toggle { margin-left: 0; }
   }

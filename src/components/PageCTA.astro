@@ -1,6 +1,7 @@
 ---
 /** Closing call-to-action band for inner pages. */
 import Icon from './Icon.astro';
+import BrandIcon from './BrandIcon.astro';
 import { site } from '../data/site';
 interface Props {
   eyebrow?: string;
@@ -20,6 +21,8 @@ const {
   secondary = { label: `Call ${site.contact.phoneDisplay}`, href: site.contact.phoneHref },
   location,
 } = Astro.props;
+// wherever we offer a call, offer WhatsApp too
+const withWhatsApp = secondary.href.startsWith('tel:');
 ---
 
 <section class="pcta section theme-dark flip" data-theme="dark" aria-label="Get in touch">
@@ -38,7 +41,18 @@ const {
       {text && <p class="lead">{text}</p>}
       <div class="pcta__btns">
         <a class="btn" href={primary.href} data-track="cta_primary" data-track-location={location}>{primary.label} <Icon name="arrow" class="arrow" /></a>
-        <a class="btn btn--ghost" href={secondary.href} data-track="cta_secondary" data-track-location={location}>{secondary.label}</a>
+        {withWhatsApp ? (
+          <>
+            <a class="btn btn--ghost pcta__icon" href={secondary.href} aria-label={secondary.label} title={secondary.label} data-track="cta_secondary" data-track-location={location}>
+              <Icon name="phone" size={20} />
+            </a>
+            <a class="btn btn--ghost pcta__icon" href={site.contact.whatsappHref} target="_blank" rel="noopener" aria-label={`WhatsApp ${site.contact.phoneDisplay}`} title={`WhatsApp ${site.contact.phoneDisplay}`} data-track="whatsapp" data-track-location={location}>
+              <BrandIcon icon="siWhatsapp" size={20} />
+            </a>
+          </>
+        ) : (
+          <a class="btn btn--ghost" href={secondary.href} data-track="cta_secondary" data-track-location={location}>{secondary.label}</a>
+        )}
       </div>
     </div>
   </div>
@@ -56,6 +70,8 @@ const {
   .pcta h2 { font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3.2rem); max-width: 18em; }
   .pcta h2 .accent { display: block; }
   .pcta .lead { max-width: 40rem; }
+  .pcta__icon { align-self: stretch; aspect-ratio: 1; width: auto; height: auto; padding: 0; display: inline-grid; place-items: center; border-radius: 50%; }
+  .pcta__icon :global(svg) { color: var(--gold); }
   .pcta__btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 0.5rem; }
   :global(:root[data-theme='light']) .pcta__panel { background: radial-gradient(90% 120% at 50% 0%, rgba(201, 149, 74, 0.14), transparent 60%), linear-gradient(180deg, #ffffff, var(--ivory)); border-color: rgba(201, 149, 74, 0.35); }
   @media (max-width: 520px) { .pcta__btns .btn { width: 100%; } }

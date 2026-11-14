@@ -332,7 +332,7 @@ p { text-wrap: pretty; }
   box-shadow: 0 0 12px rgba(201, 149, 74, 0.55);
 }
 .to-top {
-  position: fixed; right: clamp(14px, 2vw, 28px); bottom: clamp(14px, 2vw, 28px); z-index: 90;
+  position: fixed; right: calc(clamp(14px, 2vw, 28px) + 2px); bottom: calc(clamp(14px, 2vw, 28px) + 66px); z-index: 90; /* sits above the chat launcher */
   display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%;
   color: var(--gold); background: rgba(18, 16, 16, 0.78); border: 1px solid rgba(201, 149, 74, 0.2);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -369,10 +369,21 @@ p { text-wrap: pretty; }
 :where(.has-spot) { position: relative; }
 .spot {
   position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(420px circle at var(--sx, 50%) var(--sy, 50%), rgba(201, 149, 74, 0.13), transparent 45%);
+  /* bright gold light that follows the cursor (screen blend lightens without hiding the text) */
+  background: radial-gradient(340px circle at var(--sx, 50%) var(--sy, 50%), rgba(255, 218, 155, 0.48), rgba(232, 176, 96, 0.2) 38%, transparent 64%);
+  mix-blend-mode: screen;
   opacity: 0; transition: opacity 0.45s var(--ease);
 }
+/* a bright gold edge on the card border nearest the cursor */
+.spot::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+  background: radial-gradient(200px circle at var(--sx, 50%) var(--sy, 50%), rgba(255, 226, 170, 1), rgba(226, 170, 90, 0.45) 40%, transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
 .has-spot:hover > .spot { opacity: 1; }
+:root[data-theme='light'] .spot { mix-blend-mode: normal; background: radial-gradient(340px circle at var(--sx, 50%) var(--sy, 50%), rgba(201, 149, 74, 0.22), rgba(201, 149, 74, 0.08) 38%, transparent 62%); }
+:root[data-theme='light'] .spot::after { background: radial-gradient(200px circle at var(--sx, 50%) var(--sy, 50%), rgba(176, 116, 44, 0.95), rgba(201, 149, 74, 0.35) 40%, transparent 70%); }
 
 /* lists stagger in */
 .js .stagger > * { opacity: 0; transform: translate3d(-10px, 0, 0); transition: opacity 0.6s var(--ease), transform 0.7s var(--ease); transition-delay: calc(var(--i, 0) * 70ms + 150ms); }
@@ -398,9 +409,19 @@ p { text-wrap: pretty; }
 }
 :target.pcard { animation: target-glow 1.6s var(--ease) 0.35s; }
 
-/* icon tiles light up and tilt when their card is hovered */
-.ico-tile { transition: background-color 0.35s, color 0.35s, border-color 0.35s, transform 0.5s var(--ease); }
-.has-spot:hover .ico-tile { background: var(--gold); color: var(--black); border-color: var(--gold); transform: rotate(-6deg) scale(1.06); }
+/* ---------- Icon glow: every icon box lights up gold (dark icon + soft glow) when its card is hovered ---------- */
+:is(.ico-tile, .ind__icon, .stat__icon, .cap__tag, .entry__n, .step__icon, .tl__icon, .node__ico, .recipe__ico, .kpi__ico, .chan__ico, .stage__node) {
+  transition: background 0.35s var(--ease), color 0.35s, border-color 0.35s, box-shadow 0.4s var(--ease), transform 0.5s var(--ease);
+}
+:is(.has-spot, .ind__tile, .stat, .cap, .entry, .step, .tl li, .node, .recipe, .kpi, .chan, .stage):hover
+  :is(.ico-tile, .ind__icon, .stat__icon, .cap__tag, .entry__n, .step__icon, .tl__icon, .node__ico, .recipe__ico, .kpi__ico, .chan__ico, .stage__node) {
+  background: linear-gradient(135deg, #f3d39b, #d9a85e 55%, #c9954a) !important;
+  color: #0a0909 !important;
+  border-color: transparent !important;
+  box-shadow: 0 0 0 1px rgba(255, 226, 170, 0.35), 0 0 26px -4px rgba(240, 190, 110, 0.75) !important;
+  filter: none !important;
+}
+.has-spot:hover .ico-tile { transform: rotate(-6deg) scale(1.06); }
 
 @media (prefers-reduced-motion: reduce) {
   .split .w__i, .js .stagger > *, .js .steps .step__icon { transform: none !important; opacity: 1 !important; }
@@ -430,3 +451,49 @@ html.has-lenis { scroll-behavior: auto !important; }
 .depth i { animation: d-float 9s ease-in-out infinite; animation-delay: calc(var(--k, 0) * -1.7s); }
 :root[data-theme='light'] .depth .d-orb { background: radial-gradient(circle, rgba(201, 149, 74, 0.22), rgba(201, 149, 74, 0) 70%); }
 @media (prefers-reduced-motion: reduce) { .gx, [data-parallax] { translate: none; scale: none; } .depth i { animation: none; } }
+
+/* ---------- Text glow: regular text the cursor touches glows gold (pointer devices only) ----------
+   Headings and other large display text are skipped (the glow looks heavy on big type).
+   Limited to text-level elements so whole cards and buttons don't light up as boxes. */
+@media (hover: hover) and (pointer: fine) {
+  :where(p, blockquote, figcaption, dt, dd, label, th, td, small, strong, em,
+    li:not(:has(div, article, section, a, p, h2, h3, h4, img, ul, ol, button, svg)),
+    span:not(:has(div, p, img, ul, h2, h3, svg)),
+    a:not(:has(div, p, img, h2, h3, h4, ul, svg, span))):not(:is(h1, h2, h3, h4, h5, h6) *, .accent, [class*='value'], .pa__label) {
+    transition: filter 0.35s var(--ease), color 0.35s var(--ease);
+  }
+  :where(p, blockquote, figcaption, dt, dd, label, th, td, small, strong, em,
+    li:not(:has(div, article, section, a, p, h2, h3, h4, img, ul, ol, button, svg)),
+    span:not(:has(div, p, img, ul, h2, h3, svg)),
+    a:not(:has(div, p, img, h2, h3, h4, ul, svg, span))):not(:is(h1, h2, h3, h4, h5, h6) *, .accent, [class*='value'], .pa__label):hover {
+    /* bright: the text warms to near-white and gets a strong gold halo */
+    color: #fff3dc;
+    filter: drop-shadow(0 0 7px rgba(255, 214, 150, 0.95)) drop-shadow(0 0 20px rgba(236, 180, 100, 0.65));
+  }
+  :root[data-theme='light'] :where(p, blockquote, figcaption, dt, dd, label, th, td, small, strong, em,
+    li:not(:has(div, article, section, a, p, h2, h3, h4, img, ul, ol, button, svg)),
+    span:not(:has(div, p, img, ul, h2, h3, svg)),
+    a:not(:has(div, p, img, h2, h3, h4, ul, svg, span))):not(:is(h1, h2, h3, h4, h5, h6) *, .accent, [class*='value'], .pa__label):hover {
+    color: var(--gold-deep);
+    filter: drop-shadow(0 0 6px rgba(201, 149, 74, 0.6)) drop-shadow(0 0 14px rgba(201, 149, 74, 0.3));
+  }
+}
+
+/* ---------- Desktop "one section per screen" (class set by fitScreens in cinematic.ts) ---------- */
+:root.fit-screens main > :is(section, header, [data-fit-group]):not([data-hero]):not(.pin-spacer):not([data-no-fit]) {
+  display: flex !important; flex-direction: column; justify-content: center;
+  padding-top: clamp(6.25rem, 14vh, 8rem) !important; /* clears the fixed navigation */
+  padding-bottom: clamp(2.5rem, 7vh, 4.5rem) !important;
+}
+:root.fit-screens main > :is(section, header, [data-fit-group]):not([data-hero]):not(.pin-spacer):not([data-no-fit]) > * { flex: none; }
+/* Clients + Tools grouped onto one screen: trim the inner sections' own spacing */
+:root.fit-screens .fit-group > section { padding-block: clamp(1.25rem, 3.5vh, 2.5rem); }
+:root.fit-screens .fit-group > .tools { border-bottom: 0; }
+
+/* "Explore <sub-service>" links on the service pages */
+.sub-link { display: inline-flex; align-items: center; gap: 0.4rem; align-self: flex-start; justify-self: start; font-size: 0.86rem; font-weight: 600; color: var(--gold-ink); background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; padding-bottom: 2px; transition: background-size 0.4s var(--ease); }
+.sub-link:hover { background-size: 100% 1px; }
+.sub-link svg { transition: transform 0.35s var(--ease); }
+.sub-link:hover svg { transform: translateX(4px); }
+.sub-link--light { color: var(--gold); }
+:where(.stage__head, .spread__cover, .chan, .recipe__when) h3 a:hover { color: var(--gold-ink); }
