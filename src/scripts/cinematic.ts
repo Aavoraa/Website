@@ -53,12 +53,11 @@ function initSmoothScroll() {
   initSectionSnap();
 }
 
-/* ---------- desktop: every section is exactly one screen ----------
- * Each page section gets the viewport's height with its content centred. When the content is taller than the
- * screen (common on laptops), it is scaled down with `zoom` so the whole section still fits. Sections that would
- * need to shrink below MIN_ZOOM keep their natural height and scroll normally instead. */
+/* ---------- desktop: every section fills at least one screen ----------
+ * Each page section gets at least the viewport's height with its content centred. Content is always shown at its
+ * standard size — nothing is scaled down; a section taller than the screen simply grows and is stepped through
+ * (see initSectionSnap). */
 const FIT_SEL = 'main > header, main > section, main > [data-fit-group]';
-const MIN_ZOOM = 0.62;
 function fitScreens() {
   const root = document.documentElement;
   const ok = () => window.innerWidth >= 1000 && window.innerHeight >= 560;
@@ -71,18 +70,7 @@ function fitScreens() {
     root.classList.toggle('fit-screens', ok());
     if (!ok()) return;
     const vh = window.innerHeight;
-    secs.forEach((el) => {
-      el.style.minHeight = `${vh}px`;
-      const cs = getComputedStyle(el);
-      const pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
-      for (let pass = 0; pass < 3 && el.offsetHeight > vh + 1; pass++) {
-        const kids = flowKids(el);
-        const cur = parseFloat(kids[0]?.style.zoom || '1');
-        const need = ((vh - pad) / (el.offsetHeight - pad)) * cur * 0.995; // a hair under, so rounding never spills a pixel
-        if (need < MIN_ZOOM) { kids.forEach((k) => (k.style.zoom = '')); break; }
-        kids.forEach((k) => (k.style.zoom = need.toFixed(4)));
-      }
-    });
+    secs.forEach((el) => { el.style.minHeight = `${vh}px`; });
     ScrollTrigger.refresh();
   };
 
@@ -255,21 +243,6 @@ function homeEffects() {
   if (!hero) return;
   const st = { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 };
 
-  // hero: layers leave at different speeds and the content dissolves into the next section
-  const content = hero.querySelector<HTMLElement>('.hero__content');
-  if (content) {
-    mark(content);
-    gsap.to(content, { '--py': '-190px', opacity: 0, ease: 'none', scrollTrigger: st });
-  }
-  const layer = (sel: string, y: number) => {
-    const el = hero.querySelector<HTMLElement>(sel);
-    if (!el) return;
-    mark(el);
-    gsap.to(el, { '--py': `${y}px`, ease: 'none', scrollTrigger: st });
-  };
-  layer('.hero__copy', 40);
-  layer('.hero__ctas', 80);
-  layer('.hero__micro', 120);
 
   // clients & tools: the marquee rows slide sideways with the scroll, in opposite directions
   $$('.marquee__track').forEach((t, i) => drift(t, i % 2 ? -160 : 160, i % 2 ? 160 : -160, t.closest('section') || t));

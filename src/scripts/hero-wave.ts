@@ -173,21 +173,6 @@ function initInteractions(hero: HTMLElement, canvas: HTMLCanvasElement | null, r
       el.addEventListener('pointerleave', () => { el.style.setProperty('--tx', '0px'); el.style.setProperty('--ty', '0px'); });
     });
 
-    // CSS parallax for the content layers
-    let raf = 0;
-    const tick = () => {
-      raf = 0;
-      const pmx = state.mx, pmy = state.my;
-      state.mx += (state.tmx - state.mx) * 0.08;
-      state.my += (state.tmy - state.my) * 0.08;
-      if (Math.abs(state.mx - pmx) > 0.0005 || Math.abs(state.my - pmy) > 0.0005) {
-        hero.style.setProperty('--mx', state.mx.toFixed(3));
-        hero.style.setProperty('--my', state.my.toFixed(3));
-        raf = requestAnimationFrame(tick);
-      }
-    };
-    hero.addEventListener('pointermove', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
-    hero.addEventListener('pointerleave', () => { if (!raf) raf = requestAnimationFrame(tick); });
   }
   return state;
 }
@@ -202,7 +187,8 @@ function compile(gl: WebGLRenderingContext, type: number, src: string) {
 }
 
 export function initHeroWave() {
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  // the homepage hero, or the header of an inner page (both carry the live gold waves)
+  const hero = document.querySelector<HTMLElement>('[data-hero], [data-wave]');
   const canvas = hero?.querySelector<HTMLCanvasElement>('[data-hero-canvas]') || null;
   if (!hero) return;
 

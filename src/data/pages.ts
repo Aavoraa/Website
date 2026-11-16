@@ -578,7 +578,7 @@ export const solutions: {
   },
   {
     key: 'automation',
-    title: 'Remove Repetitive Manual Work',
+    title: 'Automate Everyday Work',
     problem: 'Talented people spending their week copying data, chasing follow-ups and building reports.',
     signs: ['The same data typed into several systems', 'Follow-ups depend on someone remembering', 'Weekly reports built by hand'],
     approach: ['Map processes and rank them by hours and errors', 'Automate hand-offs between forms, CRM, email and reports', 'Add AI only where it is genuinely reliable'],

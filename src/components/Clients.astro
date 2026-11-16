@@ -1,5 +1,18 @@
 ---
 import { clients } from '../data/site';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+// Cache-busting: each logo URL carries a short hash of the file, so when a logo is replaced
+// browsers fetch the new one at once (images are otherwise cached for 30 days).
+const logoSrc = (key: string) => {
+  try {
+    const v = createHash('md5').update(readFileSync(join(process.cwd(), 'public', 'clients', `${key}.png`))).digest('hex').slice(0, 8);
+    return `/clients/${key}.png?v=${v}`;
+  } catch {
+    return `/clients/${key}.png`;
+  }
+};
 // two rows scrolling in opposite directions
 const half = Math.ceil(clients.length / 2);
 const rows = [clients.slice(0, half), clients.slice(half)];
@@ -22,7 +35,7 @@ const rows = [clients.slice(0, half), clients.slice(half)];
             {[...row, ...row].map((c, i) => (
               <li class="logo" aria-hidden={i >= row.length ? 'true' : undefined}>
                 {c.logo || c.src ? (
-                  <img src={c.src ?? `/clients/${c.logo}.png`} alt={i >= row.length ? '' : c.name} loading="lazy" decoding="async" />
+                  <img src={c.src ?? logoSrc(c.logo!)} alt={i >= row.length ? '' : c.name} loading="lazy" decoding="async" />
                 ) : (
                   <span class="logo__word">{c.name}</span>
                 )}

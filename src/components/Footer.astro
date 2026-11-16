@@ -1,9 +1,56 @@
 ---
-import { pillars, site } from '../data/site';
-import { servicePath, solutions } from '../data/pages';
+import { site } from '../data/site';
+import { servicePath, subServicePath, solutions, serviceDetails } from '../data/pages';
+import type { PillarKey } from '../data/site';
 import Icon from './Icon.astro';
 import BrandIcon from './BrandIcon.astro';
 const year = new Date().getFullYear();
+// Each service sits on the same row as the solution it delivers.
+const sol = (key: string) => {
+  const s = solutions.find((x) => x.key === key)!;
+  return { label: s.title, href: `/solutions/#${s.key}` };
+};
+// every service, then each of its sub-services; a related solution sits on the same row where there is one
+const groups: { key: PillarKey; label: string; solution: string; subSolutions?: Record<string, string> }[] = [
+  { key: 'build', label: 'Software Development', solution: 'operations' },
+  { key: 'brand', label: 'Branding', solution: 'brand' },
+  { key: 'grow', label: 'Marketing & Lead Generation', solution: 'enquiries', subSolutions: { 'SEO & AI Search Visibility': 'visibility' } },
+  { key: 'transform', label: 'AI & Business Automation', solution: 'automation' },
+];
+const HIDE = new Set(['Growth & Transformation Consulting']);
+// the outcome each sub-service delivers (links to that sub-service's page)
+const subOutcome: Record<string, string> = {
+  'Custom Software Development': 'Software Built Around Your Workflow',
+  'Website & App Development': 'Websites That Turn Visitors Into Leads',
+  'SaaS & Digital Products': 'Launch Your Own Digital Product',
+  'Brand Strategy & Identity': 'A Clear, Memorable Brand Position',
+  'Creative Graphic Design': 'Visuals That Communicate Clearly',
+  'Content & Video Studio': 'Content People Watch and Share',
+  'Personal Branding': 'Become a Trusted Voice in Your Industry',
+  'Digital Marketing': 'An Always-On Brand Presence',
+  'Performance Marketing': 'Campaigns With Measurable Returns',
+  'E-commerce Marketing': 'More Online Sales and Repeat Buyers',
+  'Workflow & CRM Automation': 'Connected Workflows, Faster Follow-Ups',
+  'AI Inside Operations': 'Practical AI for Everyday Decisions',
+};
+type Row = { service: { label: string; href: string }; solution?: { label: string; href: string }; sub?: boolean };
+const pairs: Row[] = [
+  { service: { label: 'All Services', href: '/services/' }, solution: { label: 'All Solutions', href: '/solutions/' } },
+  ...groups.flatMap((g): Row[] => [
+    { service: { label: g.label, href: servicePath(g.key) }, solution: sol(g.solution) },
+    ...serviceDetails[g.key]
+      .filter((d) => !HIDE.has(d.name))
+      .map((d): Row => ({
+        service: { label: d.name, href: subServicePath(g.key, d.name) },
+        solution: g.subSolutions?.[d.name]
+          ? sol(g.subSolutions[d.name])
+          : subOutcome[d.name]
+            ? { label: subOutcome[d.name], href: subServicePath(g.key, d.name) }
+            : undefined,
+        sub: true,
+      })),
+  ]),
+];
 ---
 
 <footer class="footer theme-dark flip" data-theme="dark">
@@ -21,24 +68,21 @@ const year = new Date().getFullYear();
       </div>
 
       <nav class="footer__cols" aria-label="Footer">
-        <div>
+        <div class="footer__pairs">
           <h2>Services</h2>
-          <ul>
-            <li><a href="/services/">All Services</a></li>
-            {pillars.map((p) => <li><a href={servicePath(p.key)}>{p.label}</a></li>)}
-          </ul>
-        </div>
-        <div>
           <h2>Solutions</h2>
-          <ul>
-            {solutions.slice(0, 5).map((x) => <li><a href={`/solutions/#${x.key}`}>{x.title}</a></li>)}
-            <li><a href="/industries/">Industries</a></li>
-          </ul>
+          {pairs.map((p) => (
+            <>
+              <a href={p.service.href} class:list={{ 'footer__sub': p.sub, 'footer__main': !p.sub }}>{p.service.label}</a>
+              {p.solution ? <a href={p.solution.href} class:list={{ 'footer__main': !p.sub, 'footer__subsol': p.sub }}>{p.solution.label}</a> : <span aria-hidden="true"></span>}
+            </>
+          ))}
         </div>
         <div>
           <h2>Company</h2>
           <ul>
             <li><a href="/about/">About</a></li>
+            <li><a href="/industries/">Industries</a></li>
             <li><a href="/approach/">Our Approach</a></li>
             <li><a href="/work/">Our Work</a></li>
             <li><a href="/insights/">Blogs</a></li>
@@ -74,22 +118,36 @@ const year = new Date().getFullYear();
     content: ''; position: absolute; left: 20%; right: 20%; top: -1px; height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
   }
-  .footer__top { display: grid; grid-template-columns: minmax(230px, 280px) minmax(0, 1fr); gap: clamp(2.5rem, 4.5vw, 4.5rem); }
+  .footer__top { display: grid; grid-template-columns: minmax(210px, 240px) minmax(0, 1fr); gap: clamp(2rem, 3.2vw, 3.5rem); }
   .footer__brand { display: grid; gap: 1.25rem; align-content: start; }
   .footer__brand img { width: 220px; height: auto; }
   .footer__brand p { color: var(--text-dark-muted); font-size: 0.9rem; max-width: 22rem; }
-  .footer__tagline { font-family: var(--font-head); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.8rem; color: var(--gold) !important; }
+  .footer__tagline { white-space: nowrap; font-family: var(--font-head); font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.8rem; color: var(--gold) !important; }
   /* columns size to their longest link (no wrapping) and share the remaining space evenly */
-  .footer__cols { display: grid; grid-template-columns: max-content max-content max-content minmax(0, max-content); justify-content: space-between; gap: 2rem clamp(1.5rem, 2.4vw, 2.5rem); }
+  .footer__cols { display: grid; grid-template-columns: max-content max-content minmax(0, max-content); justify-content: space-between; gap: 2rem clamp(1.25rem, 2vw, 2.25rem); }
   .footer__cols h2 { font-family: var(--font-body); font-size: var(--fs-cap); font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.1rem; }
   .footer__cols ul { display: grid; gap: 0.85rem; }
+  /* Services | Solutions: two columns whose rows line up, so each service sits beside its solution */
+  .footer__pairs { display: grid; grid-template-columns: max-content max-content; column-gap: clamp(1.25rem, 2.2vw, 2.25rem); row-gap: 0.85rem; align-content: start; }
+  .footer__pairs h2 { margin-bottom: 0; } /* + row gap + the first row's top margin = the other columns' heading gap */
+  /* the heading row lines up with the "AAVORAA" wordmark in the logo (logo 220px wide → wordmark centre ≈ 20px down) */
+  @media (min-width: 1241px) { .footer__cols { padding-top: 14px; } }
+  /* sub-services sit indented under their service, a little smaller */
+  .footer__pairs .footer__sub { padding-left: 0.9rem; font-size: 0.82rem; position: relative; }
+  .footer__pairs .footer__sub::before { content: ''; position: absolute; left: 0.1rem; top: 0.6em; width: 5px; height: 1px; background: rgba(201, 149, 74, 0.6); }
+  .footer__pairs .footer__main { margin-top: 0.5rem; }
+  .footer__pairs .footer__subsol { font-size: 0.82rem; }
+  .footer__pairs a.footer__main:not([href^='/solutions']) { color: var(--ink); font-weight: 500; }
+  .footer__pairs { row-gap: 0.6rem; }
   .footer__cols a, .footer__cols span { font-size: 0.875rem; line-height: 1.4; color: var(--text-dark-muted); transition: color 0.3s; white-space: nowrap; }
   .footer__cols a:hover { color: var(--ink); }
   .footer__contact li { display: flex; gap: 0.65rem; align-items: center; }
   .footer__contact span { white-space: normal; max-width: 13rem; } /* the address may wrap */
   .footer__contact li:has(span) { align-items: flex-start; }
   .footer__contact li:has(span) :global(svg) { margin-top: 0.2rem; }
-  .footer__contact :global(svg) { flex: none; color: var(--gold); }
+  /* every contact icon in the same 18px box; the solid WhatsApp mark is inset so it matches the outline icons */
+  .footer__contact :global(svg) { flex: none; width: 18px; height: 18px; color: var(--gold); }
+  .footer__contact :global(svg[fill='currentColor']) { padding: 2.5px; box-sizing: border-box; }
   .footer__bottom {
     display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-top: clamp(3rem, 6vw, 5rem);
     padding-top: 1.5rem; border-top: 1px solid var(--line-dark-soft); font-size: 0.8rem; color: var(--text-dark-faint);
@@ -102,9 +160,11 @@ const year = new Date().getFullYear();
   }
   @media (max-width: 900px) {
     .footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem 2rem; }
+    .footer__pairs { grid-column: 1 / -1; }
   }
   @media (max-width: 640px) {
     .footer__cols a, .footer__cols span { white-space: normal; overflow-wrap: anywhere; }
+    .footer__pairs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   }
   @media (max-width: 400px) {
     .footer__cols { grid-template-columns: 1fr; }

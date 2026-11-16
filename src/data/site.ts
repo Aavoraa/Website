@@ -43,8 +43,8 @@ export const nav = [
   { label: 'About', href: '/about/' },
   { label: 'Services', href: '/services/' },
   { label: 'Solutions', href: '/solutions/' },
-  { label: 'Contact', href: '/contact/' },
   { label: 'Blogs', href: '/insights/' },
+  { label: 'Contact', href: '/contact/' },
 ];
 
 export type PillarKey = 'build' | 'brand' | 'grow' | 'transform';
