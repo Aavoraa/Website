@@ -43,7 +43,6 @@ const data = {
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
     </span>
     <span class="cb__launch-label">Chat with us</span>
-    <span class="cb__ping" aria-hidden="true"></span>
   </button>
 
   <section class="cb__panel" id="cb-panel" role="dialog" aria-modal="false" aria-labelledby="cb-title" hidden data-cb-panel>
@@ -101,10 +100,7 @@ const data = {
   .cb__launch-ico--close, .cb.is-open .cb__launch-ico--open { display: none; }
   .cb.is-open .cb__launch-ico--close { display: grid; }
   .cb.is-open .cb__launch { width: 54px; padding: 0; justify-content: center; }
-  .cb.is-open .cb__launch-label, .cb.is-open .cb__ping { display: none; }
-  .cb__ping { position: absolute; top: 6px; right: 8px; width: 10px; height: 10px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); animation: cb-ping 2.4s infinite; }
-  .cb.was-opened .cb__ping { display: none; }
-  @keyframes cb-ping { 70%, 100% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); } }
+  .cb.is-open .cb__launch-label { display: none; }
 
   /* panel */
   .cb__panel {
@@ -176,5 +172,5 @@ const data = {
     .cb__panel { position: fixed; left: 8px; right: 8px; bottom: 78px; width: calc(100vw - 16px); height: min(640px, calc(100svh - 96px)); }
     .cb__who h2 { font-size: 0.9rem; }
   }
-  @media (prefers-reduced-motion: reduce) { .cb__panel, .cb__log :global(.cb-msg) { animation: none; } .cb__ping { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .cb__panel, .cb__log :global(.cb-msg) { animation: none; } }
 </style>
