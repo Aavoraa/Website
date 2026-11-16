@@ -8,6 +8,7 @@ import { industries } from '../data/site';
     <header class="section-head section-head--center">
       <p class="eyebrow" data-reveal>Industries &amp; Fields</p>
       <h2 id="ind-title" data-reveal style="--d:1">Built Around the Way <span class="accent">Your Business Works.</span></h2>
+      <p class="lead" data-reveal style="--d:2">Smart growth plans tuned to how each market actually buys — from textile retail floors to US mortgage networks.</p>
     </header>
 
     <ul class="ind__grid">
@@ -20,11 +21,14 @@ import { industries } from '../data/site';
         ))
       }
     </ul>
+
+    <p class="ind__note"><LucideIcon name="Info" size={16} /> Don’t see your industry? The method travels well — we start by learning how your customers buy and how your operations run.</p>
   </div>
 </section>
 
 <style>
-  .ind .section-head { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+  .ind .section-head { margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .ind .section-head .lead { max-width: 40rem; margin-inline: auto; }
   .ind__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(0.6rem, 1.2vw, 1rem); }
   .ind__tile {
     display: flex; align-items: center; gap: 0.9rem; padding: 1.05rem 1.15rem; border-radius: 16px;
@@ -39,6 +43,8 @@ import { industries } from '../data/site';
   .ind__name { font-family: var(--font-head); font-weight: 600; font-size: 0.98rem; letter-spacing: -0.01em; line-height: 1.3; }
   .ind__tile:hover { transform: translateY(-3px); border-color: rgba(201, 149, 74, 0.4); box-shadow: 0 18px 36px -26px var(--shadow); }
   .ind__tile:hover .ind__icon { background: var(--gold); color: var(--black); }
+  .ind__note { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: clamp(1.25rem, 2.5vw, 1.75rem); text-align: center; font-size: 0.88rem; color: var(--text-light-muted); }
+  .ind__note :global(svg) { flex: none; color: var(--gold-ink); }
 
   @media (max-width: 1000px) { .ind__grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 700px) { .ind__grid { grid-template-columns: repeat(2, 1fr); } }

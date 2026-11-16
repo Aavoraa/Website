@@ -777,22 +777,3 @@ const articlePhoto: Record<string, string> = {
 };
 export const articleImage = (a: { slug: string; category: PillarKey }) => articlePhoto[a.slug] ?? pillarPhoto[a.category];
 
-/** Extra words visitors use for each industry, so the Industries search finds them. */
-export const industryKeywords: Record<string, string> = {
-  'Retail & E-commerce': 'shop store stores ecommerce online d2c marketplace shopify',
-  'Textile & Apparel': 'garments garment saree sarees clothing fashion silk mill apparel',
-  'Real Estate': 'property properties plots villas apartments realty builders developers housing',
-  'Education & EdTech': 'school schools college university admissions academy coaching',
-  'Healthcare & Wellness': 'hospital clinic clinics medical doctors pharma health',
-  'SaaS & Technology': 'software tech startup app apps it product ai',
-  'Finance & Mortgage': 'bank banking loans lending fintech insurance investment wealth mortgage',
-  Manufacturing: 'factory factories industrial plant production engineering',
-  'Logistics & Warehousing': 'warehouse supply chain distribution transport inventory',
-  Automobile: 'car cars dealer dealership showroom vehicle vehicles automotive bikes',
-  'Hospitality & Resorts': 'hotel hotels resort travel tourism homestay',
-  'Food & Beverages': 'restaurant restaurants cafe bakery fmcg food',
-  'Beauty & Cosmetics': 'salon skincare makeup spa cosmetics',
-  'Sports & Fitness': 'gym gyms fitness academy sports club',
-  'Construction & Interiors': 'builders architecture interior design contractors construction homes',
-  'Recruitment & Staffing': 'hr hiring jobs staffing manpower recruitment agency',
-};

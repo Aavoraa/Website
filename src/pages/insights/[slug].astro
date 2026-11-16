@@ -25,7 +25,7 @@ const shareUrl = new URL(`/insights/${a.slug}/`, 'https://aavoraa.com').href;
   eyebrow={`Insights · ${pillar.label}`}
   heading={a.title}
   intro={a.excerpt}
-  crumbs={[{ label: 'Insights', href: '/insights/' }, { label: pillar.label }]}
+  crumbs={[{ label: 'Blogs', href: '/insights/' }, { label: pillar.label }]}
 >
   <p slot="head" class="meta">
     <span><LucideIcon name="Calendar" size={14} /> {fmt(a.date)}</span>

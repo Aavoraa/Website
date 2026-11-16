@@ -2,25 +2,29 @@
 import Page from '../../layouts/Page.astro';
 import LucideIcon from '../../components/LucideIcon.astro';
 import PageCTA from '../../components/PageCTA.astro';
-import { pillars } from '../../data/site';
+import CaseCard from '../../components/CaseCard.astro';
+import { pillars, cases } from '../../data/site';
 import { articles } from '../../data/insights';
 import { articleImage } from '../../data/pages';
 const label = Object.fromEntries(pillars.map((p) => [p.key, p.label]));
 const fmt = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-const [lead, ...rest] = articles;
----
+const [lead, ...rest] = articles;---
 
 <Page
   title="Insights | Practical Ideas on Software, Branding, Growth & AI | AAVORAA"
-  description="Practical articles from AAVORAA on websites that generate enquiries, what to automate first, getting found in AI answers and brand positioning."
+  description="Practical articles and case studies from AAVORAA: websites that generate enquiries, what to automate first, getting found in AI answers, brand positioning and real client results."
   path="/insights/"
   eyebrow="Insights"
   heading="Ideas for Building, Transforming"
   accent="and Growing a Business."
-  intro="Practical thinking from the AAVORAA team — the questions we hear most from business owners, answered plainly."
-  crumbs={[{ label: 'Insights' }]}
+  intro="Practical thinking from the AAVORAA team — the questions we hear most from business owners, answered plainly — and the case studies behind it."
+  crumbs={[{ label: 'Blogs' }]}
 >
-  <section class="section theme-dark flip" data-theme="dark" aria-label="Articles">
+  <nav slot="head" class="jump" aria-label="Jump to a section">
+    <a class="chip" href="#articles"><LucideIcon name="BookOpen" size={14} /> Articles</a>
+    <a class="chip" href="#case-studies"><LucideIcon name="BriefcaseBusiness" size={14} /> Case Studies</a>
+  </nav>
+  <section class="section theme-dark flip" id="articles" data-theme="dark" aria-label="Articles">
     <div class="container">
       <div class="topics" role="group" aria-label="Filter articles by topic" data-topics data-reveal>
         <button class="topic is-on" type="button" aria-pressed="true" data-topic="all">All topics</button>
@@ -58,6 +62,37 @@ const [lead, ...rest] = articles;
     </div>
   </section>
 
+  <section class="section theme-dark section--alt flip" id="case-studies" data-theme="dark" aria-labelledby="all-title">
+    <div class="container">
+      <div class="wk__head">
+        <div>
+          <p class="eyebrow" data-reveal>Our Work</p>
+          <h2 id="all-title" class="ph2" data-reveal style="--d:1">Case <span class="accent">Studies.</span></h2>
+        </div>
+        <div class="filters" role="group" aria-label="Filter case studies by service" data-filters>
+          <button class="filter is-on" type="button" aria-pressed="true" data-filter="all">All <span>{cases.length}</span></button>
+          {
+            pillars.map((p) => (
+              <button class="filter" type="button" aria-pressed="false" data-filter={p.key}>
+                {p.label} <span>{cases.filter((c) => c.pillars.includes(p.key)).length}</span>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+      <ul class="wgrid" data-case-grid>
+        {
+          cases.map((c, i) => (
+            <li data-pillars={c.pillars.join(' ')} data-reveal style={`--d:${i % 3}`}>
+              <CaseCard item={c} />
+            </li>
+          ))
+        }
+      </ul>
+      <p class="wk__empty" hidden data-empty><LucideIcon name="Info" size={16} /> No case studies in this category yet.</p>
+    </div>
+  </section>
+
   <PageCTA
     title="Have a Question We Haven’t Answered?"
     accent="Ask Us Directly."
@@ -81,6 +116,30 @@ const [lead, ...rest] = articles;
       if (!el.hidden) el.classList.add('is-in');
     });
   });
+
+  {
+    // Filter case studies by service pillar
+    const bar = document.querySelector<HTMLElement>('[data-filters]');
+    const items = [...document.querySelectorAll<HTMLElement>('[data-case-grid] > li')];
+    const empty = document.querySelector<HTMLElement>('[data-empty]');
+    bar?.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+      if (!btn) return;
+      const key = btn.dataset.filter!;
+      bar.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      let shown = 0;
+      items.forEach((li) => {
+        const show = key === 'all' || (li.dataset.pillars || '').split(' ').includes(key);
+        li.hidden = !show;
+        if (show) { shown++; li.classList.add('is-in'); }
+      });
+      if (empty) empty.hidden = shown > 0;
+    });
+  }
 </script>
 
 <style>
@@ -116,4 +175,28 @@ const [lead, ...rest] = articles;
   .post__ex { font-size: 0.9rem; line-height: 1.6; color: var(--text-light-muted); }
 
   @media (max-width: 900px) { .feat { grid-template-columns: 1fr; } .feat__media { min-height: 0; aspect-ratio: 16 / 9; } .posts { grid-template-columns: 1fr; } }
+  .jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 0.75rem; }
+  .jump .chip { background: rgba(10, 9, 9, 0.35); transition: border-color 0.3s, color 0.3s; }
+  .jump .chip:hover { border-color: var(--gold); color: var(--ink); }
+  .jump :global(svg) { color: var(--gold-ink); }
+  :global(:root[data-theme='light']) .jump .chip { background: rgba(255, 255, 255, 0.6); }
+  #articles, #case-studies { scroll-margin-top: 90px; }
+
+  .wk__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.25rem 2rem; margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem); }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .filter {
+    display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.95rem; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 500; color: var(--text-light-muted); border: 1px solid var(--surface-line); background: var(--surface);
+    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+  }
+  .filter span { font-size: 0.72rem; opacity: 0.7; }
+  .filter:hover { border-color: rgba(201, 149, 74, 0.5); color: var(--ink); }
+  .filter.is-on { color: var(--black); background: var(--gold); border-color: var(--gold); }
+  .wgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(0.85rem, 1.6vw, 1.35rem); }
+  .wgrid > li[hidden] { display: none; }
+  .wk__empty { display: flex; align-items: center; gap: 0.5rem; color: var(--text-light-muted); }
+  .wk__empty[hidden] { display: none; }
+
+  @media (max-width: 1000px) { .wgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .wgrid { grid-template-columns: 1fr; } }
 </style>
