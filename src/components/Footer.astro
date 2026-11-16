@@ -10,29 +10,14 @@ const sol = (key: string) => {
   const s = solutions.find((x) => x.key === key)!;
   return { label: s.title, href: `/solutions/#${s.key}` };
 };
-// every service, then each of its sub-services; a related solution sits on the same row where there is one
-const groups: { key: PillarKey; label: string; solution: string; subSolutions?: Record<string, string> }[] = [
+// every service, then each of its sub-services, each beside its solution
+const groups: { key: PillarKey; label: string; solution: string }[] = [
   { key: 'build', label: 'Software Development', solution: 'operations' },
   { key: 'brand', label: 'Branding', solution: 'brand' },
-  { key: 'grow', label: 'Marketing & Lead Generation', solution: 'enquiries', subSolutions: { 'SEO & AI Search Visibility': 'visibility' } },
+  { key: 'grow', label: 'Marketing & Lead Generation', solution: 'enquiries' },
   { key: 'transform', label: 'AI & Business Automation', solution: 'automation' },
 ];
 const HIDE = new Set(['Growth & Transformation Consulting']);
-// the outcome each sub-service delivers (links to that sub-service's page)
-const subOutcome: Record<string, string> = {
-  'Custom Software Development': 'Software Built Around Your Workflow',
-  'Website & App Development': 'Websites That Turn Visitors Into Leads',
-  'SaaS & Digital Products': 'Launch Your Own Digital Product',
-  'Brand Strategy & Identity': 'A Clear, Memorable Brand Position',
-  'Creative Graphic Design': 'Visuals That Communicate Clearly',
-  'Content & Video Studio': 'Content People Watch and Share',
-  'Personal Branding': 'Become a Trusted Voice in Your Industry',
-  'Digital Marketing': 'An Always-On Brand Presence',
-  'Performance Marketing': 'Campaigns With Measurable Returns',
-  'E-commerce Marketing': 'More Online Sales and Repeat Buyers',
-  'Workflow & CRM Automation': 'Connected Workflows, Faster Follow-Ups',
-  'AI Inside Operations': 'Practical AI for Everyday Decisions',
-};
 type Row = { service: { label: string; href: string }; solution?: { label: string; href: string }; sub?: boolean };
 const pairs: Row[] = [
   { service: { label: 'All Services', href: '/services/' }, solution: { label: 'All Solutions', href: '/solutions/' } },
@@ -42,11 +27,11 @@ const pairs: Row[] = [
       .filter((d) => !HIDE.has(d.name))
       .map((d): Row => ({
         service: { label: d.name, href: subServicePath(g.key, d.name) },
-        solution: g.subSolutions?.[d.name]
-          ? sol(g.subSolutions[d.name])
-          : subOutcome[d.name]
-            ? { label: subOutcome[d.name], href: subServicePath(g.key, d.name) }
-            : undefined,
+        // each sub-service links to its own solution card on the Solutions page
+        solution: (() => {
+          const s = solutions.find((x) => x.service === d.name);
+          return s ? sol(s.key) : undefined;
+        })(),
         sub: true,
       })),
   ]),

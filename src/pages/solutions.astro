@@ -5,8 +5,26 @@ import Icon from '../components/Icon.astro';
 import Why from '../components/Why.astro';
 import PageCTA from '../components/PageCTA.astro';
 import { pillars, cases, entryPoints } from '../data/site';
-import { solutions, servicePath } from '../data/pages';
+import { solutions, servicePath, subServicePath, serviceDetails } from '../data/pages';
+import type { PillarKey } from '../data/site';
 const entryIcons = ['Search', 'CodeXml', 'Bot'];
+// grouped like the footer: each service's main solution, then one solution per sub-service
+const groupDefs: { key: PillarKey; main: string }[] = [
+  { key: 'build', main: 'operations' },
+  { key: 'brand', main: 'brand' },
+  { key: 'grow', main: 'enquiries' },
+  { key: 'transform', main: 'automation' },
+];
+const bySol = (k: string) => solutions.find((s) => s.key === k)!;
+const groups = groupDefs.map((g) => {
+  const subs = serviceDetails[g.key].map((d) => solutions.find((s) => s.service === d.name)).filter((s): s is (typeof solutions)[number] => !!s);
+  return { key: g.key, label: pillars.find((p) => p.key === g.key)!.label, items: [bySol(g.main), ...subs] };
+});
+const placed = new Set(groups.flatMap((g) => g.items.map((s) => s.key)));
+const rest = solutions.filter((s) => !placed.has(s.key));
+if (rest.length) groups.push({ key: 'transform', label: 'Growth Planning', items: rest });
+const ordered = groups.flatMap((g) => g.items.map((s) => ({ s, g })));
+const svcPillar = (name: string) => (Object.keys(serviceDetails) as PillarKey[]).find((k) => serviceDetails[k].some((d) => d.name === name))!;
 ---
 
 <Page
@@ -20,19 +38,22 @@ const entryIcons = ['Search', 'CodeXml', 'Bot'];
   crumbs={[{ label: 'Solutions' }]}
 >
   <nav slot="head" class="jump" aria-label="Jump to a solution" data-spy>
-    {solutions.map((s) => <a class="chip" href={`#${s.key}`}><LucideIcon name={s.icon} size={14} /> {s.title}</a>)}
+    {solutions.filter((s) => !s.service).map((s) => <a class="chip" href={`#${s.key}`}><LucideIcon name={s.icon} size={14} /> {s.title}</a>)}
   </nav>
 
   <section class="section theme-dark flip" data-theme="dark" aria-label="Solutions by business challenge">
     <div class="container sols">
       {
-        solutions.map((s, i) => {
+        ordered.map(({ s, g }, i) => {
           const proof = cases.find((c) => c.slug === s.caseSlug);
+          const first = g.items[0] === s;
           return (
+            <>
+            {first && <h2 class="sols__group" id={`sol-${g.label.toLowerCase().replace(/[^a-z]+/g, '-')}`}><span>{g.label}</span></h2>}
             <article class="sol pcard" id={s.key} data-reveal>
               <header class="sol__head">
                 <span class="ico-tile"><LucideIcon name={s.icon} size={24} /></span>
-                <span class="sol__n">0{i + 1}</span>
+                <span class="sol__n">{String(i + 1).padStart(2, '0')}</span>
                 <h2>{s.title}</h2>
                 <p class="sol__problem">{s.problem}</p>
               </header>
@@ -50,6 +71,7 @@ const entryIcons = ['Search', 'CodeXml', 'Bot'];
                 <div class="sol__svc">
                   <span class="sol__k">Services involved</span>
                   <span class="sol__links">
+                    {s.service && <a class="chip chip--svc" href={subServicePath(svcPillar(s.service), s.service)}>{s.service}</a>}
                     {s.pillars.map((k) => {
                       const p = pillars.find((x) => x.key === k)!;
                       return <a class="chip" href={servicePath(k)}>{p.label}</a>;
@@ -68,6 +90,7 @@ const entryIcons = ['Search', 'CodeXml', 'Bot'];
                 </a>
               </footer>
             </article>
+            </>
           );
         })
       }
@@ -117,6 +140,11 @@ const entryIcons = ['Search', 'CodeXml', 'Bot'];
   :global(:root[data-theme='light']) .jump .chip { background: rgba(255, 255, 255, 0.6); }
 
   .sols { display: grid; gap: 1.5rem; }
+  /* a heading line before each service's group of solutions */
+  .sols__group { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; font-family: var(--font-body); font-size: var(--fs-cap); font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-ink); scroll-margin-top: 110px; }
+  .sols__group:first-child { margin-top: 0; }
+  .sols__group::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(201, 149, 74, 0.45), transparent); }
+  .sol__links .chip--svc { border-color: rgba(201, 149, 74, 0.45); color: var(--ink); }
   .sol { display: grid; gap: 1.75rem; padding: clamp(1.5rem, 4vw, 2.75rem); scroll-margin-top: 110px; }
   .sol__head { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.5rem 1rem; }
   .sol__n { justify-self: end; font-family: var(--font-head); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; color: var(--gold-ink); }
