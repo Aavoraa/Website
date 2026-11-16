@@ -9,7 +9,7 @@ import PageCTA from '../components/PageCTA.astro';
 import Approach from '../components/Approach.astro';
 import Work from '../components/Work.astro';
 import FAQ from '../components/FAQ.astro';
-import { growthMethod, reasons, markets } from '../data/pages';
+import { growthMethod, startSteps, reasons, markets } from '../data/pages';
 const principles = [
   { icon: 'Network', title: 'No silos', text: 'Technology, brand, marketing and operations planned together — not by vendors who never talk to each other.' },
   { icon: 'Compass', title: 'No guesswork', text: 'Every engagement starts with an audit and a plan, and every result is measured against it.' },
@@ -71,6 +71,17 @@ const principles = [
         <p class="lead" data-reveal style="--d:2">A repeatable system — not random tactics — behind every result.</p>
       </header>
       <StepGrid items={growthMethod} />
+    </div>
+  </section>
+
+  <!-- How an engagement starts (moved here from the former Our Approach page) -->
+  <section class="section theme-dark section--alt flip" id="how-we-start" data-theme="dark" aria-labelledby="start-title">
+    <div class="container">
+      <header class="section-head section-head--center head-gap">
+        <p class="eyebrow" data-reveal>How We Start</p>
+        <h2 id="start-title" class="ph2" data-reveal style="--d:1">From Hello to Growth <span class="accent">in Five Moves.</span></h2>
+      </header>
+      <StepGrid items={startSteps} />
     </div>
   </section>
 

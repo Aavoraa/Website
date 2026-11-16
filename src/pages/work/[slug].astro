@@ -31,7 +31,7 @@ const story = [
   eyebrow={`Case Study · ${c.sector}`}
   heading={c.client}
   intro={c.outcome}
-  crumbs={[{ label: 'Our Work', href: '/work/' }, { label: c.client }]}
+  crumbs={[{ label: 'Blogs', href: '/insights/' }, { label: 'Case Studies', href: '/insights/#case-studies' }, { label: c.client }]}
 >
   <ul slot="head" class="tags">
     {c.services.map((s) => <li class="chip">{s}</li>)}
@@ -113,7 +113,7 @@ const story = [
           <>
             <div class="rel__head">
               <h2 class="ph2">Related <span class="accent">Work.</span></h2>
-              <a class="btn btn--outline" href="/work/">All Case Studies <Icon name="arrow" class="arrow" /></a>
+              <a class="btn btn--outline" href="/insights/#case-studies">All Case Studies <Icon name="arrow" class="arrow" /></a>
             </div>
             <ul class="rel">
               {related.map((r, k) => (
