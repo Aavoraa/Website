@@ -17,14 +17,18 @@ const groups: { key: PillarKey; label: string; solution: string }[] = [
   { key: 'grow', label: 'Marketing & Lead Generation', solution: 'enquiries' },
   { key: 'transform', label: 'AI & Business Automation', solution: 'automation' },
 ];
-const HIDE = new Set(['Growth & Transformation Consulting']);
-type Row = { service: { label: string; href: string }; solution?: { label: string; href: string }; sub?: boolean };
+const HIDE = new Set(['Growth & Transformation Consulting', 'SaaS & Digital Products', 'AI Inside Operations']);
+// services listed in the footer without their sub-services
+const NO_SUBS = new Set<PillarKey>(['brand']);
+// services that list only some of their sub-services in the footer
+const ONLY_SUBS: Partial<Record<PillarKey, string[]>> = { grow: ['SEO & AI Search Visibility'] };
+type Row = { service: { label: string; href: string }; solution?: { label: string; href: string } };
 const pairs: Row[] = [
   { service: { label: 'All Services', href: '/services/' }, solution: { label: 'All Solutions', href: '/solutions/' } },
   ...groups.flatMap((g): Row[] => [
     { service: { label: g.label, href: servicePath(g.key) }, solution: sol(g.solution) },
     ...serviceDetails[g.key]
-      .filter((d) => !HIDE.has(d.name))
+      .filter((d) => !HIDE.has(d.name) && !NO_SUBS.has(g.key) && (!ONLY_SUBS[g.key] || ONLY_SUBS[g.key]!.includes(d.name)))
       .map((d): Row => ({
         service: { label: d.name, href: subServicePath(g.key, d.name) },
         // each sub-service links to its own solution card on the Solutions page
@@ -32,7 +36,6 @@ const pairs: Row[] = [
           const s = solutions.find((x) => x.service === d.name);
           return s ? sol(s.key) : undefined;
         })(),
-        sub: true,
       })),
   ]),
 ];
@@ -58,8 +61,8 @@ const pairs: Row[] = [
           <h2>Solutions</h2>
           {pairs.map((p) => (
             <>
-              <a href={p.service.href} class:list={{ 'footer__sub': p.sub, 'footer__main': !p.sub }}>{p.service.label}</a>
-              {p.solution ? <a href={p.solution.href} class:list={{ 'footer__main': !p.sub, 'footer__subsol': p.sub }}>{p.solution.label}</a> : <span aria-hidden="true"></span>}
+              <a href={p.service.href}>{p.service.label}</a>
+              {p.solution ? <a href={p.solution.href}>{p.solution.label}</a> : <span aria-hidden="true"></span>}
             </>
           ))}
         </div>
@@ -111,16 +114,11 @@ const pairs: Row[] = [
   .footer__cols ul { display: grid; gap: 0.85rem; }
   /* Services | Solutions: two columns whose rows line up, so each service sits beside its solution */
   .footer__pairs { display: grid; grid-template-columns: max-content max-content; column-gap: clamp(1.25rem, 2.2vw, 2.25rem); row-gap: 0.85rem; align-content: start; }
-  .footer__pairs h2 { margin-bottom: 0; } /* + row gap + the first row's top margin = the other columns' heading gap */
+  /* one flat list: every row the same size and spacing as the Company column (0.25rem + 0.85rem row gap = its heading gap) */
+  .footer__pairs h2 { margin-bottom: 0.25rem; }
+  .footer__pairs { row-gap: 0.85rem; }
   /* the heading row lines up with the "AAVORAA" wordmark in the logo (logo 220px wide → wordmark centre ≈ 20px down) */
   @media (min-width: 1241px) { .footer__cols { padding-top: 14px; } }
-  /* sub-services sit indented under their service, a little smaller */
-  .footer__pairs .footer__sub { padding-left: 0.9rem; font-size: 0.82rem; position: relative; }
-  .footer__pairs .footer__sub::before { content: ''; position: absolute; left: 0.1rem; top: 0.6em; width: 5px; height: 1px; background: rgba(201, 149, 74, 0.6); }
-  .footer__pairs .footer__main { margin-top: 0.5rem; }
-  .footer__pairs .footer__subsol { font-size: 0.82rem; }
-  .footer__pairs a.footer__main:not([href^='/solutions']) { color: var(--ink); font-weight: 500; }
-  .footer__pairs { row-gap: 0.6rem; }
   .footer__cols a, .footer__cols span { font-size: 0.875rem; line-height: 1.4; color: var(--text-dark-muted); transition: color 0.3s; white-space: nowrap; }
   .footer__cols a:hover { color: var(--ink); }
   .footer__contact li { display: flex; gap: 0.65rem; align-items: center; }
