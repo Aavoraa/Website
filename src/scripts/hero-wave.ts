@@ -147,17 +147,16 @@ function initInteractions(hero: HTMLElement, canvas: HTMLCanvasElement | null, r
     return [((e.clientX - c.left) / c.width) * 2 - 1, 1 - ((e.clientY - c.top) / c.height) * 2];
   };
 
-  hero.addEventListener('pointermove', (e) => {
-    const r = hero.getBoundingClientRect();
-    state.tmx = ((e.clientX - r.left) / r.width) * 2 - 1;
-    state.tmy = ((e.clientY - r.top) / r.height) * 2 - 1;
+  window.addEventListener('pointermove', (e) => {
+    state.tmx = (e.clientX / window.innerWidth) * 2 - 1;
+    state.tmy = (e.clientY / window.innerHeight) * 2 - 1;
     [state.nx, state.ny] = toNdc(e);
     state.tptr = 1;
   }, { passive: true });
-  hero.addEventListener('pointerleave', () => { state.tmx = 0; state.tmy = 0; state.tptr = 0; });
+  document.documentElement.addEventListener('pointerleave', () => { state.tmx = 0; state.tmy = 0; state.tptr = 0; });
 
-  hero.addEventListener('pointerdown', (e) => {
-    if ((e.target as HTMLElement).closest('a, button') || !canvas) return;
+  window.addEventListener('pointerdown', (e) => {
+    if ((e.target as Element | null)?.closest?.('a, button, input, textarea, select, label, summary, [role="button"], .chat') || !canvas) return;
     const [x, y] = toNdc(e);
     state.ripples.push({ x, y, t: state.clock() });
     if (state.ripples.length > 4) state.ripples.shift();
@@ -196,6 +195,16 @@ export function initHeroWave() {
   const state = initInteractions(hero, canvas, reduce);
   const fallback = () => hero.classList.add('no-gl');
   if (!canvas || reduce) return fallback();
+
+  // The waves become a fixed layer behind the whole page, so they stay in view while scrolling
+  const bloomEl = hero.querySelector<HTMLCanvasElement>('[data-hero-bloom]');
+  const layer = document.createElement('div');
+  layer.className = 'wave-bg';
+  layer.setAttribute('aria-hidden', 'true');
+  layer.append(canvas);
+  if (bloomEl) layer.append(bloomEl);
+  document.body.prepend(layer);
+  document.documentElement.classList.add('waves-on');
 
   const gl = canvas.getContext('webgl', { antialias: true, alpha: false, powerPreference: 'low-power' });
   if (!gl) return fallback();
@@ -265,7 +274,7 @@ export function initHeroWave() {
     { seed: 0.0, width: 0.74, yOff: -0.6, scale: 1.0, bright: 0.8 },
   ];
   // Bloom: a quarter-resolution copy of each frame, blurred and screen-blended by CSS
-  const bloom = hero.querySelector<HTMLCanvasElement>('[data-hero-bloom]');
+  const bloom = bloomEl;
   // Blur happens at low resolution inside the 2D context (smooth when scaled up); skip bloom if unsupported
   let bctx = bloom?.getContext('2d') || null;
   if (bctx && !('filter' in bctx)) {
@@ -275,7 +284,7 @@ export function initHeroWave() {
 
   const rip = new Float32Array(16);
   const start = state.clock();
-  let visible = true;
+  const visible = true; // always on screen now (fixed layer); paused only when the tab is hidden
   let raf = 0;
   let shown = false;
 
@@ -340,13 +349,13 @@ export function initHeroWave() {
     if (!shown) {
       shown = true;
       hero.classList.add('gl-live');
+      layer.classList.add('gl-live');
     }
     if (visible && !document.hidden) raf = requestAnimationFrame(frame);
   };
   const play = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); };
 
-  new IntersectionObserver(([e]) => { visible = e.isIntersecting; play(); }).observe(hero);
   document.addEventListener('visibilitychange', play);
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); cancelAnimationFrame(raf); fallback(); });
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); cancelAnimationFrame(raf); layer.remove(); document.documentElement.classList.remove('waves-on'); fallback(); });
   play();
 }
