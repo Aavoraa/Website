@@ -153,6 +153,9 @@ const pairs: Row[] = [
     padding-top: 1.5rem; border-top: 1px solid var(--line-dark-soft); font-size: 0.8rem; color: var(--text-dark-faint);
   }
   .footer__bottom ul { display: flex; gap: 1.5rem; }
+  /* keep the bottom row clear of the fixed "Chat with us" launcher (bottom-right) */
+  @media (min-width: 641px) { .footer__bottom { padding-right: 240px; } }
+  @media (max-width: 640px) { .footer { padding-bottom: 6.5rem; } }
   .footer__bottom a:hover { color: var(--ink); }
   @media (max-width: 1240px) {
     .footer__top { grid-template-columns: 1fr; }
