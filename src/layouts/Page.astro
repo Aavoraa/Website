@@ -21,10 +21,13 @@ const { title, description, path, eyebrow, heading, accent, intro, noindex, crum
 <Base title={title} description={description} path={path} noindex={noindex}>
   <Nav />
   <main id="main">
-    <header class="phead theme-dark flip" data-theme="dark">
+    <header class="phead theme-dark flip" data-theme="dark" data-wave>
       <div class="phead__bg" aria-hidden="true">
         <img class="only-dark" src="/images/hero-ribbon.webp" alt="" width="2400" height="1400" decoding="async" />
         <img class="only-light" src="/images/hero-ribbon-light.webp" alt="" width="2400" height="1400" decoding="async" />
+        <!-- the same live gold waves as the homepage hero (scripts/hero-wave.ts) -->
+        <canvas data-hero-canvas></canvas>
+        <canvas class="phead__bloom" data-hero-bloom></canvas>
       </div>
       <div class="depth" aria-hidden="true">
         <i class="d-orb" data-parallax="0.35" style="--k:0; width:420px; height:420px; left:-6%; top:12%"></i>
@@ -64,12 +67,21 @@ const { title, description, path, eyebrow, heading, accent, intro, noindex, crum
   .phead__bg { position: absolute; inset: 0; z-index: -1; }
   .phead__bg img { position: absolute; inset: auto 0 0; width: 100%; height: 150%; object-fit: cover; object-position: 50% 100%; opacity: 0.55;
     translate: 0 calc(var(--hp, 0) * 45%); scale: calc(1 + var(--hp, 0) * 0.08); } /* background lags behind the page */
-  .phead__bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10, 9, 9, 0.85), rgba(10, 9, 9, 0.55) 60%, var(--black)); }
+  .phead__bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 0.6s var(--ease); }
+  .phead__bg .phead__bloom { mix-blend-mode: screen; filter: brightness(1.5); }
+  :global(.gl-live) .phead__bg canvas { opacity: 1; }
+  :global(.gl-live) .phead__bg .phead__bloom { opacity: 0.6; }
+  :global(.gl-live) .phead__bg img { opacity: 0; }
+  :global(.no-gl) .phead__bg canvas { display: none; }
+  /* veil: keeps the heading readable while the waves stay visible lower down */
+  .phead__bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 50% at 50% 38%, rgba(10, 9, 9, 0.78), rgba(10, 9, 9, 0.35) 60%, transparent 80%), linear-gradient(to bottom, rgba(10, 9, 9, 0.55), transparent 40%, transparent 85%, var(--black)); }
   .phead__content { display: grid; gap: 1.25rem; justify-items: center; text-align: center; }
   .phead h1 { font-size: clamp(2.4rem, 1.4rem + 4vw, 4.6rem); letter-spacing: -0.035em; max-width: 15em; }
   .phead h1 .accent { display: block; }
   .phead .lead { max-width: 42rem; }
 
   :global(:root[data-theme='light']) .phead { background: var(--ivory); }
-  :global(:root[data-theme='light']) .phead__bg::after { background: linear-gradient(to bottom, rgba(244, 240, 232, 0.85), rgba(244, 240, 232, 0.5) 60%, var(--ivory)); }
+  :global(:root[data-theme='light']) .phead__bg::after { background: radial-gradient(ellipse 55% 50% at 50% 38%, rgba(244, 240, 232, 0.88), rgba(244, 240, 232, 0.45) 60%, transparent 80%), linear-gradient(to bottom, rgba(244, 240, 232, 0.55), transparent 40%, transparent 85%, var(--ivory)); }
+  :global(:root[data-theme='light']) .phead__bg .phead__bloom { mix-blend-mode: multiply; filter: none; }
+  :global(:root[data-theme='light']) :global(.gl-live) .phead__bg .phead__bloom { opacity: 0.08; }
 </style>

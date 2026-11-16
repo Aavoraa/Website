@@ -37,7 +37,7 @@ const data = {
 <div class="cb" data-chatbot data-no-snap>
   <button class="cb__launch" type="button" aria-expanded="false" aria-controls="cb-panel" data-cb-toggle>
     <span class="cb__launch-ico cb__launch-ico--open" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-5.1A8 8 0 1 1 21 12Z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="2.4"/></svg>
+      <img src="/brand/aavoraa-mark-gold.png" alt="" width="400" height="300" />
     </span>
     <span class="cb__launch-ico cb__launch-ico--close" aria-hidden="true">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
@@ -48,7 +48,7 @@ const data = {
 
   <section class="cb__panel" id="cb-panel" role="dialog" aria-modal="false" aria-labelledby="cb-title" hidden data-cb-panel>
     <header class="cb__head">
-      <span class="cb__avatar" aria-hidden="true">A</span>
+      <span class="cb__avatar" aria-hidden="true"><img src="/brand/aavoraa-mark-gold.png" alt="" width="400" height="300" /></span>
       <div class="cb__who">
         <h2 id="cb-title">Aavo · AAVORAA Assistant</h2>
         <p><i aria-hidden="true"></i> Typically replies instantly</p>
@@ -94,6 +94,10 @@ const data = {
   }
   .cb__launch:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(201, 149, 74, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.2) inset; }
   .cb__launch-ico { display: grid; place-items: center; }
+  /* the AAVORAA monogram sits on a dark disc inside the gold launcher */
+  .cb__launch-ico--open { width: 36px; height: 36px; border-radius: 50%; background: #0d0b0a; box-shadow: inset 0 0 0 1px rgba(226, 189, 132, 0.35); }
+  .cb__launch-ico--open img { width: 24px; height: auto; display: block; }
+  .cb__launch { padding-left: 0.55rem; }
   .cb__launch-ico--close, .cb.is-open .cb__launch-ico--open { display: none; }
   .cb.is-open .cb__launch-ico--close { display: grid; }
   .cb.is-open .cb__launch { width: 54px; padding: 0; justify-content: center; }
@@ -114,7 +118,8 @@ const data = {
   @keyframes cb-in { from { opacity: 0; transform: translateY(12px) scale(0.96); } }
 
   .cb__head { display: flex; align-items: center; gap: 0.75rem; padding: 0.95rem 0.9rem 0.95rem 1.1rem; background: linear-gradient(180deg, rgba(201, 149, 74, 0.16), rgba(201, 149, 74, 0.02)); border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
-  .cb__avatar { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; font-family: var(--font-head); font-weight: 700; font-size: 1.1rem; color: var(--black); background: linear-gradient(135deg, #e2bd84, #c9954a); }
+  .cb__avatar { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: #0d0b0a; border: 1px solid rgba(201, 149, 74, 0.45); box-shadow: 0 0 18px -6px rgba(201, 149, 74, 0.6); }
+  .cb__avatar img { width: 28px; height: auto; display: block; }
   .cb__who { flex: 1; min-width: 0; }
   .cb__who h2 { font-size: 0.95rem; font-weight: 600; letter-spacing: 0; line-height: 1.2; color: #fff; }
   .cb__who p { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.15rem; font-size: 0.75rem; color: rgba(255, 255, 255, 0.55); }

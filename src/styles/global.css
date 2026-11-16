@@ -367,23 +367,8 @@ p { text-wrap: pretty; }
 
 /* cursor spotlight on cards */
 :where(.has-spot) { position: relative; }
-.spot {
-  position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none;
-  /* bright gold light that follows the cursor (screen blend lightens without hiding the text) */
-  background: radial-gradient(340px circle at var(--sx, 50%) var(--sy, 50%), rgba(255, 218, 155, 0.48), rgba(232, 176, 96, 0.2) 38%, transparent 64%);
-  mix-blend-mode: screen;
-  opacity: 0; transition: opacity 0.45s var(--ease);
-}
-/* a bright gold edge on the card border nearest the cursor */
-.spot::after {
-  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-  background: radial-gradient(200px circle at var(--sx, 50%) var(--sy, 50%), rgba(255, 226, 170, 1), rgba(226, 170, 90, 0.45) 40%, transparent 70%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-}
-.has-spot:hover > .spot { opacity: 1; }
-:root[data-theme='light'] .spot { mix-blend-mode: normal; background: radial-gradient(340px circle at var(--sx, 50%) var(--sy, 50%), rgba(201, 149, 74, 0.22), rgba(201, 149, 74, 0.08) 38%, transparent 62%); }
-:root[data-theme='light'] .spot::after { background: radial-gradient(200px circle at var(--sx, 50%) var(--sy, 50%), rgba(176, 116, 44, 0.95), rgba(201, 149, 74, 0.35) 40%, transparent 70%); }
+/* (cursor spotlight removed — .has-spot is still added to cards for the icon glow) */
+.spot { display: none; }
 
 /* lists stagger in */
 .js .stagger > * { opacity: 0; transform: translate3d(-10px, 0, 0); transition: opacity 0.6s var(--ease), transform 0.7s var(--ease); transition-delay: calc(var(--i, 0) * 70ms + 150ms); }
@@ -399,8 +384,7 @@ p { text-wrap: pretty; }
 /* on-page navigation highlights the section in view */
 [data-spy] a { transition: color 0.3s, border-color 0.3s, background-color 0.3s; }
 
-/* page header eases up as you scroll away */
-.phead__content { transform: translate3d(0, calc(var(--hp, 0) * -70px), 0); opacity: calc(1 - var(--hp, 0) * 1.1); }
+
 
 /* a jumped-to card glows briefly */
 @keyframes target-glow {
@@ -452,32 +436,6 @@ html.has-lenis { scroll-behavior: auto !important; }
 :root[data-theme='light'] .depth .d-orb { background: radial-gradient(circle, rgba(201, 149, 74, 0.22), rgba(201, 149, 74, 0) 70%); }
 @media (prefers-reduced-motion: reduce) { .gx, [data-parallax] { translate: none; scale: none; } .depth i { animation: none; } }
 
-/* ---------- Text glow: regular text the cursor touches glows gold (pointer devices only) ----------
-   Headings and other large display text are skipped (the glow looks heavy on big type).
-   Limited to text-level elements so whole cards and buttons don't light up as boxes. */
-@media (hover: hover) and (pointer: fine) {
-  :where(p, blockquote, figcaption, dt, dd, label, th, td, small, strong, em,
-    li:not(:has(div, article, section, a, p, h2, h3, h4, img, ul, ol, button, svg)),
-    span:not(:has(div, p, img, ul, h2, h3, svg)),
-    a:not(:has(div, p, img, h2, h3, h4, ul, svg, span))):not(:is(h1, h2, h3, h4, h5, h6) *, .accent, [class*='value'], .pa__label) {
-    transition: filter 0.35s var(--ease), color 0.35s var(--ease);
-  }
-  :where(p, blockquote, figcaption, dt, dd, label, th, td, small, strong, em,
-    li:not(:has(div, article, section, a, p, h2, h3, h4, img, ul, ol, button, svg)),
-    span:not(:has(div, p, img, ul, h2, h3, svg)),
-    a:not(:has(div, p, img, h2, h3, h4, ul, svg, span))):not(:is(h1, h2, h3, h4, h5, h6) *, .accent, [class*='value'], .pa__label):hover {
-    /* bright: the text warms to near-white and gets a strong gold halo */
-    color: #fff3dc;
-    filter: drop-shadow(0 0 7px rgba(255, 214, 150, 0.95)) drop-shadow(0 0 20px rgba(236, 180, 100, 0.65));
-  }
-  :root[data-theme='light'] :where(p, blockquote, figcaption, dt, dd, label, th, td, small, strong, em,
-    li:not(:has(div, article, section, a, p, h2, h3, h4, img, ul, ol, button, svg)),
-    span:not(:has(div, p, img, ul, h2, h3, svg)),
-    a:not(:has(div, p, img, h2, h3, h4, ul, svg, span))):not(:is(h1, h2, h3, h4, h5, h6) *, .accent, [class*='value'], .pa__label):hover {
-    color: var(--gold-deep);
-    filter: drop-shadow(0 0 6px rgba(201, 149, 74, 0.6)) drop-shadow(0 0 14px rgba(201, 149, 74, 0.3));
-  }
-}
 
 /* ---------- Desktop "one section per screen" (class set by fitScreens in cinematic.ts) ---------- */
 :root.fit-screens main > :is(section, header, [data-fit-group]):not([data-hero]):not(.pin-spacer):not([data-no-fit]) {

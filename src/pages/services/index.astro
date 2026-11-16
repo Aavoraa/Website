@@ -7,7 +7,7 @@ import Tools from '../../components/Tools.astro';
 import PageCTA from '../../components/PageCTA.astro';
 import { pillars } from '../../data/site';
 import PillarArt from '../../components/PillarArt.astro';
-import { serviceDetails, servicePath, subServicePath, subSlug, startSteps } from '../../data/pages';
+import { serviceDetails, servicePath, subServicePath, startSteps } from '../../data/pages';
 ---
 
 <Page
@@ -42,13 +42,6 @@ import { serviceDetails, servicePath, subServicePath, subSlug, startSteps } from
                       <span>{d.name}</span>
                       <LucideIcon name="ArrowUpRight" size={16} class="svc__go" />
                     </a>
-                    {d.children && (
-                      <ul class="svc__kids">
-                        {d.children.map((c) => (
-                          <li><a href={`${subServicePath(p.key, d.name)}${subSlug(c.name)}/`}>{c.name}</a></li>
-                        ))}
-                      </ul>
-                    )}
                   </li>
                 ))}
               </ul>
@@ -73,14 +66,17 @@ import { serviceDetails, servicePath, subServicePath, subSlug, startSteps } from
     </div>
   </section>
 
-  <Tools />
-
-  <PageCTA
-    title="Not Sure Where to Start?"
-    accent="Start With a Conversation."
-    text="Many engagements begin with a single need — a website, a brand or one automation. We’ll help you decide what will move the business first."
-    location="services_page"
-  />
+  <!-- Tools + closing band share one screen (see fitScreens in cinematic.ts) -->
+  <div class="fit-group theme-dark" data-theme="dark" data-fit-group>
+    <Tools />
+  
+    <PageCTA
+      title="Not Sure Where to Start?"
+      accent="Start With a Conversation."
+      text="Many engagements begin with a single need — a website, a brand or one automation. We’ll help you decide what will move the business first."
+      location="services_page"
+    />
+  </div>
 </Page>
 
 <style>
@@ -102,9 +98,6 @@ import { serviceDetails, servicePath, subServicePath, subSlug, startSteps } from
   .svc__sub :global(svg) { color: var(--gold-ink); }
   .svc__sub :global(.svc__go) { opacity: 0.45; transition: opacity 0.3s, transform 0.4s var(--ease); }
   .svc__sub:hover :global(.svc__go) { opacity: 1; transform: translate(2px, -2px); }
-  .svc__kids { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0 0.85rem 1.85rem; }
-  .svc__kids a { display: inline-block; padding: 0.32rem 0.7rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; background: rgba(201, 149, 74, 0.08); border: 1px solid rgba(201, 149, 74, 0.22); color: var(--ink); transition: background-color 0.3s, border-color 0.3s; }
-  .svc__kids a:hover { background: rgba(201, 149, 74, 0.16); border-color: rgba(201, 149, 74, 0.5); }
   @media (max-width: 900px) {
     .svc { grid-template-columns: 1fr; }
     .svc--rev .svc__media { order: 0; }
